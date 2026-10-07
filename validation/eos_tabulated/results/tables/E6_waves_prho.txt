@@ -1,0 +1,25 @@
+S1 rho 1e-18 g/cc T 10 K  Gamma1 1.6679  cs 1.2795
+   E6_wave_S1_n64           L1/amp 5.578e-02  amplitude kept 0.99830  phase-speed error -1.33e-02  order 0.07
+   E6_wave_S1_n256          L1/amp 5.608e-02  amplitude kept 1.00008  phase-speed error -1.40e-02  order -0.01
+   E6_wave_S1_n64_prho      L1/amp 7.584e-03  amplitude kept 0.99818  phase-speed error +1.23e-04  order 2.89
+   E6_wave_S1_n256_prho     L1/amp 2.634e-03  amplitude kept 0.99997  phase-speed error -5.94e-04  order 1.53
+S2 rho 1e-15 g/cc T 100 K  Gamma1 1.5974  cs 3.9609
+   E6_wave_S2_n64           L1/amp 3.448e-02  amplitude kept 0.99821  phase-speed error -7.80e-03  order 0.16
+   E6_wave_S2_n256          L1/amp 3.422e-02  amplitude kept 1.00000  phase-speed error -8.53e-03  order -0.00
+   E6_wave_S2_n64_prho      L1/amp 8.834e-03  amplitude kept 0.99818  phase-speed error +5.63e-04  order 1.95
+   E6_wave_S2_n256_prho     L1/amp 9.494e-04  amplitude kept 0.99997  phase-speed error -1.54e-04  order 3.22
+S3 rho 1e-12 g/cc T 500 K  Gamma1 1.4281  cs 8.3758
+   E6_wave_S3_n64           L1/amp 1.928e-02  amplitude kept 0.99819  phase-speed error -3.89e-03  order 0.64
+   E6_wave_S3_n256          L1/amp 1.862e-02  amplitude kept 0.99998  phase-speed error -4.61e-03  order 0.00
+   E6_wave_S3_n64_prho      L1/amp 7.866e-03  amplitude kept 0.99818  phase-speed error -5.19e-04  order 1.24
+   E6_wave_S3_n256_prho     L1/amp 5.172e-03  amplitude kept 0.99997  phase-speed error -1.24e-03  order 0.60
+S4 rho 1e-09 g/cc T 2000 K  Gamma1 1.1011  cs 15.328
+   E6_wave_S4_n64           L1/amp 1.406e-02  amplitude kept 0.99819  phase-speed error +2.29e-03  order 1.39
+   E6_wave_S4_n256          L1/amp 6.453e-03  amplitude kept 0.99997  phase-speed error +1.57e-03  order 0.29
+   E6_wave_S4_n64_prho      L1/amp 8.775e-03  amplitude kept 0.99818  phase-speed error -8.72e-04  order -0.44
+   E6_wave_S4_n256_prho     L1/amp 6.581e-03  amplitude kept 0.99997  phase-speed error -1.59e-03  order 0.42
+S5 rho 1e-08 g/cc T 10000 K  Gamma1 1.1448  cs 50.235
+   E6_wave_S5_n64           L1/amp 2.695e-02  amplitude kept 0.99820  phase-speed error +6.23e-03  order 0.77
+   E6_wave_S5_n256          L1/amp 2.198e-02  amplitude kept 0.99997  phase-speed error +5.51e-03  order 0.05
+   E6_wave_S5_n64_prho      L1/amp 8.018e-03  amplitude kept 0.99818  phase-speed error +2.81e-04  order 1.45
+   E6_wave_S5_n256_prho     L1/amp 2.023e-03  amplitude kept 0.99997  phase-speed error -4.36e-04  order 1.99

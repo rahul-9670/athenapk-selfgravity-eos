@@ -1,0 +1,30 @@
+L9 nj4: t=2.2083 rho_max=9.118e+01 peaks(>1000, rsep 0.1)=0 max level 1 top: 
+L9 nj4: t=2.2531 rho_max=1.792e+02 peaks(>1000, rsep 0.1)=0 max level 2 top: 
+L9 nj4: t=2.3029 rho_max=3.281e+02 peaks(>1000, rsep 0.1)=0 max level 2 top: 
+L9 nj4: t=2.3512 rho_max=8.326e+02 peaks(>1000, rsep 0.1)=0 max level 3 top: 
+L9 nj4: t=2.4005 rho_max=3.262e+03 peaks(>1000, rsep 0.1)=2 max level 4 sep(1-2) 0.8286 top: (+0.059,-0.410,-0.012;3.26e+03) (-0.059,+0.410,-0.012;3.26e+03)
+L9 nj4: t=2.4501 rho_max=8.183e+05 peaks(>1000, rsep 0.1)=6 max level 7 sep(1-2) 0.6893 top: (+0.110,-0.327,-0.001;8.18e+05) (-0.110,+0.327,-0.001;8.18e+05) (+0.057,-0.183,-0.001;3.96e+05) (-0.057,+0.183,-0.001;3.96e+05)
+L9 nj8: t=2.1521 rho_max=1.603e+02 peaks(>1000, rsep 0.1)=0 max level 3 top: 
+L9 nj8: t=2.2025 rho_max=3.641e+02 peaks(>1000, rsep 0.1)=0 max level 3 top: 
+L9 nj8: t=2.2505 rho_max=7.281e+02 peaks(>1000, rsep 0.1)=0 max level 4 top: 
+L9 nj8: t=2.3005 rho_max=6.274e+02 peaks(>1000, rsep 0.1)=0 max level 4 top: 
+L9 nj8: t=2.3507 rho_max=9.462e+02 peaks(>1000, rsep 0.1)=0 max level 4 top: 
+L9 nj8: t=2.4001 rho_max=5.999e+03 peaks(>1000, rsep 0.1)=2 max level 5 sep(1-2) 0.8188 top: (+0.064,-0.404,-0.006;6.00e+03) (-0.064,+0.404,-0.006;6.00e+03)
+L10 mu120: t=1.2512 rho_max=1.315e+02 peaks(>100000, rsep 0.08)=0 max level 3 top: 
+L10 mu120: t=1.3007 rho_max=2.210e+02 peaks(>100000, rsep 0.08)=0 max level 4 top: 
+L10 mu120: t=1.3507 rho_max=4.147e+02 peaks(>100000, rsep 0.08)=0 max level 4 top: 
+L10 mu120: t=1.4005 rho_max=1.007e+03 peaks(>100000, rsep 0.08)=0 max level 5 top: 
+L10 mu120: t=1.4505 rho_max=5.203e+03 peaks(>100000, rsep 0.08)=0 max level 6 top: 
+L10 mu120: t=1.5000 rho_max=2.470e+08 peaks(>100000, rsep 0.08)=1 max level 9 top: (-0.039,+1.569,+7.051;2.47e+08)
+L10 mu2: t=1.5515 rho_max=9.610e+01 peaks(>100000, rsep 0.08)=0 max level 2 top: 
+L10 mu2: t=1.6011 rho_max=1.644e+02 peaks(>100000, rsep 0.08)=0 max level 3 top: 
+L10 mu2: t=1.6512 rho_max=2.996e+02 peaks(>100000, rsep 0.08)=0 max level 3 top: 
+L10 mu2: t=1.7000 rho_max=6.819e+02 peaks(>100000, rsep 0.08)=0 max level 4 top: 
+L10 mu2: t=1.7504 rho_max=2.269e+03 peaks(>100000, rsep 0.08)=0 max level 5 top: 
+L10 mu2: t=1.8000 rho_max=1.567e+04 peaks(>100000, rsep 0.08)=0 max level 6 top: 
+L10 mu5: t=1.3524 rho_max=1.472e+02 peaks(>100000, rsep 0.08)=0 max level 3 top: 
+L10 mu5: t=1.4005 rho_max=2.378e+02 peaks(>100000, rsep 0.08)=0 max level 3 top: 
+L10 mu5: t=1.4518 rho_max=4.921e+02 peaks(>100000, rsep 0.08)=0 max level 4 top: 
+L10 mu5: t=1.5001 rho_max=1.060e+03 peaks(>100000, rsep 0.08)=0 max level 4 top: 
+L10 mu5: t=1.5505 rho_max=2.898e+03 peaks(>100000, rsep 0.08)=0 max level 5 top: 
+L10 mu5: t=1.6001 rho_max=6.215e+04 peaks(>100000, rsep 0.08)=0 max level 7 top: 

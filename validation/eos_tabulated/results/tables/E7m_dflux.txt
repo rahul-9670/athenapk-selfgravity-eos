@@ -1,0 +1,20 @@
+(1) pure moving contact: L1 / max |P/P*-1|   [standard PLM]   | energy: (E_dflux - E_std)/E_std
+R4_ionization    N   400: 9.46e-15 / 2.6e-14   [2.84e-03 / 4.2e-02]   | dE/E +2.35e-03
+R4_ionization    N   800: 1.02e-14 / 3.0e-14   [1.75e-03 / 3.7e-02]   | dE/E +1.45e-03
+R4_ionization    N  1600: 1.36e-14 / 5.7e-14   [1.07e-03 / 3.2e-02]   | dE/E +8.94e-04
+R2_dissociation  N   400: 2.79e-15 / 3.3e-14   [7.72e-04 / 1.1e-02]   | dE/E +1.13e-03
+R2_dissociation  N   800: 2.61e-15 / 1.8e-14   [4.84e-04 / 9.6e-03]   | dE/E +7.05e-04
+R2_dissociation  N  1600: 2.50e-15 / 2.4e-14   [3.04e-04 / 8.3e-03]   | dE/E +4.42e-04
+R1_molecular     N   400: 1.30e-15 / 7.3e-15   [5.05e-06 / 3.4e-05]   | dE/E -2.69e-06
+R1_molecular     N   800: 1.33e-15 / 1.1e-14   [3.45e-06 / 3.2e-05]   | dE/E -1.02e-06
+R1_molecular     N  1600: 1.87e-15 / 1.6e-14   [3.16e-06 / 2.2e-05]   | dE/E -3.48e-08
+(2) Riemann: plateau P* error and L1(rho) vs exact   [standard PLM]   | energy (E_dflux - E_std)/E_std
+R4_ionization    N   400: dP* +4.52e-03  L1 1.03e-02   [dP* -1.79e-03  L1 5.44e-03]   | dE/E +5.00e-03
+R4_ionization    N   800: dP* +4.22e-03  L1 8.25e-03   [dP* -1.11e-03  L1 3.12e-03]   | dE/E +4.21e-03
+R4_ionization    N  1600: dP* +4.10e-03  L1 7.20e-03   [dP* -8.72e-04  L1 1.82e-03]   | dE/E +3.76e-03
+R2_dissociation  N   400: dP* +8.10e-04  L1 5.66e-03   [dP* -5.20e-04  L1 4.20e-03]   | dE/E +1.41e-03
+R2_dissociation  N   800: dP* +1.85e-04  L1 3.95e-03   [dP* -3.77e-04  L1 2.38e-03]   | dE/E +9.04e-04
+R2_dissociation  N  1600: dP* +1.20e-04  L1 3.06e-03   [dP* -2.59e-04  L1 1.35e-03]   | dE/E +6.27e-04
+R1_molecular     N   400: dP* -1.57e-03  L1 1.44e-03   [dP* +3.95e-05  L1 1.43e-03]   | dE/E -9.95e-04
+R1_molecular     N   800: dP* -1.59e-03  L1 8.13e-04   [dP* +4.72e-06  L1 7.21e-04]   | dE/E -9.74e-04
+R1_molecular     N  1600: dP* -1.59e-03  L1 5.35e-04   [dP* +1.25e-06  L1 3.73e-04]   | dE/E -9.63e-04

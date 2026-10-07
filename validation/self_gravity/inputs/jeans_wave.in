@@ -1,0 +1,84 @@
+<comment>
+problem = Linear Jeans wave / instability (SG-D1..D3); Athena++ grav/jeans_3d.py,
+          unstable_jeans_3d_mg.py; Tomida and Stone 2023 Sec. 4.3. four_pi_G is set per run on
+          the CLI from n_J (scripts/sg_suite.py). Periodic box -> swindle, default BCs.
+
+<job>
+problem_id = jeans_wave
+
+<problem/jeans_wave>
+amp = 1.0e-6
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = none
+multigrid  = true
+nx1    = 64
+x1min  = 0.0
+x1max  = 1.0
+ix1_bc = periodic
+ox1_bc = periodic
+nx2    = 32
+x2min  = 0.0
+x2max  = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3    = 32
+x3min  = 0.0
+x3max  = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 16
+nx3 = 16
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.3
+tlim       = 1.0
+nlim       = -1
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.6666666666666667
+riemann        = hlld   # production solver (artemis/Athena++ references use HLLC)
+reconstruction = plm
+
+<parthenon/output0>
+file_type = hdf5
+dt        = 1.0e30
+variables = prim
+
+<parthenon/output1>
+file_type = hst
+dt        = 1.0e-3
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 1.0
+use_swindle        = true
+packed_bc          = true
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

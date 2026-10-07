@@ -1,0 +1,126 @@
+{
+ "r4|R2_dissociation": {
+  "table": "$REPO/validation/eos_tabulated/runs/E7g_tables/eos_table_v5cold_r4.bin",
+  "L": [
+   1829156758.7342236,
+   0.0,
+   5332.933141345078
+  ],
+  "R": [
+   182915675.87342235,
+   0.0,
+   217.40715541069937
+  ],
+  "P": 249617795529.0151,
+  "u": 32.80557644925928,
+  "tlim": 0.010360493958934739,
+  "vmax": 38.608197793025674,
+  "L_T": 4000.0,
+  "R_T": 1000.0,
+  "Lstar": {
+   "rho": 552814098.3215377,
+   "tail": 9.884298583303899,
+   "head": -34.59471801478805,
+   "type": "rarefaction"
+  },
+  "Rstar": {
+   "rho": 1217043845.3911254,
+   "S": 38.608197793025674,
+   "type": "shock"
+  },
+  "what": "shock tube with a partially dissociated driver (rarefaction through recombination)"
+ },
+ "r4|R4_ionization": {
+  "table": "$REPO/validation/eos_tabulated/runs/E7g_tables/eos_table_v5cold_r4.bin",
+  "L": [
+   18291567587.342236,
+   0.0,
+   50927.54065527361
+  ],
+  "R": [
+   1829156758.7342236,
+   0.0,
+   5959.547958698264
+  ],
+  "P": 34926652097828.27,
+  "u": 125.97089866420782,
+  "tlim": 0.002797495716895197,
+  "vmax": 142.9850267810027,
+  "L_T": 30000.0,
+  "R_T": 6000.0,
+  "Lstar": {
+   "rho": 5698018902.809476,
+   "tail": 37.54662835871933,
+   "head": -133.35152970012703,
+   "type": "rarefaction"
+  },
+  "Rstar": {
+   "rho": 15372050000.96895,
+   "S": 142.9850267810027,
+   "type": "shock"
+  },
+  "what": "shock tube with an ionized driver (rarefaction through H recombination)"
+ },
+ "x2|R2_dissociation": {
+  "table": "$REPO/validation/eos_tabulated/runs/E7g_tables/eos_table_v5cold_x2.bin",
+  "L": [
+   1829156758.7342236,
+   0.0,
+   5332.921974866646
+  ],
+  "R": [
+   182915675.87342235,
+   0.0,
+   217.4036963226516
+  ],
+  "P": 249550600186.08667,
+  "u": 32.800470718240824,
+  "tlim": 0.010361861987918669,
+  "vmax": 38.603100530230655,
+  "L_T": 4000.0,
+  "R_T": 1000.0,
+  "Lstar": {
+   "rho": 552831492.6448041,
+   "tail": 9.834959244787044,
+   "head": -34.583515924493256,
+   "type": "rarefaction"
+  },
+  "Rstar": {
+   "rho": 1216881388.7983365,
+   "S": 38.603100530230655,
+   "type": "shock"
+  },
+  "what": "shock tube with a partially dissociated driver (rarefaction through recombination)"
+ },
+ "x2|R4_ionization": {
+  "table": "$REPO/validation/eos_tabulated/runs/E7g_tables/eos_table_v5cold_x2.bin",
+  "L": [
+   18291567587.342236,
+   0.0,
+   50927.43297123126
+  ],
+  "R": [
+   1829156758.7342236,
+   0.0,
+   5959.320062853316
+  ],
+  "P": 34924720769172.57,
+  "u": 125.96636864115155,
+  "tlim": 0.0027975993843970927,
+  "vmax": 142.97972834527326,
+  "L_T": 30000.0,
+  "R_T": 6000.0,
+  "Lstar": {
+   "rho": 5697875152.339276,
+   "tail": 37.80444144406866,
+   "head": -133.38905507616602,
+   "type": "rarefaction"
+  },
+  "Rstar": {
+   "rho": 15372174632.937471,
+   "S": 142.97972834527326,
+   "type": "shock"
+  },
+  "what": "shock tube with an ionized driver (rarefaction through H recombination)"
+ }
+}

@@ -1,0 +1,15 @@
+L7 nj16: rho_c(3D)/rho_c(1D) - 1: t=0.20: +0.38% t=0.40: +0.55% t=0.60: +2.11% t=0.70: -1.62% t=0.75: -1.79% t=0.80: -2.87%
+L7 nj16 t(3D) - t(1D) at rho_c = 100: +0.0033 1000: +0.0032 10000: +0.0030 100000: +0.0029
+L7 nj16 LP profile deviation (median over x<30): rho_c=5e+01:36.5% rho_c=2e+02:15.8% rho_c=8e+02:15.6% rho_c=3e+03:11.0%
+L7 nj4: rho_c(3D)/rho_c(1D) - 1: t=0.20: +8.26% t=0.40: -0.85% t=0.60: +1.00% t=0.70: +8.67% t=0.75: +8.62% t=0.80: -6.15%
+L7 nj4 t(3D) - t(1D) at rho_c = 100: +0.0487 1000: +0.0433 10000: +nan 100000: +nan
+L7 nj4 LP profile deviation (median over x<30): rho_c=1e+02:63.8%
+L7 nj8: rho_c(3D)/rho_c(1D) - 1: t=0.20: +8.26% t=0.40: -0.85% t=0.60: +1.00% t=0.70: -1.66% t=0.75: -6.88% t=0.80: -3.48%
+L7 nj8 t(3D) - t(1D) at rho_c = 100: +0.0164 1000: +0.0153 10000: +0.0142 100000: +0.0139
+L7 nj8 LP profile deviation (median over x<30): rho_c=6e+01:39.6% rho_c=8e+02:28.9% rho_c=9e+03:20.3%
+L7 nj8_rk2: rho_c(3D)/rho_c(1D) - 1: t=0.20: +8.65% t=0.40: -0.09% t=0.60: +3.10% t=0.70: +1.58% t=0.75: -3.28% t=0.80: +2.02%
+L7 nj8_rk2 t(3D) - t(1D) at rho_c = 100: +0.0106 1000: +0.0091 10000: +0.0081 100000: +0.0080
+L7 nj8_rk2 LP profile deviation (median over x<30): rho_c=6e+01:40.7% rho_c=9e+02:21.7%
+L7 nj8_vl2same: rho_c(3D)/rho_c(1D) - 1: t=0.20: +8.59% t=0.40: -0.23% t=0.60: +2.73% t=0.70: +1.00% t=0.75: -3.92% t=0.80: +1.01%
+L7 nj8_vl2same t(3D) - t(1D) at rho_c = 100: +0.0116 1000: +0.0102 10000: +0.0093 100000: +0.0091
+L7 nj8_vl2same LP profile deviation (median over x<30): rho_c=6e+01:41.1% rho_c=9e+02:26.6%

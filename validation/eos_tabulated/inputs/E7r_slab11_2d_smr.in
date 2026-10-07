@@ -1,0 +1,75 @@
+<comment>
+problem = E7r (double flux + mesh refinement) periodic oblique slab of pure contacts (R4 star states), k = (1, 1, 0), N = 64, meshblock [64, 64, 1]
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = slab
+mx = 1
+my = 1
+mz = 0
+rhoL = 5698043741.696797
+espL_code = 41751.68456274639
+rhoR = 15372317457.795109
+espR_code = 14847.599259165014
+u_slab = 125.9711150274905
+
+<parthenon/mesh>
+refinement = static
+nx1 = 64
+x1min = 0.0
+x1max = 1.0
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 64
+x2min = 0.0
+x2max = 1.0
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = 0.0
+x3max = 1.0
+ix3_bc = periodic
+ox3_bc = periodic
+numlevel = 2
+
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 16
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.002381498329474431
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold.bin
+gamma = 1.4
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_plain
+eos_floor_consistent = true
+dfloor = 1.0e-12
+pfloor = 1.0e-14
+eos_interp = p_over_rho
+
+<physics>
+self_gravity = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, cons
+dt = 0.00029768729118430387
+
+<parthenon/static_refinement0>
+x1min = 0.25
+x1max = 0.75
+x2min = 0.25
+x2max = 0.75
+level = 1

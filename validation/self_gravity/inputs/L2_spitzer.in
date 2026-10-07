@@ -1,0 +1,91 @@
+<comment>
+problem = advected Spitzer sheet (Mullen et al. 2021 Sec. 4.1): Gamma = gamma = 1.2, G = K = 1,
+          mean rho 0.3, period 4 along x, contrast 1.45e4, advected at vx = 1 for one period (t = 4).
+
+<job>
+problem_id = profile1d
+
+<problem/profile1d>
+table = $REPO/validation/self_gravity/inputs/tables/L2_spitzer.txt
+geometry = planar
+vx = 1.0
+nsub = 4
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = none
+numlevel   = 1
+multigrid  = true
+nx1 = 64
+x1min = 0.0
+x1max = 4.0
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 8
+x2min = 0.0
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 8
+x3min = 0.0
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 32
+nx2 = 8
+nx3 = 8
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.3
+tlim       = 4.0
+nlim       = -1
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.2
+riemann        = hlld
+reconstruction = plm
+cons_diag      = true
+pfloor = 1e-14
+dfloor = 1e-12
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, grav.phi
+single_precision_output = true
+dt = 0.5
+
+<parthenon/output1>
+file_type = hst
+dt = 0.05
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 12.566370614359172
+use_swindle        = true
+packed_bc          = true
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

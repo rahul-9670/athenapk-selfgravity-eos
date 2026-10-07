@@ -1,0 +1,83 @@
+# Object and binary directories
+build*/
+
+# Mac OS metadata
+.DS_Store
+
+# editor temp files
+*~
+*.swp
+.cache/
+.clangd/
+
+# Gcov: GCC coverage testing tool- data files
+*.gcno
+*.gcda
+
+# Gcov log files
+*.gcov
+
+# Lcov: graphical frontend for Gcov- tracefiles
+*.info
+
+# genhtml test case description format produced by gendesc
+*.desc
+
+# User editor files
+.vscode
+compile_commands.json
+
+# HDF5/Output Files
+*.phdf
+*.phdf.xdmf
+*.dat
+
+# jupyter notebook temp files
+.ipynb_checkpoints
+
+# CMake Test files
+Testing
+
+# generate_cluster_input.ipynb files
+inputs/cluster/generate_cluster_input.ipynb
+inputs/cluster/my_cluster.input
+
+# Run directories (scratch output) — added during self-gravity port work
+amr_adap_test/
+amr_test/
+be_test/
+sg_test/
+
+# Run artifacts not already covered
+*.hst
+*.rhdf
+*.log
+be_jeans_test/
+__pycache__/
+*.pyc
+*.pdf
+
+# Local development backups (not for upstream)
+*.cpp.bak
+*.cpp.pre_fix_bak
+*.cpp.before_*
+inputs/*_test.in
+run_diagnostics_dump/
+*.bak_pre_cxx20
+*.bak
+
+# simulation run instances (data, logs, restarts) -- not source
+/runs/
+tools/*/lib*.so
+
+# dated backups (`*.bak_<tag>`) are not matched by `*.bak`
+*.bak_*
+# per-job SLURM output that lands inside src/ during table builds
+src/eos/*.out
+# session scratch -- never part of the source tree
+.scratch_backup/
+.snapshots/
+
+# validation results ship their logs
+!validation/*/results/*.log
+!validation/*/results/**/*.log

@@ -1,0 +1,61 @@
+<comment>
+problem = E8 homologous compression leg 4: rho 1e-05 -> 0.001 g/cc from T 3888 K on the table adiabat; alpha 0.4119_cfl015
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = compress
+rho0 = 18291567587342.266
+T0 = 3887.749155831406
+alpha = 0.4119409812489959
+xc = 0.5
+
+<parthenon/mesh>
+refinement = none
+nx1 = 33
+x1min = 0.0
+x1max = 1.0
+ix1_bc = eos_homologous
+ox1_bc = eos_homologous
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 33
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.15
+tlim = 2.403256886455778
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold.bin
+gamma = 1.4
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_plain   # 1D decks: dedner_extended (production, 3D) segfaults in 1D (E-F3); B = 0 here
+eos_floor_consistent = true
+dfloor = 1.0e-12
+pfloor = 1.0e-14
+
+<physics>
+self_gravity = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+dt = 0.04005428144092963

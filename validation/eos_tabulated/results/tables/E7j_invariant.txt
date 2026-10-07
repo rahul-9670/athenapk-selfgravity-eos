@@ -1,0 +1,12 @@
+R4_ionization plm   N  1600: dJ/|u*| left star median -5.857e-06 | first 15% of fan median +1.602e-08
+R4_ionization plm   N  3200: dJ/|u*| left star median -2.950e-06 | first 15% of fan median +1.058e-08
+R4_ionization plm   N  6400: dJ/|u*| left star median -5.634e-07 | first 15% of fan median -6.791e-21
+R4_ionization limo3 N  1600: dJ/|u*| left star median -4.811e-06 | first 15% of fan median -2.295e-08
+R4_ionization limo3 N  3200: dJ/|u*| left star median -4.086e-06 | first 15% of fan median -1.673e-08
+R4_ionization limo3 N  6400: dJ/|u*| left star median -4.645e-07 | first 15% of fan median +3.681e-14
+R2_dissociation plm   N  1600: dJ/|u*| left star median -4.772e-06 | first 15% of fan median +1.719e-20
+R2_dissociation plm   N  3200: dJ/|u*| left star median -2.193e-06 | first 15% of fan median +1.719e-20
+R2_dissociation plm   N  6400: dJ/|u*| left star median -1.176e-06 | first 15% of fan median +1.719e-20
+R2_dissociation limo3 N  1600: dJ/|u*| left star median -3.567e-06 | first 15% of fan median -8.656e-11
+R2_dissociation limo3 N  3200: dJ/|u*| left star median -1.358e-06 | first 15% of fan median -2.427e-15
+R2_dissociation limo3 N  6400: dJ/|u*| left star median -1.499e-07 | first 15% of fan median +1.719e-20

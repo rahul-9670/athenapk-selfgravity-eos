@@ -1,0 +1,11 @@
+E7r double flux + mesh refinement: pure moving contacts, R4 star states. Per run: max over snapshots of
+max|P/P*-1| (final value), refinement levels seen, blocks at the end, energy.
+case                      variant | max|P/P*-1| all snaps (final) | levels seen | nblocks end | dE/E
+E7r_R4_mov_1d_amr         std   | missing
+E7r_R4_mov_1d_amr         dflux | 4.72e-04 (1.18e-04) | [0, 1, 2] | 23 | --
+E7r_R4_mov_1d_smr         std   | missing
+E7r_R4_mov_1d_smr         dflux | 4.00e-14 (4.00e-14) | [0, 1, 2] | 16 | --
+E7r_slab11_2d_amr         std   | missing
+E7r_slab11_2d_amr         dflux | 3.99e-03 (4.25e-04) | [0, 1] | 64 | run +1.08e-02
+E7r_slab11_2d_smr         std   | missing
+E7r_slab11_2d_smr         dflux | 4.79e-04 (3.95e-05) | [0, 1] | 28 | run +1.62e-02

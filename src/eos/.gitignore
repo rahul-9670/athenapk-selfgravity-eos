@@ -1,0 +1,4 @@
+# HDF5 sidecars written next to each generated .bin (regenerable, large).
+*.h5
+# per-job output from table builds
+*.out

@@ -1,0 +1,67 @@
+<comment>
+problem = E7k pure contact, star states of R2_dissociation, u = mov, N = 1600
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = riemann
+x0 = 0.35
+rhoL = 552820989.8808185
+TL = 2581.0874124376323
+uL = 32.8055779056865
+rhoR = 1217046169.6354008
+TR = 1946.9787761518583
+uR = 32.8055779056865
+espL_code = 4685.549519268279
+espR_code = 838.8630697418249
+
+<parthenon/mesh>
+refinement = none
+nx1 = 1600
+x1min = 0.0
+x1max = 1.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 1600
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.009144786318426605
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold.bin
+gamma = 1.4
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_plain   # 1D decks: dedner_extended (production, 3D) segfaults in 1D (E-F3); B = 0 here
+eos_floor_consistent = true
+dfloor = 1.0e-12
+pfloor = 1.0e-14
+eos_interp = p_over_rho
+
+<physics>
+self_gravity = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+dt = 0.009144786318426605

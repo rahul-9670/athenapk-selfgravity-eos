@@ -1,0 +1,5 @@
+E7x acoustic wave S3 (amp 1e-4) through static patch [0.25,0.5]: L1(rho - rho_IC)/(amp rho0) after one period
+N base | standard | double flux + ghost fill | double flux, fill off | max|dflux+gf - std|/(amp rho0)
+  32 | 2.4875e-02 | 2.4875e-02 | 2.4875e-02 | 1.17e-07
+  64 | 7.2128e-03 | 7.2128e-03 | 7.2128e-03 | 1.95e-08
+ 128 | 5.3392e-03 | 5.3392e-03 | 5.3392e-03 | 6.06e-09

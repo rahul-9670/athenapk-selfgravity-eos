@@ -1,0 +1,8 @@
+E7e_R1_molecular_p_n400_mb100                L1(GPU-CPU) rho 4.7e-07 u 7.2e-07 P 3.2e-07 | L1 err vs exact GPU rho 2.038e-03 CPU 2.038e-03 | P GPU 1.722e-03 CPU 1.722e-03 | t_gpu - t_cpu +0.0e+00
+E7e_R1_molecular_p_over_rho_n400_mb100       L1(GPU-CPU) rho 5.0e-07 u 8.7e-07 P 3.5e-07 | L1 err vs exact GPU rho 1.433e-03 CPU 1.433e-03 | P GPU 9.631e-04 CPU 9.631e-04 | t_gpu - t_cpu +0.0e+00
+E7e_R2_dissociation_p_n400_mb100             L1(GPU-CPU) rho 5.9e-07 u 1.0e-06 P 4.4e-07 | L1 err vs exact GPU rho 4.802e-03 CPU 4.802e-03 | P GPU 2.031e-03 CPU 2.031e-03 | t_gpu - t_cpu +0.0e+00
+E7e_R2_dissociation_p_over_rho_n400_mb100    L1(GPU-CPU) rho 3.3e-07 u 4.9e-07 P 2.3e-07 | L1 err vs exact GPU rho 4.205e-03 CPU 4.205e-03 | P GPU 1.347e-03 CPU 1.347e-03 | t_gpu - t_cpu +0.0e+00
+E7e_R3_dissoc_shock_p_n400_mb100             L1(GPU-CPU) rho 9.7e-09 u 4.3e-10 P 1.4e-09 | L1 err vs exact GPU rho 1.806e-03 CPU 1.806e-03 | P GPU 1.296e-03 CPU 1.296e-03 | t_gpu - t_cpu +0.0e+00
+E7e_R3_dissoc_shock_p_over_rho_n400_mb100    L1(GPU-CPU) rho 5.2e-09 u 3.1e-10 P 1.3e-09 | L1 err vs exact GPU rho 1.829e-03 CPU 1.829e-03 | P GPU 1.271e-03 CPU 1.271e-03 | t_gpu - t_cpu +0.0e+00
+E7e_R4_ionization_p_n400_mb100               L1(GPU-CPU) rho 1.5e-06 u 1.9e-06 P 8.8e-07 | L1 err vs exact GPU rho 6.020e-03 CPU 6.020e-03 | P GPU 2.117e-03 CPU 2.117e-03 | t_gpu - t_cpu +0.0e+00
+E7e_R4_ionization_p_over_rho_n400_mb100      L1(GPU-CPU) rho 2.8e-06 u 6.5e-06 P 2.3e-06 | L1 err vs exact GPU rho 5.440e-03 CPU 5.440e-03 | P GPU 1.384e-03 CPU 1.384e-03 | t_gpu - t_cpu +0.0e+00

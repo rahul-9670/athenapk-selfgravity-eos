@@ -1,0 +1,137 @@
+<comment>
+problem = pressure-free sphere (R = 4, rho0 = 1.01 incl. floor) collapsing through 4 nested static levels
+          to rho/rho0 ~ 1e3; central density vs the exact cycloid. dt_ceil 5e-4 suppresses the SG-F4 term.
+
+<job>
+problem_id = grav_analytic
+
+<problem/grav_analytic>
+profile = spheres
+m1 = 268.082573106329
+r1 = 4.0
+rho_out = 1.0e-2
+pressure = 1.0e-6
+nsub = 8
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = static
+numlevel   = 5
+multigrid  = true
+nx1 = 64
+x1min = -8.0
+x1max = 8.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 64
+x2min = -8.0
+x2max = 8.0
+ix2_bc = outflow
+ox2_bc = outflow
+nx3 = 64
+x3min = -8.0
+x3max = 8.0
+ix3_bc = outflow
+ox3_bc = outflow
+
+<parthenon/static_refinement1>
+level = 1
+x1min = -5.0
+x1max = 5.0
+x2min = -5.0
+x2max = 5.0
+x3min = -5.0
+x3max = 5.0
+
+<parthenon/static_refinement2>
+level = 2
+x1min = -2.5
+x1max = 2.5
+x2min = -2.5
+x2max = 2.5
+x3min = -2.5
+x3max = 2.5
+
+<parthenon/static_refinement3>
+level = 3
+x1min = -1.25
+x1max = 1.25
+x2min = -1.25
+x2max = 1.25
+x3min = -1.25
+x3max = 1.25
+
+<parthenon/static_refinement4>
+level = 4
+x1min = -0.625
+x1max = 0.625
+x2min = -0.625
+x2max = 0.625
+x3min = -0.625
+x3max = 0.625
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 16
+nx3 = 16
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.2
+tlim       = 1.92
+nlim       = -1
+dt_ceil = 0.0005
+dt_init = 1.0e-4
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.4
+riemann        = hlld
+reconstruction = plm
+cons_diag      = true
+dfloor = 1e-10
+pfloor = 1e-14
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+single_precision_output = true
+dt = 0.02
+
+<parthenon/output1>
+file_type = hst
+dt = 0.002
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 1.0
+use_swindle        = false
+packed_bc          = true
+ix1_bc             = multipole
+ox1_bc             = multipole
+ix2_bc             = multipole
+ox2_bc             = multipole
+ix3_bc             = multipole
+ox3_bc             = multipole
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

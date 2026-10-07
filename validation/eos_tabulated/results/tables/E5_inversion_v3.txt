@@ -1,0 +1,159 @@
+# E5 2026-10-05T12:13:11+02:00  eos_table.hpp md5 918d01fc  table md5 f712d6a8
+
+================ eos_interp = p, eos_extrapolate = false ================
+axes (code): log rho [-1.7377, 18.2623] (cgs [-20.00, 0.00]) d 0.05013 | log esp [-2.0308, 5.3313] d 0.005266 | log T [-1.3366, 5.4771] d 0.004977
+[M] P(rho_i, esp_j+1)/P(rho_i, esp_j): violations of > 1: 529 of 559200; min ratio 1.00000000 at i=355 j=1397 (log rho_cgs -2.206, T 300000.0 K)
+[M] esp(rho, T) strictly increasing in T: 0 violations; log T(rho, esp) increasing in esp: 529 violations
+[R] T -> e -> T, 797 x 1201 off-node points, T in [0.1 K, 2.93e+05 K]: |T'/T - 1|
+      T<100K (molecular, rot. frozen)    n  443929  median 1.23e-05  99.9% 1.64e-05  max 1.64e-05
+      100-1e3 K (rot./vib.)              n  148242  median 1.44e-05  99.9% 9.59e-05  max 1.72e-04
+      1e3-5e3 K (H2 dissociation)        n  103610  median 5.82e-05  99.9% 1.21e-02  max 1.32e-02
+      5e3-3e4 K (H ionization)           n  114768  median 7.94e-05  99.9% 9.09e-03  max 1.18e-02
+      >3e4 K (He ionization)             n  146648  median 1.19e-05  99.9% 4.87e-04  max 6.97e-04
+      production footprint (rho<=1e-10, 1-200 K)  n  170373  median 1.23e-05  max 1.98e-05
+      design range (rho<=0.1, T>=3 K)     n  701739  median 1.53e-05  max 1.32e-02
+      worst at log rho_cgs -18.936 T 1377 K; clamp counters over the sweep: state 0 (T< 0, esp< 0)
+[B] e -> P -> e via EspFromP; bound 0.5 * 7.3622 dex * 2^-n -> relative 8.08e-06 (n=20) 7.89e-09 (30)
+    n_bisect 20:  [0] de max 8.04e-06 dP max 8.06e-06  [1] de max 8.08e-06 dP max 7.48e-06  [2] de max 8.08e-06 dP max 9.25e-05  [3] de max 8.08e-06 dP max 9.21e-05  [4] de max 8.08e-06 dP max 2.87e-05
+    n_bisect 30:  [0] de max 7.87e-09 dP max 7.88e-09  [1] de max 7.89e-09 dP max 7.29e-09  [2] de max 7.89e-09 dP max 9.16e-08  [3] de max 7.89e-09 dP max 9.24e-08  [4] de max 7.89e-09 dP max 2.82e-08
+    n_bisect 40:  [0] de max 7.71e-12 dP max 7.69e-12  [1] de max 7.71e-12 dP max 7.12e-12  [2] de max 7.71e-12 dP max 8.57e-11  [3] de max 7.71e-12 dP max 8.71e-11  [4] de max 7.71e-12 dP max 2.76e-11
+    n_bisect 60:  [0] de max 2.22e-15 dP max 1.78e-15  [1] de max 4.11e-15 dP max 3.00e-15  [2] de max 5.22e-15 dP max 3.22e-14  [3] de max 5.33e-15 dP max 3.31e-14  [4] de max 5.33e-15 dP max 1.02e-14
+      clamp counters over the B sweeps: state 0
+[E] rho BELOW the table (lower edge 1.00e-20 g/cc), T = 10 K state, esp from the edge row:
+      rho/rho_edge 1       P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 1.79433e-02  ratio 1.000000  counters rho< 0
+      rho/rho_edge 0.5     P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 8.97165e-03  ratio 2.000000  counters rho< 1
+      rho/rho_edge 0.1     P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 1.79433e-03  ratio 9.999999  counters rho< 1
+      rho/rho_edge 0.01    P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 1.79433e-04  ratio 99.999989  counters rho< 1
+      rho/rho_edge 0.0001  P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 1.79433e-06  ratio 9999.998940  counters rho< 1
+      check: (P/rho) at 100 x rho_edge / at rho_edge, same esp: 1.00058148
+[E] P BELOW P(rho, esp_min): EspFromP result and counters (production pfloor 1e-8 code):
+      rho 3.2e-20 g/cc  P 1.796e-04 (P(esp_min) 3.593e-04)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 3.2e-20 g/cc  P 1.000e-08 (P(esp_min) 3.593e-04)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 3.593e+04  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-17 g/cc  P 5.684e-02 (P(esp_min) 1.137e-01)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-17 g/cc  P 1.000e-08 (P(esp_min) 1.137e-01)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 1.137e+07  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-14 g/cc  P 5.687e+01 (P(esp_min) 1.137e+02)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-14 g/cc  P 1.000e-08 (P(esp_min) 1.137e+02)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 1.137e+10  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-11 g/cc  P 5.689e+04 (P(esp_min) 1.138e+05)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-11 g/cc  P 1.000e-08 (P(esp_min) 1.138e+05)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 1.138e+13  T(esp) 0.0633 K  counters: esp< 0, state total 0
+[E] esp BELOW esp_min (a cell with e_int > 0 but T < 0.063 K): PresFromRhoEint and counters:
+      esp = 5e-01 esp_min: P 1.1368e-01 = P(esp_min) x 1.000000 ; counters esp< 1
+      esp = 1e-03 esp_min: P 1.1368e-01 = P(esp_min) x 1.000000 ; counters esp< 1
+      esp = 1e-09 esp_min: P 1.1368e-01 = P(esp_min) x 1.000000 ; counters esp< 1
+[F] production pressure floor pfloor = 1e-8 code through InternalEnergyFromPres = EintFromRhoPres:
+      rho 1.3e-20 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.4300e-04 code = 1.430e+04 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-18 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1365e-02 code = 1.137e+06 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-15 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1373e+01 code = 1.137e+09 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-12 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1377e+04 code = 1.138e+12 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-09 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1378e+07 code = 1.138e+15 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-05 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1373e+11 code = 1.137e+19 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+
+================ eos_interp = p_over_rho, eos_extrapolate = false ================
+axes (code): log rho [-1.7377, 18.2623] (cgs [-20.00, 0.00]) d 0.05013 | log esp [-2.0308, 5.3313] d 0.005266 | log T [-1.3366, 5.4771] d 0.004977
+[M] P(rho_i, esp_j+1)/P(rho_i, esp_j): violations of > 1: 529 of 559200; min ratio 1.00000000 at i=355 j=1397 (log rho_cgs -2.206, T 300000.0 K)
+[M] esp(rho, T) strictly increasing in T: 0 violations; log T(rho, esp) increasing in esp: 529 violations
+[R] T -> e -> T, 797 x 1201 off-node points, T in [0.1 K, 2.93e+05 K]: |T'/T - 1|
+      T<100K (molecular, rot. frozen)    n  443929  median 1.23e-05  99.9% 1.64e-05  max 1.64e-05
+      100-1e3 K (rot./vib.)              n  148242  median 1.44e-05  99.9% 9.59e-05  max 1.72e-04
+      1e3-5e3 K (H2 dissociation)        n  103610  median 5.82e-05  99.9% 1.21e-02  max 1.32e-02
+      5e3-3e4 K (H ionization)           n  114768  median 7.94e-05  99.9% 9.09e-03  max 1.18e-02
+      >3e4 K (He ionization)             n  146648  median 1.19e-05  99.9% 4.87e-04  max 6.97e-04
+      production footprint (rho<=1e-10, 1-200 K)  n  170373  median 1.23e-05  max 1.98e-05
+      design range (rho<=0.1, T>=3 K)     n  701739  median 1.53e-05  max 1.32e-02
+      worst at log rho_cgs -18.936 T 1377 K; clamp counters over the sweep: state 0 (T< 0, esp< 0)
+[B] e -> P -> e via EspFromP; bound 0.5 * 7.3622 dex * 2^-n -> relative 8.08e-06 (n=20) 7.89e-09 (30)
+    n_bisect 20:  [0] de max 8.04e-06 dP max 8.06e-06  [1] de max 8.08e-06 dP max 7.48e-06  [2] de max 8.08e-06 dP max 9.25e-05  [3] de max 8.08e-06 dP max 9.21e-05  [4] de max 8.08e-06 dP max 2.87e-05
+    n_bisect 30:  [0] de max 7.87e-09 dP max 7.88e-09  [1] de max 7.89e-09 dP max 7.29e-09  [2] de max 7.89e-09 dP max 9.16e-08  [3] de max 7.89e-09 dP max 9.24e-08  [4] de max 7.89e-09 dP max 2.82e-08
+    n_bisect 40:  [0] de max 7.71e-12 dP max 7.69e-12  [1] de max 7.71e-12 dP max 7.12e-12  [2] de max 7.71e-12 dP max 8.57e-11  [3] de max 7.71e-12 dP max 8.71e-11  [4] de max 7.71e-12 dP max 2.76e-11
+    n_bisect 60:  [0] de max 2.22e-15 dP max 1.89e-15  [1] de max 4.11e-15 dP max 3.00e-15  [2] de max 5.22e-15 dP max 3.22e-14  [3] de max 5.33e-15 dP max 3.34e-14  [4] de max 5.33e-15 dP max 1.02e-14
+      clamp counters over the B sweeps: state 0
+[E] rho BELOW the table (lower edge 1.00e-20 g/cc), T = 10 K state, esp from the edge row:
+      rho/rho_edge 1       P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 1.79433e-02  ratio 1.000000  counters rho< 0
+      rho/rho_edge 0.5     P 8.97165e-03  ideal-gas continuation rho*(P/rho)_edge 8.97165e-03  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.1     P 1.79433e-03  ideal-gas continuation rho*(P/rho)_edge 1.79433e-03  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.01    P 1.79433e-04  ideal-gas continuation rho*(P/rho)_edge 1.79433e-04  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.0001  P 1.79433e-06  ideal-gas continuation rho*(P/rho)_edge 1.79433e-06  ratio 1.000000  counters rho< 1
+      check: (P/rho) at 100 x rho_edge / at rho_edge, same esp: 1.00000000
+[E] P BELOW P(rho, esp_min): EspFromP result and counters (production pfloor 1e-8 code):
+      rho 3.2e-20 g/cc  P 1.796e-04 (P(esp_min) 3.592e-04)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 3.2e-20 g/cc  P 1.000e-08 (P(esp_min) 3.592e-04)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 3.592e+04  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-17 g/cc  P 5.679e-02 (P(esp_min) 1.136e-01)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-17 g/cc  P 1.000e-08 (P(esp_min) 1.136e-01)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 1.136e+07  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-14 g/cc  P 5.679e+01 (P(esp_min) 1.136e+02)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-14 g/cc  P 1.000e-08 (P(esp_min) 1.136e+02)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 1.136e+10  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-11 g/cc  P 5.679e+04 (P(esp_min) 1.136e+05)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 2.000e+00  T(esp) 0.0633 K  counters: esp< 0, state total 0
+      rho 1.0e-11 g/cc  P 1.000e-08 (P(esp_min) 1.136e+05)  -> esp/esp_min - 1 = 8.08e-06  P(esp)/P = 1.136e+13  T(esp) 0.0633 K  counters: esp< 0, state total 0
+[E] esp BELOW esp_min (a cell with e_int > 0 but T < 0.063 K): PresFromRhoEint and counters:
+      esp = 5e-01 esp_min: P 1.1359e-01 = P(esp_min) x 1.000000 ; counters esp< 1
+      esp = 1e-03 esp_min: P 1.1359e-01 = P(esp_min) x 1.000000 ; counters esp< 1
+      esp = 1e-09 esp_min: P 1.1359e-01 = P(esp_min) x 1.000000 ; counters esp< 1
+[F] production pressure floor pfloor = 1e-8 code through InternalEnergyFromPres = EintFromRhoPres:
+      rho 1.3e-20 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.4300e-04 code = 1.430e+04 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-18 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1359e-02 code = 1.136e+06 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-15 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1359e+01 code = 1.136e+09 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-12 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1359e+04 code = 1.136e+12 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-09 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1359e+07 code = 1.136e+15 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+      rho 1.0e-05 g/cc: e_fl/rho = esp_min x (1 + 8.08e-06); P(e_fl) = 1.1359e+11 code = 1.136e+19 x pfloor; T(e_fl) 0.0633 K; state clamps 0  -> cons-npfloor test (P <= pfloor(1+1e-9)) does NOT count
+
+[X] eos_extrapolate=true vs legacy, IN-TABLE lookups (EintFromRhoTk, Pof, EspFromP, Cs2of, TemperatureK, TemperatureKFromPres): 0 of 1431582 differ
+
+================ eos_interp = p, eos_extrapolate = true ================
+axes (code): log rho [-1.7377, 18.2623] (cgs [-20.00, 0.00]) d 0.05013 | log esp [-2.0308, 5.3313] d 0.005266 | log T [-1.3366, 5.4771] d 0.004977
+[E] rho BELOW the table (lower edge 1.00e-20 g/cc), T = 10 K state, esp from the edge row:
+      rho/rho_edge 1       P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 1.79433e-02  ratio 1.000000  counters rho< 0
+      rho/rho_edge 0.5     P 8.97165e-03  ideal-gas continuation rho*(P/rho)_edge 8.97165e-03  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.1     P 1.79433e-03  ideal-gas continuation rho*(P/rho)_edge 1.79433e-03  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.01    P 1.79433e-04  ideal-gas continuation rho*(P/rho)_edge 1.79433e-04  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.0001  P 1.79433e-06  ideal-gas continuation rho*(P/rho)_edge 1.79433e-06  ratio 1.000000  counters rho< 1
+      check: (P/rho) at 100 x rho_edge / at rho_edge, same esp: 1.00058148
+[E] P BELOW P(rho, esp_min): EspFromP result and counters (production pfloor 1e-8 code):
+      rho 3.2e-20 g/cc  P 1.796e-04 (P(esp_min) 3.593e-04)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 3.2e-20 g/cc  P 1.000e-08 (P(esp_min) 3.593e-04)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+      rho 1.0e-17 g/cc  P 5.684e-02 (P(esp_min) 1.137e-01)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 1.0e-17 g/cc  P 1.000e-08 (P(esp_min) 1.137e-01)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+      rho 1.0e-14 g/cc  P 5.687e+01 (P(esp_min) 1.137e+02)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 1.0e-14 g/cc  P 1.000e-08 (P(esp_min) 1.137e+02)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+      rho 1.0e-11 g/cc  P 5.689e+04 (P(esp_min) 1.138e+05)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 1.0e-11 g/cc  P 1.000e-08 (P(esp_min) 1.138e+05)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+[E] esp BELOW esp_min (a cell with e_int > 0 but T < 0.063 K): PresFromRhoEint and counters:
+      esp = 5e-01 esp_min: P 5.6841e-02 = P(esp_min) x 0.500000 ; counters esp< 1
+      esp = 1e-03 esp_min: P 1.1368e-04 = P(esp_min) x 0.001000 ; counters esp< 1
+      esp = 1e-09 esp_min: P 1.1368e-10 = P(esp_min) x 0.000000 ; counters esp< 1
+[F] production pressure floor pfloor = 1e-8 code through InternalEnergyFromPres = EintFromRhoPres:
+      rho 1.3e-20 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-18 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-15 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-12 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-09 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-05 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+
+[X] eos_extrapolate=true vs legacy, IN-TABLE lookups (EintFromRhoTk, Pof, EspFromP, Cs2of, TemperatureK, TemperatureKFromPres): 0 of 1431582 differ
+
+================ eos_interp = p_over_rho, eos_extrapolate = true ================
+axes (code): log rho [-1.7377, 18.2623] (cgs [-20.00, 0.00]) d 0.05013 | log esp [-2.0308, 5.3313] d 0.005266 | log T [-1.3366, 5.4771] d 0.004977
+[E] rho BELOW the table (lower edge 1.00e-20 g/cc), T = 10 K state, esp from the edge row:
+      rho/rho_edge 1       P 1.79433e-02  ideal-gas continuation rho*(P/rho)_edge 1.79433e-02  ratio 1.000000  counters rho< 0
+      rho/rho_edge 0.5     P 8.97165e-03  ideal-gas continuation rho*(P/rho)_edge 8.97165e-03  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.1     P 1.79433e-03  ideal-gas continuation rho*(P/rho)_edge 1.79433e-03  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.01    P 1.79433e-04  ideal-gas continuation rho*(P/rho)_edge 1.79433e-04  ratio 1.000000  counters rho< 1
+      rho/rho_edge 0.0001  P 1.79433e-06  ideal-gas continuation rho*(P/rho)_edge 1.79433e-06  ratio 1.000000  counters rho< 1
+      check: (P/rho) at 100 x rho_edge / at rho_edge, same esp: 1.00000000
+[E] P BELOW P(rho, esp_min): EspFromP result and counters (production pfloor 1e-8 code):
+      rho 3.2e-20 g/cc  P 1.796e-04 (P(esp_min) 3.592e-04)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 3.2e-20 g/cc  P 1.000e-08 (P(esp_min) 3.592e-04)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+      rho 1.0e-17 g/cc  P 5.679e-02 (P(esp_min) 1.136e-01)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 1.0e-17 g/cc  P 1.000e-08 (P(esp_min) 1.136e-01)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+      rho 1.0e-14 g/cc  P 5.679e+01 (P(esp_min) 1.136e+02)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 1.0e-14 g/cc  P 1.000e-08 (P(esp_min) 1.136e+02)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+      rho 1.0e-11 g/cc  P 5.679e+04 (P(esp_min) 1.136e+05)  -> esp/esp_min - 1 = -5.00e-01  P(esp)/P = 1.000e+00  T(esp) 0.0317 K  counters: esp< 1, state total 1
+      rho 1.0e-11 g/cc  P 1.000e-08 (P(esp_min) 1.136e+05)  -> esp/esp_min - 1 = -1.00e+00  P(esp)/P = 1.000e+00  T(esp) 0.0000 K  counters: esp< 1, state total 1
+[E] esp BELOW esp_min (a cell with e_int > 0 but T < 0.063 K): PresFromRhoEint and counters:
+      esp = 5e-01 esp_min: P 5.6794e-02 = P(esp_min) x 0.500000 ; counters esp< 1
+      esp = 1e-03 esp_min: P 1.1359e-04 = P(esp_min) x 0.001000 ; counters esp< 1
+      esp = 1e-09 esp_min: P 1.1359e-10 = P(esp_min) x 0.000000 ; counters esp< 1
+[F] production pressure floor pfloor = 1e-8 code through InternalEnergyFromPres = EintFromRhoPres:
+      rho 1.3e-20 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-18 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-15 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-12 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-09 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS
+      rho 1.0e-05 g/cc: e_fl/rho = esp_min x (1 + -1.00e+00); P(e_fl) = 1.0000e-08 code = 1.000e+00 x pfloor; T(e_fl) 0.0000 K; state clamps 2  -> cons-npfloor test (P <= pfloor(1+1e-9)) COUNTS

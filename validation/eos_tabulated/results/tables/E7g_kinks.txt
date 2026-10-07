@@ -1,0 +1,6 @@
+R1_molecular     p_over_rho fan: rho 1.00e-14->3.32e-15 g/cc, T 300->182 K | grid lines crossed: rho 9, e 50 | slope dlnc/dlnrho +nan -> +nan | total |jumps| at grid lines 0.079, smooth variation 0.233
+R1_molecular     p          fan: rho 1.00e-14->3.32e-15 g/cc, T 300->182 K | grid lines crossed: rho 9, e 50 | slope dlnc/dlnrho +nan -> +nan | total |jumps| at grid lines 0.436, smooth variation 0.212
+R2_dissociation  p_over_rho fan: rho 1.00e-09->3.02e-10 g/cc, T 3999->2581 K | grid lines crossed: rho 10, e 11 | slope dlnc/dlnrho +nan -> +nan | total |jumps| at grid lines 0.224, smooth variation 0.412
+R2_dissociation  p          fan: rho 1.00e-09->3.02e-10 g/cc, T 3999->2581 K | grid lines crossed: rho 10, e 11 | slope dlnc/dlnrho +nan -> +nan | total |jumps| at grid lines 0.663, smooth variation 0.392
+R4_ionization    p_over_rho fan: rho 1.00e-08->3.12e-09 g/cc, T 29994->17405 K | grid lines crossed: rho 10, e 16 | slope dlnc/dlnrho +nan -> +nan | total |jumps| at grid lines 0.184, smooth variation 0.411
+R4_ionization    p          fan: rho 1.00e-08->3.12e-09 g/cc, T 29994->17400 K | grid lines crossed: rho 10, e 16 | slope dlnc/dlnrho +nan -> +nan | total |jumps| at grid lines 0.590, smooth variation 0.405

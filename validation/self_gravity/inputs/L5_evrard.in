@@ -1,0 +1,98 @@
+<comment>
+problem = Evrard (1988) adiabatic collapse: M = R = G = 1, rho = 1/(2 pi r), u = 0.05, gamma = 5/3;
+          energies (kinetic, thermal, potential) vs the 1D Lagrangian reference; multipole BC.
+
+<job>
+problem_id = profile1d
+
+<problem/profile1d>
+table = $REPO/validation/self_gravity/inputs/tables/L5_evrard.txt
+geometry = spherical
+rho_out = 1.6e-5
+p_out = 5.3e-7
+nsub = 2
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = none
+numlevel   = 1
+multigrid  = true
+nx1 = 128
+x1min = -2.0
+x1max = 2.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 128
+x2min = -2.0
+x2max = 2.0
+ix2_bc = outflow
+ox2_bc = outflow
+nx3 = 128
+x3min = -2.0
+x3max = 2.0
+ix3_bc = outflow
+ox3_bc = outflow
+
+<parthenon/meshblock>
+nx1 = 32
+nx2 = 32
+nx3 = 32
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.3
+tlim       = 3.0
+nlim       = -1
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.6666666666666667
+riemann        = hlld
+reconstruction = plm
+cons_diag      = true
+dfloor = 1e-8
+pfloor = 1e-12
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, grav.phi
+single_precision_output = true
+dt = 0.1
+
+<parthenon/output1>
+file_type = hst
+dt = 0.01
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 12.566370614359172
+use_swindle        = false
+packed_bc          = true
+ix1_bc             = multipole
+ox1_bc             = multipole
+ix2_bc             = multipole
+ox2_bc             = multipole
+ix3_bc             = multipole
+ox3_bc             = multipole
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

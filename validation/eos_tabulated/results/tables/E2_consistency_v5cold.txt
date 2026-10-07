@@ -1,0 +1,12 @@
+--- GATE 1/2: charge neutrality + element conservation (Saha) ---
+  worst |sum Z n|/n_H = 5.05e-15 ; H-cons = 0.00e+00 ; He-cons = 2.19e-16  PASS
+--- GATE 3: thermodynamic identity  -rho^2 (du/drho)_T == T (dP/dT)_rho - P ---
+  worst rel residual over 154 states = 2.46e-03  (tol 3e-3, finite-diff limited)  PASS
+--- GATE 4: eos_table.bin P(rho,esp) reproduces Saha P(rho,T) ---
+  n=750  median=1.56e-03  p99=3.37e-03  max=5.53e-03  (gate: median<1e-2)  PASS
+  CHARACTERIZATION: worst 0.6% at T=7454 K rho=1e-14 (a dissociation/ionization kink) -> Phase-3 EOS item.
+--- GATE 5: sound-speed consistency  cs2_table == cs2_Saha(isentrope) ---
+  n=504  median=1.55e-03  max=3.31e-02  (gate: median<3e-2)  PASS
+  CHARACTERIZATION: worst 3.3% at T=9047 K rho=1e-13 (cs2 is derivative-sensitive at the kinks).
+
+ALL GATES PASS (0 failures)

@@ -1,0 +1,8 @@
+p_over_rho R3 +-16 km/s  P*/P0       764  rho*/rho0  19.232  P values with !=1 root: 0 of 400 | rho_H(P) increasing: False (rho_H decreases for P/P0 in [957, 1.5e+03], i.e. above P*) | max|P_H-chord|/P* 7.90e-01 | Liu sign(P_H - chord) in [-1,-1]
+p_over_rho R1 right      P*/P0      20.1  rho*/rho0   3.650  P values with !=1 root: 0 of 400 | rho_H(P) increasing: True | max|P_H-chord|/P* 5.51e-01 | Liu sign(P_H - chord) in [-1,-1]
+p_over_rho R2 right      P*/P0      13.9  rho*/rho0   6.654  P values with !=1 root: 0 of 400 | rho_H(P) increasing: True | max|P_H-chord|/P* 4.55e-01 | Liu sign(P_H - chord) in [-1,-1]
+p_over_rho R4 right      P*/P0      17.6  rho*/rho0   8.404  P values with !=1 root: 0 of 400 | rho_H(P) increasing: False (rho_H decreases for P/P0 in [52.4, 52.9], i.e. above P*) | max|P_H-chord|/P* 5.39e-01 | Liu sign(P_H - chord) in [-1,-1]
+p          R3 +-16 km/s  P*/P0       762  rho*/rho0  19.219  P values with !=1 root: 0 of 400 | rho_H(P) increasing: False (rho_H decreases for P/P0 in [956, 1.46e+03], i.e. above P*) | max|P_H-chord|/P* 7.90e-01 | Liu sign(P_H - chord) in [-1,-1]
+p          R1 right      P*/P0      20.1  rho*/rho0   3.650  P values with !=1 root: 0 of 400 | rho_H(P) increasing: True | max|P_H-chord|/P* 5.51e-01 | Liu sign(P_H - chord) in [-1,-1]
+p          R2 right      P*/P0      13.9  rho*/rho0   6.655  P values with !=1 root: 0 of 400 | rho_H(P) increasing: True | max|P_H-chord|/P* 4.55e-01 | Liu sign(P_H - chord) in [-1,-1]
+p          R4 right      P*/P0      17.6  rho*/rho0   8.404  P values with !=1 root: 0 of 400 | rho_H(P) increasing: True | max|P_H-chord|/P* 5.39e-01 | Liu sign(P_H - chord) in [-1,-1]

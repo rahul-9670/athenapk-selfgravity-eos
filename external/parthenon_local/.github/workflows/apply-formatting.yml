@@ -1,0 +1,15 @@
+name: Command Mode Formatting
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  apply-formatting:
+    name: Format Py and C++ Code
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.comment.body, '@par-hermes format')
+    steps:
+    - uses: pgrete/cpp-py-formatter/command@v0.4.0
+      with:
+        botName: par-hermes
+        clangFormatVersion: 20
+        token: ${{ secrets.GITHUB_TOKEN }}

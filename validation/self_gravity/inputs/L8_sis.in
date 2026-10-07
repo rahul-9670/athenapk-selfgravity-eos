@@ -1,0 +1,117 @@
+<comment>
+problem = singular isothermal sphere rho = 2/r^2 (cs = 1, 4 pi G = 1), at rest, core capped at r = 0.02;
+          production barotropic enforcement (rho_crit 1e6: the capped core, rho = 5000, starts <1 % over-pressured; with 1e4 it started 25 % over and bounced); vs Shu (1977) expansion wave.
+
+<job>
+problem_id = profile1d
+
+<problem/profile1d>
+table = $REPO/validation/self_gravity/inputs/tables/L8_sis.txt
+geometry = spherical
+nsub = 8
+barotropic = true
+rho_crit = 1.0e6
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = static
+numlevel   = 3
+multigrid  = true
+nx1 = 128
+x1min = -4.0
+x1max = 4.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 128
+x2min = -4.0
+x2max = 4.0
+ix2_bc = outflow
+ox2_bc = outflow
+nx3 = 128
+x3min = -4.0
+x3max = 4.0
+ix3_bc = outflow
+ox3_bc = outflow
+
+<parthenon/static_refinement1>
+level = 1
+x1min = -1.0
+x1max = 1.0
+x2min = -1.0
+x2max = 1.0
+x3min = -1.0
+x3max = 1.0
+
+<parthenon/static_refinement2>
+level = 2
+x1min = -0.5
+x1max = 0.5
+x2min = -0.5
+x2max = 0.5
+x3min = -0.5
+x3max = 0.5
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 16
+nx3 = 16
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.3
+tlim       = 2.0
+nlim       = -1
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.4
+riemann        = hlld
+reconstruction = plm
+cons_diag      = true
+boundary_flux_clamp = true
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, grav.phi
+single_precision_output = true
+dt = 0.25
+
+<parthenon/output1>
+file_type = hst
+dt = 0.025
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 1.0
+use_swindle        = false
+packed_bc          = true
+ix1_bc             = multipole
+ox1_bc             = multipole
+ix2_bc             = multipole
+ox2_bc             = multipole
+ix3_bc             = multipole
+ox3_bc             = multipole
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

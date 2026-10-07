@@ -1,0 +1,8 @@
+E7e_R1_molecular_p_n400              4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing
+E7e_R1_molecular_p_over_rho_n400     4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing
+E7e_R2_dissociation_p_n400           4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing
+E7e_R2_dissociation_p_over_rho_n400  4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing
+E7e_R3_dissoc_shock_p_n400           4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing
+E7e_R3_dissoc_shock_p_over_rho_n400  4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing
+E7e_R4_ionization_p_n400             4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing
+E7e_R4_ionization_p_over_rho_n400    4x100 vs 1x400: 0 differing (max rel 0.0e+00) | 1x400 a687 vs E7e 890d: 0 differing

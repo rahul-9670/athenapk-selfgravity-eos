@@ -1,0 +1,8 @@
+R1_limo3_n1600         N   1600 cycles    2802 | plateau dP* +1.903e-06  du*/vmax +3.471e-07 | L1 rho 3.281e-04
+R1_limo3_n3200         N   3200 cycles    5601 | plateau dP* +2.136e-06  du*/vmax +4.045e-09 | L1 rho 1.740e-04
+R2_limo3_n800          N    800 cycles    1558 | plateau dP* +7.058e-06  du*/vmax -2.005e-05 | L1 rho 1.948e-03
+R2_limo3_n1600         N   1600 cycles    3113 | plateau dP* -8.564e-05  du*/vmax +3.611e-05 | L1 rho 1.045e-03
+R2_limo3_n3200         N   3200 cycles    6218 | plateau dP* -5.370e-05  du*/vmax +2.323e-05 | L1 rho 5.518e-04
+R2_limo3_n6400         N   6400 cycles   12420 | plateau dP* -3.599e-05  du*/vmax +1.260e-05 | L1 rho 3.072e-04
+R3_limo3_n1600         N   1600 cycles   40862 | plateau dP* +3.503e-06  du*/vmax +1.817e-15 | L1 rho 4.111e-04
+R3_limo3_n3200         N   3200 cycles   81724 | plateau dP* +7.804e-07  du*/vmax -2.997e-15 | L1 rho 2.065e-04

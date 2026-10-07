@@ -1,0 +1,6 @@
+sweep over the position f inside a density cell (T fixed), errors vs the DIRECT Saha EOS:
+ T=     10 K  P err: current [+3.3e-04,+1.7e-03]  P/rho-interp [+2.0e-05,+2.0e-05] | c_eff err: current [-1.50e-02,+1.62e-02]  P/rho-interp [+2.23e-05,+2.23e-05]
+ T=    100 K  P err: current [+3.2e-04,+1.7e-03]  P/rho-interp [+1.5e-05,+1.5e-05] | c_eff err: current [-1.52e-02,+1.73e-02]  P/rho-interp [+4.80e-04,+4.80e-04]
+ T=    500 K  P err: current [+3.2e-04,+1.7e-03]  P/rho-interp [+1.5e-05,+1.5e-05] | c_eff err: current [-1.81e-02,+1.83e-02]  P/rho-interp [-5.37e-04,-5.37e-04]
+ T=   2000 K  P err: current [+3.9e-04,+1.8e-03]  P/rho-interp [+6.6e-05,+8.3e-05] | c_eff err: current [-2.49e-02,+2.54e-02]  P/rho-interp [-6.31e-04,-2.17e-04]
+ T=  10000 K  P err: current [+5.3e-04,+2.0e-03]  P/rho-interp [+1.3e-04,+2.1e-04] | c_eff err: current [-2.41e-02,+2.66e-02]  P/rho-interp [+3.01e-04,+1.38e-03]

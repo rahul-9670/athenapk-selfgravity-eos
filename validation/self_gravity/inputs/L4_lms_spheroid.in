@@ -1,0 +1,103 @@
+<comment>
+problem = pressure-free collapse of a homogeneous oblate spheroid (Lin, Mestel and Shu 1965): a = 4,
+          c = 2, rho = 1 (+0.01 floor), four_pi_G = 1; exact semi-axes from the index-symbol ODE.
+
+<job>
+problem_id = grav_analytic
+
+<problem/grav_analytic>
+profile = ellipsoid
+a1 = 4.0
+a2 = 4.0
+a3 = 2.0
+rho_in = 1.0
+rho_out = 1.0e-2
+pressure = 1.0e-6
+nsub = 8
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = none
+numlevel   = 1
+multigrid  = true
+nx1 = 128
+x1min = -8.0
+x1max = 8.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 128
+x2min = -8.0
+x2max = 8.0
+ix2_bc = outflow
+ox2_bc = outflow
+nx3 = 128
+x3min = -8.0
+x3max = 8.0
+ix3_bc = outflow
+ox3_bc = outflow
+
+<parthenon/meshblock>
+nx1 = 32
+nx2 = 32
+nx3 = 32
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.2
+tlim       = 2.5
+nlim       = -1
+dt_ceil = 0.0005
+dt_init = 1.0e-4
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.4
+riemann        = hlld
+reconstruction = plm
+cons_diag      = true
+dfloor = 1e-10
+pfloor = 1e-14
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+single_precision_output = true
+dt = 0.05
+
+<parthenon/output1>
+file_type = hst
+dt = 0.005
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 1.0
+use_swindle        = false
+packed_bc          = true
+ix1_bc             = multipole
+ox1_bc             = multipole
+ix2_bc             = multipole
+ox2_bc             = multipole
+ix3_bc             = multipole
+ox3_bc             = multipole
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

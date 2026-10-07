@@ -1,0 +1,8 @@
+rho0 1.0099999904632568  t_ff 1.91428
+t=1.0002 rho_c/rho0=      1.8 err_c= +0.013%  time lead t_exact(rho_c)-t = +9.38e-05 (+0.005% of t_ff)
+t=1.2802 rho_c/rho0=      3.0 err_c= +0.041%  time lead t_exact(rho_c)-t = +1.71e-04 (+0.009% of t_ff)
+t=1.4402 rho_c/rho0=      4.8 err_c= +0.080%  time lead t_exact(rho_c)-t = +2.34e-04 (+0.012% of t_ff)
+t=1.6002 rho_c/rho0=      9.6 err_c= +0.176%  time lead t_exact(rho_c)-t = +3.18e-04 (+0.017% of t_ff)
+t=1.7602 rho_c/rho0=     34.5 err_c= +0.529%  time lead t_exact(rho_c)-t = +4.39e-04 (+0.023% of t_ff)
+t=1.8402 rho_c/rho0=    138.3 err_c= +1.371%  time lead t_exact(rho_c)-t = +5.26e-04 (+0.027% of t_ff)
+t=1.9002 rho_c/rho0=   3756.1 err_c= +7.609%  time lead t_exact(rho_c)-t = +5.12e-04 (+0.027% of t_ff)

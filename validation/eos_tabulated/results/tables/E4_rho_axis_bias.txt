@@ -1,0 +1,6 @@
+rho axis: log10 rho_code from -1.738, d=0.05013 dex, n=400  -> rho_cgs 1.00e-20 .. 1.00e+00
+esp axis d=0.00527 dex, n=1399
+predicted max bias at mid-cell (dln rho)^2/8 = 1.67e-03
+T=    20 K, rho~1e-13: frac 0.00: +3.07e-05  frac 0.25: +1.30e-03  frac 0.50: +1.70e-03  frac 0.75: +1.26e-03
+T=   300 K, rho~1e-13: frac 0.00: +3.01e-05  frac 0.25: +1.30e-03  frac 0.50: +1.70e-03  frac 0.75: +1.26e-03
+T=  3000 K, rho~1e-13: frac 0.00: +3.18e-05  frac 0.25: +1.31e-03  frac 0.50: +1.70e-03  frac 0.75: +1.26e-03

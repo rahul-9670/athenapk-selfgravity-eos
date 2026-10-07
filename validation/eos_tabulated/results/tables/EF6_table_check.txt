@@ -1,0 +1,20 @@
+nr: production 400  extended 520
+ne: production 1399  extended 1399
+nT: production 1370  extended 1370
+lr0: production -1.73774907389156  extended -7.75278666787652  diff -6.015e+00
+dlr: production 0.050125313283208  extended 0.0501253132832069  diff -1.110e-15
+le0: production -2.03083306801575  extended -2.03083306801575  diff +0.000e+00
+dle: production 0.00526620400112598  extended 0.00526620400112598  diff +0.000e+00
+lT0: production -1.33664240743403  extended -1.33664240743403  diff +0.000e+00
+dlT: production 0.00497718309872441  extended 0.00497718309872441  diff +0.000e+00
+original rows, P: 0 of 559600 values differ; rows with differences []; max rel 0.00e+00
+original rows, cs2: 1399 of 559600 values differ; rows with differences [0]; max rel 6.10e-02
+original rows, logT: 0 of 559600 values differ; rows with differences []; max rel 0.00e+00
+original rows, espT: 0 of 548000 values differ; rows with differences []; max rel 0.00e+00
+new rows vs direct Saha (off-node rho): P_table/P_Saha - 1 (extended table)  [continuation with the production table]
+rho [g/cc]                        3                      10                     100                    1000                    1200                    2000                    3000                    4000                    5000                   10000                   30000
+  2.3e-21    +2.3e-05 [+2.3e-05]   +2.0e-05 [+2.0e-05]   +1.5e-05 [+1.5e-05]   +6.4e-04 [+2.8e-02]   +3.8e-03 [+3.1e-02]   +1.6e-04 [+1.6e-04]   -4.8e-04 [+1.7e-02]   +5.1e-04 [+3.6e-02]   +4.2e-03 [+8.6e-03]   +9.9e-05 [+1.0e-04]   +6.8e-05 [+6.8e-05]
+  1.7e-22    +2.3e-05 [+2.3e-05]   +2.0e-05 [+2.0e-05]   +1.5e-05 [+1.5e-05]   +1.4e-03 [+8.1e-02]   +1.6e-02 [+5.5e-02]   +1.6e-04 [+1.6e-04]   -4.1e-04 [+6.7e-02]   +2.7e-03 [+9.6e-02]   +8.2e-04 [+9.0e-03]   +9.9e-05 [+1.0e-04]   +6.8e-05 [+6.8e-05]
+  3.1e-24    +2.3e-05 [+2.3e-05]   +2.0e-05 [+2.0e-05]   +1.5e-05 [+1.5e-05]   +7.1e-04 [+1.7e-01]   +5.9e-03 [+5.7e-02]   +1.5e-04 [+1.7e-04]   -1.5e-05 [+1.6e-01]   +1.7e-02 [+1.3e-01]   -1.7e-03 [+9.6e-03]   +9.6e-05 [+1.0e-04]   +6.8e-05 [+6.8e-05]
+  1.3e-26    +2.3e-05 [+2.3e-05]   +2.0e-05 [+2.0e-05]   +1.5e-05 [+1.5e-05]   +2.0e-02 [+2.2e-01]   +2.9e-04 [+5.7e-02]   -1.2e-05 [+2.3e-04]   +7.5e-04 [+3.2e-01]   +7.9e-04 [+1.3e-01]   -1.0e-03 [+1.6e-01]   -4.1e-04 [+3.8e-04]   +6.8e-05 [+6.8e-05]
+max |P_table/P_Saha - 1| over the new rows sampled: 2.04e-02

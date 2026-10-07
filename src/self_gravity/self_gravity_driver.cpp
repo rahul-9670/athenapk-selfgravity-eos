@@ -1,0 +1,121 @@
+//========================================================================================
+// AthenaPK - Self-gravity solver driver
+// Adapted from Artemis (LANL) and parthenon poisson_gmg example.
+// Licensed under the BSD 3-Clause License (the "LICENSE").
+//========================================================================================
+
+#include <memory>
+#include <string>
+
+#include <parthenon/driver.hpp>
+#include <parthenon/package.hpp>
+#include <solvers/solver_utils.hpp>
+
+#include "../diagnostics/grav_diag.hpp"
+#include "self_gravity.hpp"
+#include "poisson_equation.hpp"
+#include <solvers/internal_prolongation.hpp>
+#include <solvers/mg_solver.hpp>
+#include <solvers/bicgstab_solver.hpp>
+#include <solvers/solver_base.hpp>
+
+using PoissEq = SelfGravity::PoissonEquation<SelfGravity::grav::phi>;
+using prolongator_t = parthenon::solvers::ProlongationBlockInteriorZeroDirichlet;
+using preconditioner_t = parthenon::solvers::MGSolver<PoissEq, prolongator_t>;
+using SolverT = parthenon::solvers::BiCGSTABSolver<PoissEq, preconditioner_t>;
+
+namespace SelfGravity {
+
+// NOTE (resolved): Multi-rank GPU runs of the GMG-preconditioned BiCGSTAB solver
+// once required CUDA_LAUNCH_BLOCKING=1 at runtime to avoid an asynchronous-execution
+// race in Parthenon's boundary exchange (a sender posted its MPI send before the
+// device-side buffer-pack kernel had completed, so a neighbor rank received garbage
+// ghost data and the preconditioned solve diverged to grav.phi -> NaN).
+// This is now FIXED at the source by a Kokkos::fence() before the MPI send in
+// external/parthenon/src/bvals/comms/boundary_communication.cpp (~line 158, plus an
+// unpack-side fence ~line 358). CUDA_LAUNCH_BLOCKING is therefore NO LONGER NEEDED
+// and should be removed from submit scripts (it serializes every kernel and badly
+// throttles the many small multigrid kernels). Verified: launch-blocking-off multi-
+// rank GPU runs are bit-identical to the old launch-blocking baseline (no NaN).
+//! Add the Poisson solve (solver setup + solve + phi halo + copy back to "base") to a TaskRegion.
+//! Per partition: warm start from base grav.phi (seed_from_phi), RHS from grav::rhs (filled by
+//! FillPoissonRHS in the preceding FillDerived), BiCGSTAB+MG solve, non-convergence warning.
+void SolvePoissonInRegion(parthenon::TaskRegion &region, Mesh *pmesh) {
+  using namespace parthenon;
+  TaskID none(0);
+
+  auto pkg = pmesh->packages.Get("self_gravity");
+  auto psolver = pkg->Param<std::shared_ptr<parthenon::solvers::SolverBase>>("solver_pointer");
+  const bool solver_diag = pkg->Param<bool>("solver_diag");
+  const bool seed_from_phi = pkg->Param<bool>("seed_from_phi");
+
+  auto partitions = pmesh->GetDefaultBlockPartitions();
+  const int num_partitions = partitions.size();
+  for (int i = 0; i < num_partitions; ++i) {
+    TaskList &tl = region[i];
+
+    auto &md = pmesh->mesh_data.Add("base", partitions[i]);
+    auto &md_phi = pmesh->mesh_data.Add("phi", md, {grav::phi::name()});
+    auto &md_rhs = pmesh->mesh_data.Add("rhs", md, {grav::phi::name()});
+
+    // The solver expects both "phi" container and "rhs" container to hold
+    // fields named grav::phi (it operates on IndependentVars = {grav::phi}).
+    // rhs lives in field grav::rhs in md. Copy into grav::phi slot of md_rhs.
+    // seed_from_phi: warm-start from the restart-persisted base grav.phi. Must run BEFORE
+    // copy_rhs, which overwrites base grav.phi with the RHS for the duration of the solve.
+    TaskID seeded = none;
+    if (seed_from_phi) {
+      seeded = tl.AddTask(
+          none, TF(parthenon::solvers::utils::CopyData<parthenon::TypeList<grav::phi>>),
+          md, md_phi);
+    }
+    auto copy_rhs = tl.AddTask(
+        seeded,
+        TF(parthenon::solvers::utils::between_fields::CopyData<grav::rhs, grav::phi>), md);
+    copy_rhs = tl.AddTask(
+        copy_rhs,
+        TF(parthenon::solvers::utils::CopyData<parthenon::TypeList<grav::phi>>),
+        md, md_rhs);
+
+    // Solve
+    auto setup = psolver->AddSetupTasks(tl, copy_rhs, i, pmesh);
+    auto solve = psolver->AddTasks(tl, setup, i, pmesh);
+
+    // VALIDATION WP-5: record iteration count / final residual and flag a solve that
+    // exhausted max_iterations (the solver reports neither). once_per_region because the
+    // recorded scalars are global -- every partition would write the same values.
+    // Pure read of solver state + package Params; touches no field data => bit-identical.
+    if (solver_diag) {
+      solve = tl.AddTask(
+          TaskQualifier::once_per_region, solve, "grav solver convergence diag",
+          [](Mesh *pm) { return Diagnostics::GravDiagRecord(pm); }, pmesh);
+    }
+
+    // B2: the non-convergence WARNING is unconditional -- production does not set solver_diag
+    // (it adds hst columns), which is exactly why the failure mode was invisible where it
+    // mattered. Reads solver state only, writes no field data => bit-identical.
+    solve = tl.AddTask(
+        TaskQualifier::once_per_region, solve, "grav solver nonconvergence warn",
+        [](Mesh *pm) { return Diagnostics::GravConvergenceWarn(pm); }, pmesh);
+
+    // Communicate phi ghost cells after solve (so ApplyGravitySource sees full halo).
+    auto bcs = parthenon::AddBoundaryExchangeTasks(solve, tl, md_phi, pmesh->multilevel);
+
+    // Copy solution from md_phi's grav::phi slot back into md (the base container)
+    // so downstream tasks (ApplyGravitySource) and outputs can find it.
+    tl.AddTask(
+        bcs,
+        TF(parthenon::solvers::utils::CopyData<parthenon::TypeList<grav::phi>>),
+        md_phi, md);
+  }
+}
+
+
+//! Entry point: the solve in its own region.
+void SolvePoisson(TaskCollection &tc, Mesh *pmesh) {
+  auto partitions = pmesh->GetDefaultBlockPartitions();
+  parthenon::TaskRegion &region = tc.AddRegion(partitions.size());
+  SolvePoissonInRegion(region, pmesh);
+}
+
+} // namespace SelfGravity

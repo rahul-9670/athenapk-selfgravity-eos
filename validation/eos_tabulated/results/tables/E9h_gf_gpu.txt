@@ -1,0 +1,2 @@
+E9h: double flux + ghost fill on GPU (eacbd7c1) vs CPU (11d1eb2b, runs/E7w/gfchk), all snapshots
+run                          | cycles GPU/CPU | max over snaps: |P/P*-1| GPU, CPU | max rel diff rho, P GPU-CPU

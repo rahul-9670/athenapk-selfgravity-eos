@@ -1,0 +1,53 @@
+R1_molecular [p_over_rho]  t = 0.045412  exact P* 1.084151e+05 u* +6.394842e+00  waves rarefaction/shock
+   N   100  L1 rho 5.579e-03 u 1.223e-02 P 3.840e-03 | plateau dP* -1.35e-03 du* +7.87e-04 drho*L -3.50e-03 drho*R -4.96e-03 | shock offset [cells] R +0.50
+   N   200  L1 rho 2.859e-03 u 6.157e-03 P 1.925e-03  orders 0.96 0.99 1.00 | plateau dP* +2.07e-04 du* +6.69e-05 drho*L +4.22e-05 drho*R +1.65e-03 | shock offset [cells] R +0.52
+   N   400  L1 rho 1.434e-03 u 3.098e-03 P 9.680e-04  orders 1.00 0.99 0.99 | plateau dP* +5.53e-05 du* +2.54e-05 drho*L -5.00e-06 drho*R +4.21e-05 | shock offset [cells] R +0.53
+   N   800  L1 rho 7.213e-04 u 1.560e-03 P 4.935e-04  orders 0.99 0.99 0.97 | plateau dP* +2.05e-05 du* +1.24e-05 drho*L -7.47e-06 drho*R -2.59e-05 | shock offset [cells] R +0.53
+   N  1600  L1 rho 3.737e-04 u 7.953e-04 P 2.617e-04  orders 0.95 0.97 0.91 | plateau dP* +1.95e-05 du* +7.54e-06 drho*L -6.15e-06 drho*R -1.66e-05 | shock offset [cells] R +0.54
+   N  3200  L1 rho 2.050e-04 u 4.150e-04 P 1.482e-04  orders 0.87 0.94 0.82 | plateau dP* +1.78e-05 du* +5.98e-06 drho*L -1.21e-06 drho*R -8.70e-06 | shock offset [cells] R +0.55
+R2_dissociation [p_over_rho]  t = 0.01036  exact P* 2.496177e+11 u* +3.280558e+01  waves rarefaction/shock
+   N   100  L1 rho 1.328e-02 u 1.385e-02 P 4.386e-03 | plateau dP* -7.10e-03 du* +3.11e-03 drho*L -5.20e-03 drho*R -7.74e-02 | shock offset [cells] R +0.23
+   N   200  L1 rho 7.348e-03 u 7.144e-03 P 2.456e-03  orders 0.85 0.96 0.84 | plateau dP* -2.26e-03 du* +1.00e-03 drho*L -2.25e-03 drho*R -4.34e-03 | shock offset [cells] R +0.15
+   N   400  L1 rho 4.196e-03 u 3.653e-03 P 1.394e-03  orders 0.81 0.97 0.82 | plateau dP* -6.74e-04 du* +1.48e-04 drho*L -5.35e-04 drho*R +2.33e-03 | shock offset [cells] R +0.09
+   N   800  L1 rho 2.374e-03 u 1.876e-03 P 7.914e-04  orders 0.82 0.96 0.82 | plateau dP* -5.28e-04 du* +1.17e-04 drho*L -4.32e-04 drho*R -5.11e-04 | shock offset [cells] R +0.04
+   N  1600  L1 rho 1.350e-03 u 9.607e-04 P 4.568e-04  orders 0.81 0.97 0.79 | plateau dP* -4.11e-04 du* +5.43e-05 drho*L -3.45e-04 drho*R -2.97e-04 | shock offset [cells] R -0.03
+   N  3200  L1 rho 7.707e-04 u 4.928e-04 P 2.761e-04  orders 0.81 0.96 0.73 | plateau dP* -3.25e-04 du* +8.73e-06 drho*L -2.47e-04 drho*R -2.02e-04 | shock offset [cells] R -0.13
+R3_dissoc_shock [p_over_rho]  t = 0.0866  exact P* 1.370072e+12 u* +0.000000e+00  waves shock/shock
+   N   100  L1 rho 6.567e-03 u 5.623e-03 P 4.762e-03 | plateau dP* +8.72e-04 du* -3.46e-15 drho*L +5.98e-04 drho*R +5.98e-04 | shock offset [cells] L -0.02, R +0.02
+   N   200  L1 rho 3.524e-03 u 2.931e-03 P 2.494e-03  orders 0.90 0.94 0.93 | plateau dP* +1.66e-04 du* +9.96e-16 drho*L +1.13e-04 drho*R +1.13e-04 | shock offset [cells] L -0.03, R +0.03
+   N   400  L1 rho 1.829e-03 u 1.530e-03 P 1.271e-03  orders 0.95 0.94 0.97 | plateau dP* -5.29e-05 du* -1.80e-15 drho*L -5.71e-05 drho*R -5.71e-05 | shock offset [cells] L -0.03, R +0.03
+   N   800  L1 rho 9.102e-04 u 7.568e-04 P 6.269e-04  orders 1.01 1.02 1.02 | plateau dP* -8.85e-06 du* +2.49e-15 drho*L -5.95e-06 drho*R -5.95e-06 | shock offset [cells] L -0.03, R +0.03
+R4_ionization [p_over_rho]  t = 0.0027975  exact P* 3.492671e+13 u* +1.259711e+02  waves rarefaction/shock
+   N   100  L1 rho 1.610e-02 u 1.424e-02 P 4.527e-03 | plateau dP* -1.46e-02 du* +5.32e-03 drho*L -1.05e-02 drho*R -1.17e-01 | shock offset [cells] R +0.00
+   N   200  L1 rho 8.630e-03 u 7.322e-03 P 2.505e-03  orders 0.90 0.96 0.85 | plateau dP* -6.13e-03 du* +2.68e-03 drho*L -5.38e-03 drho*R -1.79e-02 | shock offset [cells] R -0.08
+   N   400  L1 rho 5.444e-03 u 3.738e-03 P 1.418e-03  orders 0.66 0.97 0.82 | plateau dP* -1.92e-03 du* +7.92e-04 drho*L -1.68e-03 drho*R +2.42e-03 | shock offset [cells] R -0.23
+   N   800  L1 rho 3.129e-03 u 1.946e-03 P 8.187e-04  orders 0.80 0.94 0.79 | plateau dP* -1.25e-03 du* +4.63e-04 drho*L -9.41e-04 drho*R +1.54e-03 | shock offset [cells] R -0.36
+   N  1600  L1 rho 1.829e-03 u 1.037e-03 P 4.848e-04  orders 0.77 0.91 0.76 | plateau dP* -1.06e-03 du* +3.72e-04 drho*L -7.96e-04 drho*R -2.79e-04 | shock offset [cells] R -0.58
+   N  3200  L1 rho 1.091e-03 u 5.760e-04 P 2.989e-04  orders 0.75 0.85 0.70 | plateau dP* -7.31e-04 du* +2.13e-04 drho*L -5.20e-04 drho*R -2.23e-04 | shock offset [cells] R -0.87
+R1_molecular [p]  t = 0.045394  exact P* 1.085034e+05 u* +6.397411e+00  waves rarefaction/shock
+   N   100  L1 rho 5.999e-03 u 1.281e-02 P 4.353e-03 | plateau dP* -1.37e-03 du* +9.15e-04 drho*L -3.31e-03 drho*R -5.42e-03 | shock offset [cells] R +0.51
+   N   200  L1 rho 3.535e-03 u 7.082e-03 P 2.762e-03  orders 0.76 0.85 0.66 | plateau dP* +2.04e-04 du* +9.42e-05 drho*L -7.72e-05 drho*R +1.85e-03 | shock offset [cells] R +0.52
+   N   400  L1 rho 2.039e-03 u 3.925e-03 P 1.727e-03  orders 0.79 0.85 0.68 | plateau dP* +1.03e-04 du* +2.24e-05 drho*L +4.04e-05 drho*R +7.02e-05 | shock offset [cells] R +0.53
+   N   800  L1 rho 1.131e-03 u 2.121e-03 P 1.008e-03  orders 0.85 0.89 0.78 | plateau dP* +5.88e-05 du* +9.12e-06 drho*L +1.02e-05 drho*R -2.02e-05 | shock offset [cells] R +0.55
+   N  1600  L1 rho 6.067e-04 u 1.115e-03 P 5.539e-04  orders 0.90 0.93 0.86 | plateau dP* +4.27e-05 du* +8.73e-06 drho*L +4.34e-09 drho*R -2.40e-05 | shock offset [cells] R +0.56
+   N  3200  L1 rho 3.271e-04 u 5.843e-04 P 3.006e-04  orders 0.89 0.93 0.88 | plateau dP* +2.96e-05 du* +8.71e-06 drho*L -2.25e-06 drho*R -1.18e-05 | shock offset [cells] R +0.58
+R2_dissociation [p]  t = 0.010356  exact P* 2.498606e+11 u* +3.282136e+01  waves rarefaction/shock
+   N   100  L1 rho 1.355e-02 u 1.428e-02 P 4.692e-03 | plateau dP* -6.58e-03 du* +3.00e-03 drho*L -5.47e-03 drho*R -7.69e-02 | shock offset [cells] R +0.23
+   N   200  L1 rho 7.921e-03 u 7.979e-03 P 3.094e-03  orders 0.77 0.84 0.60 | plateau dP* -1.82e-03 du* +6.89e-04 drho*L -2.00e-03 drho*R -4.43e-03 | shock offset [cells] R +0.16
+   N   400  L1 rho 4.796e-03 u 4.504e-03 P 2.074e-03  orders 0.72 0.83 0.58 | plateau dP* -6.42e-04 du* +1.72e-04 drho*L -5.58e-04 drho*R +2.70e-03 | shock offset [cells] R +0.10
+   N   800  L1 rho 2.819e-03 u 2.499e-03 P 1.312e-03  orders 0.77 0.85 0.66 | plateau dP* -5.08e-04 du* +1.15e-04 drho*L -4.02e-04 drho*R -4.91e-04 | shock offset [cells] R +0.05
+   N  1600  L1 rho 1.619e-03 u 1.332e-03 P 7.747e-04  orders 0.80 0.91 0.76 | plateau dP* -4.07e-04 du* +5.45e-05 drho*L -3.17e-04 drho*R -2.92e-04 | shock offset [cells] R -0.01
+   N  3200  L1 rho 9.191e-04 u 6.949e-04 P 4.476e-04  orders 0.82 0.94 0.79 | plateau dP* -3.21e-04 du* +7.31e-06 drho*L -2.34e-04 drho*R -2.13e-04 | shock offset [cells] R -0.11
+R3_dissoc_shock [p]  t = 0.086539  exact P* 1.370126e+12 u* +0.000000e+00  waves shock/shock
+   N   100  L1 rho 6.548e-03 u 5.691e-03 P 4.896e-03 | plateau dP* +7.69e-04 du* -1.69e-13 drho*L +4.21e-04 drho*R +4.21e-04 | shock offset [cells] L -0.02, R +0.02
+   N   200  L1 rho 3.490e-03 u 2.940e-03 P 2.583e-03  orders 0.91 0.95 0.92 | plateau dP* +1.81e-04 du* +2.13e-14 drho*L +1.00e-04 drho*R +1.00e-04 | shock offset [cells] L -0.03, R +0.03
+   N   400  L1 rho 1.806e-03 u 1.532e-03 P 1.296e-03  orders 0.95 0.94 1.00 | plateau dP* -3.41e-05 du* +5.12e-15 drho*L -4.51e-05 drho*R -4.51e-05 | shock offset [cells] L -0.03, R +0.03
+   N   800  L1 rho 9.016e-04 u 7.617e-04 P 6.462e-04  orders 1.00 1.01 1.00 | plateau dP* -8.93e-06 du* +5.54e-15 drho*L -4.95e-06 drho*R -4.95e-06 | shock offset [cells] L -0.03, R +0.03
+   N  1600  L1 rho 4.512e-04 u 3.782e-04 P 3.192e-04  orders 1.00 1.01 1.02 | plateau dP* -2.98e-07 du* -2.05e-15 drho*L +1.81e-08 drho*R +1.81e-08 | shock offset [cells] L -0.03, R +0.03
+R4_ionization [p]  t = 0.002796  exact P* 3.496666e+13 u* +1.260414e+02  waves rarefaction/shock
+   N   100  L1 rho 1.674e-02 u 1.505e-02 P 5.313e-03 | plateau dP* -1.43e-02 du* +5.27e-03 drho*L -1.03e-02 drho*R -1.17e-01 | shock offset [cells] R +0.00
+   N   200  L1 rho 9.339e-03 u 8.296e-03 P 3.389e-03  orders 0.84 0.86 0.65 | plateau dP* -6.01e-03 du* +2.67e-03 drho*L -5.12e-03 drho*R -1.84e-02 | shock offset [cells] R -0.08
+   N   400  L1 rho 6.027e-03 u 4.544e-03 P 2.152e-03  orders 0.63 0.87 0.65 | plateau dP* -1.97e-03 du* +8.42e-04 drho*L -1.55e-03 drho*R +2.69e-03 | shock offset [cells] R -0.22
+   N   800  L1 rho 3.529e-03 u 2.493e-03 P 1.321e-03  orders 0.77 0.87 0.70 | plateau dP* -1.29e-03 du* +4.64e-04 drho*L -9.62e-04 drho*R +1.66e-03 | shock offset [cells] R -0.35
+   N  1600  L1 rho 2.062e-03 u 1.353e-03 P 7.794e-04  orders 0.78 0.88 0.76 | plateau dP* -1.05e-03 du* +3.67e-04 drho*L -7.89e-04 drho*R -2.90e-04 | shock offset [cells] R -0.57
+   N  3200  L1 rho 1.220e-03 u 7.519e-04 P 4.602e-04  orders 0.76 0.85 0.76 | plateau dP* -7.17e-04 du* +2.04e-04 drho*L -5.28e-04 drho*R -2.44e-04 | shock offset [cells] R -0.86

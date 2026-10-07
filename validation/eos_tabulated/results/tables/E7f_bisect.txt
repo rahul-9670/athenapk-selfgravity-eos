@@ -1,0 +1,10 @@
+R2_dissociation_n12800 N  12800 cycles   24817 | plateau dP* -6.768e-05  du* +3.541e-05 | L1 rho 2.646e-04
+R2_dissociation_n6400  N   6400 cycles   12429 | plateau dP* -1.089e-04  du* +6.140e-05 | L1 rho 4.559e-04
+R4_ionization_n12800   N  12800 cycles   25820 | plateau dP* -2.186e-04  du* +1.175e-04 | L1 rho 4.108e-04
+R4_ionization_n6400    N   6400 cycles   12944 | plateau dP* -3.403e-04  du* +1.888e-04 | L1 rho 6.340e-04
+R4_n1600_bis60         N   1600 cycles    3254 | plateau dP* -8.750e-04  du* +4.816e-04 | L1 rho 1.816e-03
+R4_n1600_cfl01         N   1600 cycles    9759 | plateau dP* -8.389e-04  du* +4.648e-04 | L1 rho 1.785e-03
+R4_n1600_dcpred        N   1600 cycles    3250 | plateau dP* -5.032e-04  du* +2.789e-04 | L1 rho 1.529e-03
+R4_n1600_hlle          (no final dump)
+R4_n1600_ref           N   1600 cycles    3254 | plateau dP* -8.715e-04  du* +4.817e-04 | L1 rho 1.816e-03
+R4_n1600_rk2           N   1600 cycles    3254 | plateau dP* -8.695e-04  du* +4.793e-04 | L1 rho 1.820e-03

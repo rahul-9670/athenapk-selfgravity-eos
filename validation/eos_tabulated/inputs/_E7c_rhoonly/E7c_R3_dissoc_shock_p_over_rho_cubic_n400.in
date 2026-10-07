@@ -1,0 +1,68 @@
+<comment>
+problem = E7c R3_dissoc_shock (colliding molecular streams +-16 km/s: two shocks heating the gas into H2 dissociation (T* 2530 K, compression 19)), eos_interp = p_over_rho, eos_rho_interp = cubic, N = 400
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = riemann
+x0 = 0.5
+rhoL = 182915675.87342235
+TL = 100.00159639614873
+uL = 84.21052631578948
+rhoR = 182915675.87342235
+TR = 100.00159639614873
+uR = -84.21052631578948
+espL_code = 15.041181554443751
+espR_code = 15.041181554443751
+
+<parthenon/mesh>
+refinement = none
+nx1 = 400
+x1min = 0.0
+x1max = 1.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 400
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.0866007437625794
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold.bin
+gamma = 1.4
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_plain   # 1D decks: dedner_extended (production, 3D) segfaults in 1D (E-F3); B = 0 here
+eos_floor_consistent = true
+dfloor = 1.0e-12
+pfloor = 1.0e-14
+eos_interp = p_over_rho
+eos_rho_interp = cubic
+
+<physics>
+self_gravity = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+dt = 0.0866007437625794

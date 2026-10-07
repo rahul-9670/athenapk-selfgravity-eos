@@ -1,0 +1,36 @@
+(1) pure moving contact: L1 / max |P/P*-1|   [standard PLM]   | energy: (E_dflux - E_std)/E_std
+R4_ionization    N   400: 9.64e-15 / 3.2e-14   [2.84e-03 / 4.2e-02]   | dE/E +2.35e-03
+R4_ionization    N   800: 9.67e-15 / 3.8e-14   [1.75e-03 / 3.7e-02]   | dE/E +1.45e-03
+R4_ionization    N  1600: 1.22e-14 / 4.8e-14   [1.07e-03 / 3.2e-02]   | dE/E +8.94e-04
+R4_ionization    N  3200: 1.62e-14 / 8.9e-14   [6.61e-04 / 2.8e-02]   | dE/E +5.54e-04
+R4_ionization    N  6400: 2.11e-14 / 1.4e-13   [4.08e-04 / 2.3e-02]   | dE/E +3.44e-04
+R2_dissociation  N   400: 2.55e-15 / 1.8e-14   [7.72e-04 / 1.1e-02]   | dE/E +1.13e-03
+R2_dissociation  N   800: 4.05e-15 / 4.9e-14   [4.84e-04 / 9.6e-03]   | dE/E +7.05e-04
+R2_dissociation  N  1600: 7.13e-15 / 5.3e-14   [3.04e-04 / 8.3e-03]   | dE/E +4.42e-04
+R2_dissociation  N  3200: 1.17e-14 / 9.4e-14   [1.91e-04 / 7.2e-03]   | dE/E +2.78e-04
+R2_dissociation  N  6400: 1.66e-14 / 2.0e-13   [1.21e-04 / 6.1e-03]   | dE/E +1.75e-04
+R1_molecular     N   400: 1.46e-15 / 8.8e-15   [5.05e-06 / 3.4e-05]   | dE/E -2.69e-06
+R1_molecular     N   800: 1.93e-15 / 1.1e-14   [3.45e-06 / 3.2e-05]   | dE/E -1.02e-06
+R1_molecular     N  1600: 2.71e-15 / 2.1e-14   [3.16e-06 / 2.2e-05]   | dE/E -3.48e-08
+R1_molecular     N  3200: 2.77e-15 / 2.0e-14   [3.25e-06 / 2.1e-05]   | dE/E +5.80e-07
+R1_molecular     N  6400: 4.98e-15 / 3.1e-14   [3.43e-06 / 2.3e-05]   | dE/E +9.56e-07
+(2) Riemann: plateau P* error and L1(rho) vs exact   [standard PLM]   | energy (E_dflux - E_std)/E_std
+R4_ionization    N   400: dP* +1.81e-04  L1 5.43e-03   [dP* -1.79e-03  L1 5.44e-03]   | dE/E +9.00e-04
+R4_ionization    N   800: dP* +1.57e-04  L1 3.10e-03   [dP* -1.11e-03  L1 3.12e-03]   | dE/E +6.24e-04
+R4_ionization    N  1600: dP* +1.31e-06  L1 1.78e-03   [dP* -8.72e-04  L1 1.82e-03]   | dE/E +4.26e-04
+R4_ionization    N  3200: dP* -3.17e-06  L1 1.02e-03   [dP* -5.35e-04  L1 1.07e-03]   | dE/E +2.86e-04
+R4_ionization    N  6400: dP* -1.23e-06  L1 5.88e-04   [dP* -3.40e-04  L1 6.34e-04]   | dE/E +1.89e-04
+R2_dissociation  N   400: dP* +2.63e-04  L1 4.17e-03   [dP* -5.20e-04  L1 4.20e-03]   | dE/E +5.30e-04
+R2_dissociation  N   800: dP* +2.73e-05  L1 2.34e-03   [dP* -3.77e-04  L1 2.38e-03]   | dE/E +3.37e-04
+R2_dissociation  N  1600: dP* -5.54e-06  L1 1.32e-03   [dP* -2.59e-04  L1 1.35e-03]   | dE/E +2.14e-04
+R2_dissociation  N  3200: dP* -2.63e-06  L1 7.37e-04   [dP* -1.72e-04  L1 7.60e-04]   | dE/E +1.35e-04
+R2_dissociation  N  6400: dP* -3.70e-06  L1 4.45e-04   [dP* -1.09e-04  L1 4.56e-04]   | dE/E +8.56e-05
+R1_molecular     N   400: dP* +2.63e-05  L1 1.43e-03   [dP* +3.95e-05  L1 1.43e-03]   | dE/E -2.67e-06
+R1_molecular     N   800: dP* -2.18e-06  L1 7.20e-04   [dP* +4.72e-06  L1 7.21e-04]   | dE/E -1.87e-06
+R1_molecular     N  1600: dP* -2.04e-06  L1 3.72e-04   [dP* +1.25e-06  L1 3.73e-04]   | dE/E -1.08e-06
+R1_molecular     N  3200: dP* -1.29e-06  L1 2.04e-04   [dP* -2.01e-07  L1 2.04e-04]   | dE/E -5.84e-07
+R1_molecular     N  6400: dP* +4.10e-07  L1 1.16e-04
+R3_dissoc_shock  N   400: dP* -5.30e-05  L1 1.83e-03   [dP* -5.30e-05  L1 1.83e-03]   | dE/E +2.56e-06
+R3_dissoc_shock  N   800: dP* -8.80e-06  L1 9.11e-04   [dP* -8.87e-06  L1 9.10e-04]   | dE/E +1.28e-06
+R3_dissoc_shock  N  1600: dP* +2.12e-06  L1 4.54e-04   [dP* +2.16e-06  L1 4.54e-04]   | dE/E +6.49e-07
+R3_dissoc_shock  N  3200: dP* +5.91e-07  L1 2.28e-04   [dP* +6.54e-07  L1 2.28e-04]   | dE/E +3.30e-07

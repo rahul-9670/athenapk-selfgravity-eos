@@ -1,0 +1,69 @@
+<comment>
+problem = E10 floor probe: right half esp = 0.0046573291947043256, eos_floor_consistent = false
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = riemann
+x0 = 0.5
+rhoL = 18.291567587342236
+TL = 10.0
+rhoR = 18.291567587342236
+TR = 10.0
+espR_code = 0.0046573291947043256
+
+<parthenon/mesh>
+refinement = none
+nx1 = 32
+x1min = 0.0
+x1max = 1.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 4
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 4
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 32
+nx2 = 4
+nx3 = 4
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 1.0
+nlim = 3
+
+<hydro>
+fluid = glmmhd
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold.bin
+gamma = 1.4
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_plain   # 1D decks: dedner_extended (production, 3D) segfaults in 1D (E-F3); B = 0 here
+eos_floor_consistent = false
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+cons_diag = true   # production: floor counters in the hst
+
+<physics>
+self_gravity = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+dt = 1.0
+
+<parthenon/output1>
+file_type = hst
+dt = -1
+dn = 1

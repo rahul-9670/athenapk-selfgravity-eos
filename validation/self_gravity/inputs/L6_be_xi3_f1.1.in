@@ -1,0 +1,108 @@
+<comment>
+problem = exact isothermal Bonnor-Ebert sphere xi_max = 3.0, overdensity f = 1.1, pressure-bounded
+          (collapse_be exterior momentum BC), production barotropic EOS, Jeans AMR.
+
+<job>
+problem_id = collapse_be
+
+<problem/collapse_be>
+mass = 6.0
+temperature = 10.0
+f = 1.1
+rhocrit = 1.0e-6
+be_profile = exact
+xi_max = 3.0
+amp = 0.0
+omegatff = 0.0
+turb_mach = 0.0
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = adaptive
+numlevel   = 6
+multigrid  = true
+nx1 = 64
+x1min = -8.0
+x1max = 8.0
+ix1_bc = diode
+ox1_bc = diode
+nx2 = 64
+x2min = -8.0
+x2max = 8.0
+ix2_bc = diode
+ox2_bc = diode
+nx3 = 64
+x3min = -8.0
+x3max = 8.0
+ix3_bc = diode
+ox3_bc = diode
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 16
+nx3 = 16
+
+
+<refinement>
+type   = jeans
+njeans = 8
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.3
+tlim       = 30.0
+nlim       = -1
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.4
+riemann        = hlld
+reconstruction = plm
+cons_diag      = true
+boundary_flux_clamp = true
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+single_precision_output = true
+dt = 1.0
+
+<parthenon/output1>
+file_type = hst
+dt = 0.1
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 1.0
+use_swindle        = false
+packed_bc          = true
+ix1_bc             = multipole
+ox1_bc             = multipole
+ix2_bc             = multipole
+ox2_bc             = multipole
+ix3_bc             = multipole
+ox3_bc             = multipole
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

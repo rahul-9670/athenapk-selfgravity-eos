@@ -1,0 +1,4 @@
+esp_min (code) 9.314658e-03; P(rho, esp_min)/rho = 6.2098e-03; pfloor 1e-8
+E10_probe_control_fctrue_Tfloor EOS-warning lines 0 (esp< per cycle []) | hst (cycle, npfloor, tot-E) [(0, 0.0, 26.9144), (1, 0.0, 26.9144), (2, 0.0, 26.9144), (3, 0.0, 26.9144)] | right half: P/rho in [9.8096e-01, 9.8096e-01], P/pfloor 1.794e+09
+E10_probe_negative_fctrue_Tfloor EOS-warning lines 1 (esp< per cycle [2304]) | hst (cycle, npfloor, tot-E) [(0, 0.0, 17.1312), (1, 0.0, 17.1312), (2, 0.0, 17.1312), (3, 0.0, 17.1312)] | right half: P/rho in [2.6782e-01, 2.6782e-01], P/pfloor 4.899e+08
+E10_probe_subedge_fctrue_Tfloor EOS-warning lines 1 (esp< per cycle [1152]) | hst (cycle, npfloor, tot-E) [(0, 0.0, 17.1312), (1, 0.0, 17.1312), (2, 0.0, 17.1312), (3, 0.0, 17.1312)] | right half: P/rho in [2.6782e-01, 2.6782e-01], P/pfloor 4.899e+08

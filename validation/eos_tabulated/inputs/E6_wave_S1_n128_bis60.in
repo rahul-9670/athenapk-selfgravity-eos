@@ -1,0 +1,61 @@
+<comment>
+problem = as E6_wave_S1_n128 with 60 P->e bisections (production: 20)
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = wave
+rho0 = 1.8291567587342235
+T0 = 10.0
+amp = 1.0e-6
+
+<parthenon/mesh>
+refinement = none
+nx1 = 128
+x1min = 0.0
+x1max = 1.0
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 128
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.7815626041891005
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold.bin
+gamma = 1.4
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_plain   # 1D decks: dedner_extended (production, 3D) indexes y/z neighbours and segfaults in 1D; B = 0 here
+eos_floor_consistent = true
+dfloor = 1.0e-12
+pfloor = 1.0e-14
+eos_bisections = 60
+
+<physics>
+self_gravity = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+dt = 0.7815626041891005

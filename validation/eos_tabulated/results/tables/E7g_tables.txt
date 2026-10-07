@@ -1,0 +1,16 @@
+r4  R2_dissociation  N   800 | plateau dP* -3.782e-04 | L1 rho 2.378e-03
+r4  R2_dissociation  N  1600 | plateau dP* -2.563e-04 | L1 rho 1.347e-03
+r4  R2_dissociation  N  3200 | plateau dP* -1.712e-04 | L1 rho 7.600e-04
+r4  R2_dissociation  N  6400 | plateau dP* -1.090e-04 | L1 rho 4.562e-04
+r4  R4_ionization    N   800 | plateau dP* -1.108e-03 | L1 rho 3.123e-03
+r4  R4_ionization    N  1600 | plateau dP* -8.706e-04 | L1 rho 1.816e-03
+r4  R4_ionization    N  3200 | plateau dP* -5.371e-04 | L1 rho 1.070e-03
+r4  R4_ionization    N  6400 | plateau dP* -3.472e-04 | L1 rho 6.341e-04
+x2  R2_dissociation  N   800 | plateau dP* -3.816e-04 | L1 rho 2.366e-03
+x2  R2_dissociation  N  1600 | plateau dP* -2.608e-04 | L1 rho 1.357e-03
+x2  R2_dissociation  N  3200 | plateau dP* -1.748e-04 | L1 rho 7.748e-04
+x2  R2_dissociation  N  6400 | plateau dP* -1.087e-04 | L1 rho 4.659e-04
+x2  R4_ionization    N   800 | plateau dP* -1.099e-03 | L1 rho 3.089e-03
+x2  R4_ionization    N  1600 | plateau dP* -8.797e-04 | L1 rho 1.810e-03
+x2  R4_ionization    N  3200 | plateau dP* -5.548e-04 | L1 rho 1.075e-03
+x2  R4_ionization    N  6400 | plateau dP* -3.592e-04 | L1 rho 6.430e-04

@@ -1,0 +1,16 @@
+R4_ionization plmref N   800: de in left star region median +1.502e-05 (range -1.16e-01..+4.34e-05); in fan median +3.797e-07
+R4_ionization plmref N  1600: de in left star region median +8.193e-06 (range -6.29e-02..+3.44e-05); in fan median +1.226e-07
+R4_ionization plmref N  3200: de in left star region median +5.183e-06 (range -1.23e-02..+3.70e-05); in fan median -4.114e-09
+R4_ionization plmref N  6400: de in left star region median +2.871e-06 (range -1.79e-04..+2.05e-05); in fan median -1.567e-08
+R4_ionization limo3  N   800: de in left star region median +7.597e-06 (range -1.95e-02..+3.51e-04); in fan median +2.411e-07
+R4_ionization limo3  N  1600: de in left star region median +5.014e-06 (range -2.57e-04..+4.36e-05); in fan median +9.283e-08
+R4_ionization limo3  N  3200: de in left star region median +1.870e-06 (range -9.45e-05..+1.45e-04); in fan median -4.460e-08
+R4_ionization limo3  N  6400: de in left star region median +9.304e-07 (range -5.84e-05..+1.04e-04); in fan median -3.009e-08
+R2_dissociation plmref N   800: de in left star region median +1.608e-05 (range -4.25e-04..+4.59e-05); in fan median +4.635e-07
+R2_dissociation plmref N  1600: de in left star region median +4.103e-06 (range -6.76e-06..+1.72e-05); in fan median +5.498e-08
+R2_dissociation plmref N  3200: de in left star region median -1.029e-06 (range -8.74e-06..+1.12e-05); in fan median -2.150e-08
+R2_dissociation plmref N  6400: de in left star region median -5.275e-06 (range -1.14e-05..+1.04e-05); in fan median -2.572e-08
+R2_dissociation limo3  N   800: de in left star region median +7.908e-06 (range -2.18e-05..+2.70e-05); in fan median +1.726e-07
+R2_dissociation limo3  N  1600: de in left star region median +4.078e-06 (range -3.46e-05..+2.70e-05); in fan median +1.706e-09
+R2_dissociation limo3  N  3200: de in left star region median -2.466e-07 (range -1.60e-05..+1.24e-05); in fan median -1.285e-07
+R2_dissociation limo3  N  6400: de in left star region median -8.711e-07 (range -1.86e-05..+1.27e-05); in fan median -1.904e-07

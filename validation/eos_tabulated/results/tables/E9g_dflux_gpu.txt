@@ -1,0 +1,7 @@
+E9g: double flux v6 on the GPU (84aab51e = source of CPU 37c90051, bitwise = fe0caa0f) vs CPU fe0caa0f, final
+run                       cycles GPU/CPU | max rel rho  max |dv|/max|v|  max rel P | L1(drho)/mean rho | max|P/P*-1| GPU, CPU
+E7e_R4_n400_mb100         816/816 | 7.1e-05  2.0e-05  5.6e-05 | 2.4e-06 | 9.8e-01, 9.8e-01
+E7k_R4_mov_n400_mb100     681/681 | 6.1e-14  2.7e-14  5.0e-14 | 4.9e-15 | 4.2e-14, 3.1e-14
+E7q_slab111_3d_n64        82/82 | 3.0e-14  7.6e-15  2.8e-14 | 4.9e-15 | 1.0e-14, 2.0e-14
+E7q_slab11_2d_n128        181/181 | 1.9e-13  1.3e-14  2.4e-14 | 9.8e-15 | 1.7e-14, 2.0e-14
+E7r_R4_mov_1d_amr         1358/1358 | 1.6e-05  1.6e-05  4.2e-05 | 3.8e-07 | 1.8e-04, 1.8e-04

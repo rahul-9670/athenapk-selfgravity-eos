@@ -1,0 +1,118 @@
+<comment>
+problem = Hennebelle et al. (2011) massive magnetised turbulent barotropic core: rho = rho_c/(1+(r/r0)^2),
+          contrast 10, alpha_th = 0.12 (=> 142 Msun at their rho_c), E_turb = 0.2 |W| (Kolmogorov, seed 42), mu = 2,
+          barotropic rho_crit 1e-13 g/cc, uniform B (theirs ~ column density), Jeans AMR. Statistical benchmark.
+
+<job>
+problem_id = collapse_be
+
+<problem/collapse_be>
+mass = 7.498681832477106
+temperature = 10.0
+f = 1.0
+rhocrit = 1.0e-13
+be_profile = hennebelle
+xi_max = 16.618337948967557
+profile_r0 = 5.539445982989186
+amp = 0.0
+omegatff = 0.0
+B0z = 0.7229443573931895
+turb_mach = 2.2360679774997867
+turb_alpha = 3.667
+turb_ksample = k2
+turb_seed = 42
+turb_kmin = 1
+turb_kmax = 8
+turb_nmodes = 2048
+turb_region = sphere
+
+<parthenon/mesh>
+task_collection_timeout_in_seconds = 7200   # production value
+refinement = adaptive
+numlevel   = 10
+multigrid  = true
+nx1 = 64
+x1min = -21.0
+x1max = 21.0
+ix1_bc = diode
+ox1_bc = diode
+nx2 = 64
+x2min = -21.0
+x2max = 21.0
+ix2_bc = diode
+ox2_bc = diode
+nx3 = 64
+x3min = -21.0
+x3max = 21.0
+ix3_bc = diode
+ox3_bc = diode
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 16
+nx3 = 16
+
+
+<refinement>
+type   = jeans
+njeans = 8
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.3
+tlim       = 2.6
+nlim       = -1
+
+<hydro>
+fluid          = glmmhd
+glmmhd_source  = dedner_extended
+eos            = adiabatic
+gamma          = 1.4
+riemann        = hlld
+reconstruction = plm
+cons_diag      = true
+boundary_flux_clamp = true
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim
+single_precision_output = true
+dt = 0.05
+
+<parthenon/output1>
+file_type = hst
+dt = 0.005
+
+<physics>
+self_gravity = true
+
+<self_gravity>
+units_override     = true
+four_pi_G          = 1.0
+use_swindle        = false
+packed_bc          = true
+ix1_bc             = multipole
+ox1_bc             = multipole
+ix2_bc             = multipole
+ox2_bc             = multipole
+ix3_bc             = multipole
+ox3_bc             = multipole
+mp_deterministic   = true
+solver_diag        = true
+phi_operator_split = true
+phi_prolongation   = linear
+
+<self_gravity/solver_params>
+solver             = BiCGSTAB
+max_iterations     = 200
+residual_tolerance = 1.0e-6
+relative_residual  = true
+do_FAS             = true
+max_coarsenings    = 20
+smoother           = SRJ2
+presmoother        = SRJ2
+postsmoother       = SRJ2
+preconditioner     = Multigrid
+seed_from_phi      = true

@@ -1,0 +1,10 @@
+E9f: GPU (fix source, a967dca0) vs CPU, final states; max |rel diff| of rho, v1, P (v1 relative to max|v1|)
+E10_probe_control_fcfalse_fix                 cycles GPU 3 CPU 3  rho 0.00e+00  v1 0.00e+00  P 2.22e-16
+E10_probe_control_fctrue_fix                  cycles GPU 3 CPU 3  rho 0.00e+00  v1 0.00e+00  P 2.22e-16
+E10_probe_negative_fcfalse_fix                cycles GPU 3 CPU 3  rho 4.44e-16  v1 1.21e-15  P 1.33e-15
+E10_probe_negative_fctrue_fix                 cycles GPU 3 CPU 3  rho 4.44e-16  v1 1.21e-15  P 1.33e-15
+E10_probe_subedge_fcfalse_fix                 cycles GPU 3 CPU 3  rho 2.22e-16  v1 4.92e-16  P 8.88e-16
+E10_probe_subedge_fctrue_fix                  cycles GPU 3 CPU 3  rho 2.22e-16  v1 4.92e-16  P 8.88e-16
+E7e_R4_ionization_p_over_rho_n400_mb100       cycles GPU 816 CPU 816  rho 1.10e-04  v1 1.72e-04  P 2.90e-04
+E8_leg2                                       cycles GPU 12427 CPU 12427  rho 4.74e-10  v1 4.81e-10  P 5.17e-10
+R4 n400 mb100: L1(rho_GPU - rho_CPU)/mean(rho) = 5.14e-06 (discretisation L1 error at n400 = 5.4e-3); cells with |drho/rho| > 1e-8: 301 of 400
