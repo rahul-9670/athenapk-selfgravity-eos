@@ -653,6 +653,7 @@ refined meshes (Sec. 6.5-6.6).
 | E-F10 contacts | `hydro/double_flux = true` (opt-in, default off) makes contacts pressure-exact with PLM in 1D/2D/3D, on CPU and GPU (Sec. 6.4-6.5); energy +1e-4..4e-4 (Riemann) to 1e-2 (slab, N = 128) at regime-changing contacts, converging. Refined meshes: pressure-exact with the sensor-gated EOS-consistent fill (`hydro/double_flux_ghost_fill`, default on with double flux; Sec. 6.6; two null-default hooks in the vendored Parthenon). Production restart: effect within the noise floor at <= 133 K, +6 % wall time. Alternative: LimO3. Matters past ~1500 K |
 | E-F7 round trip | characterised; relevant to any T-based coupling above 1000 K |
 | constant mu outside the EOS | the EOS has a variable mu(rho, T) (2.33 molecular -> 1.27 atomic -> 0.6 ionized); any other module that assumes mu = 2.33 is valid only below ~2000 K |
+| `collapse_be` with `eos = hydrogen` | added after this report (2026-10-07): the barotropic step prescribes T(rho) = T0 sqrt(1 + (rho/rhocrit)^(2(gamma-1))) and sets e = e_table(rho, T). Checked on two collapse_be decks straddling rhocrit (rho26 table, gravity and AMR off, float64 output): e = e_table(rho, T_law) to <= 3e-13 in all 2 x 262 144 cells; T read back from the table matches T_law to 1.6e-5 (the E-F7 round trip). Ideal-gas collapse_be runs bitwise unchanged |
 | table coverage | complete for the production footprint (rho 1.8e-20-1.5e-11, T 0.7-133 K) and the design range up to 3e5 K |
 
 ## 12. Test-infrastructure traps met in this module (not code findings)

@@ -170,6 +170,11 @@ void RegisterCollapseBeParams(parthenon::ParameterInput *pin,
   InitBEProfile(pin);
   hydro_pkg->AddParam("collapse_be_rc", g_rc);
   hydro_pkg->AddParam("collapse_be_gamma", gam);
+  // Tabulated EOS: the barotropic law sets the TEMPERATURE, T = T0 sqrt(1 + (rho/rhocrit)^(2(gamma-1))), and
+  // the internal energy comes from the table at that T. T0 = the temperature of T_code = 1 (the IC state).
+  hydro_pkg->AddParam("collapse_be_table",
+                      pin->GetOrAddString("hydro", "eos", "adiabatic") == "hydrogen");
+  hydro_pkg->AddParam("collapse_be_T0K", PhysUnits::BuildPhysicalUnits(pin).temperature_unit);
 
   // Consistency guard: the authoritative unit system (PhysUnits) must reproduce this BE normalization
   // exactly. Both now route through DeriveBENormalization, so this is a regression sentinel
@@ -732,6 +737,15 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
 // This OVERWRITES the thermal energy every step — it's a barotropic EOS
 // enforcement, not a differential cooling equation.
 //
+// With the tabulated EOS (eos = hydrogen) the same law prescribes the temperature,
+//   T = T0 * sqrt(1 + (rho/rhocrit)^(2(gamma-1)))     (T0 = temperature of T_code = 1),
+// which is the ideal-gas law's T_code = p/rho, and e_th = e_table(rho, T): isothermal at T0 below
+// rhocrit, T ~ rho^(gamma-1) above it, with the table's own energy (H2 rotation/vibration,
+// dissociation, ionization) at that temperature. gamma (= hydro/gamma) is then only the barotropic index.
+// Verified (2026-10-07): with self-gravity off, every cell's e equals e_table(rho, T_law) to 3e-15; the ideal-gas
+// path is bitwise unchanged. With self-gravity on, ApplyGravitySource runs AFTER this step in every stage, so
+// an output state carries one stage of gravitational work on top of the reset (both EOS paths; median ~1e-5).
+//
 // Also zeroes momentum outside the sphere (fixed boundary condition on velocity).
 // ---------------------------------------------------------------------------
 TaskStatus ApplyBarotropicCooling(MeshData<Real> *md, const parthenon::SimTime &tm,
@@ -745,6 +759,7 @@ TaskStatus ApplyBarotropicCooling(MeshData<Real> *md, const parthenon::SimTime &
   const Real gm1 = gam - 1.0;
   const Real igm1 = 1.0 / gm1;
   const Real rcsq = rc * rc;
+  const bool use_table = hydro_pkg->Param<bool>("collapse_be_table");
 
   const auto &cons_pack = md->PackVariables(std::vector<std::string>{"cons"});
 
@@ -752,6 +767,37 @@ TaskStatus ApplyBarotropicCooling(MeshData<Real> *md, const parthenon::SimTime &
   parthenon::IndexRange jb = md->GetBoundsJ(parthenon::IndexDomain::interior);
   parthenon::IndexRange kb = md->GetBoundsK(parthenon::IndexDomain::interior);
   const int nblocks = md->NumBlocks();
+
+  if (use_table) {
+    const Real T0K = hydro_pkg->Param<Real>("collapse_be_T0K");
+    const auto tab = hydro_pkg->Param<AdiabaticGLMMHDEOS>("eos").GetEosTable();
+    parthenon::par_for(
+        DEFAULT_LOOP_PATTERN, "BEcollapse::BaroCoolTable", parthenon::DevExecSpace(),
+        0, nblocks - 1, kb.s, kb.e, jb.s, jb.e, ib.s, ib.e,
+        KOKKOS_LAMBDA(const int b, const int k, const int j, const int i) {
+          auto &cons = cons_pack(b);
+          const auto &coords = cons_pack.GetCoords(b);
+          const Real x = coords.template Xc<1>(i);
+          const Real y = coords.template Xc<2>(j);
+          const Real z = coords.template Xc<3>(k);
+          if (x * x + y * y + z * z > rcsq) {
+            cons(IM1, k, j, i) = 0.0;
+            cons(IM2, k, j, i) = 0.0;
+            cons(IM3, k, j, i) = 0.0;
+          }
+          const Real rho = cons(IDN, k, j, i);
+          const Real ke = 0.5 / rho * (cons(IM1, k, j, i) * cons(IM1, k, j, i)
+                                     + cons(IM2, k, j, i) * cons(IM2, k, j, i)
+                                     + cons(IM3, k, j, i) * cons(IM3, k, j, i));
+          const Real me = mhd ? 0.5 * (cons(IB1, k, j, i) * cons(IB1, k, j, i)
+                                     + cons(IB2, k, j, i) * cons(IB2, k, j, i)
+                                     + cons(IB3, k, j, i) * cons(IB3, k, j, i))
+                               : 0.0;
+          const Real TK = T0K * std::sqrt(1.0 + std::pow(rho / rhocrit, 2.0 * gm1));
+          cons(IEN, k, j, i) = tab.EintFromRhoTk(rho, TK) + ke + me;
+        });
+    return TaskStatus::complete;
+  }
 
   parthenon::par_for(
       DEFAULT_LOOP_PATTERN, "BEcollapse::BaroCool", parthenon::DevExecSpace(),

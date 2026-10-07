@@ -932,13 +932,8 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
       PARTHENON_REQUIRE(riem == "hlld",
                         "Tabulated protostellar EOS (eos=hydrogen) requires riemann=hlld "
                         "(HLLE's Roe average bakes in a constant gamma).");
-      // The table EOS owns the gas thermodynamics. collapse_be's barotropic cooling overwrites the
-      // thermal energy with an ideal-gamma law that is inconsistent with the table (a radiative
-      // energy equation, not part of this tree, would be needed instead), so the table is refused for collapse_be and available for every other problem generator.
-      PARTHENON_REQUIRE(!(pin->DoesParameterExist("job", "problem_id") &&
-                          pin->GetString("job", "problem_id") == "collapse_be"),
-                        "eos=hydrogen is not available for collapse_be in this build (its barotropic "
-                        "cooling would overwrite the table's thermal energy); use eos=adiabatic.");
+      // collapse_be's barotropic step uses the table too: it prescribes T(rho) and takes the
+      // internal energy from the table at that T (collapse_be.cpp, ApplyBarotropicCooling).
       if (parthenon::Globals::my_rank == 0) {
         std::cout << "## EOS: tabulated protostellar EOS ACTIVE (second-core). table="
                   << tabfile << " grid " << eos_tab.nr_ << "x" << eos_tab.ne_

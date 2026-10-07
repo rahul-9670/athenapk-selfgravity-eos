@@ -14,7 +14,9 @@ contains two validated additions:
 
 Problem generators: `collapse_be` (magnetized Bonnor-Ebert sphere collapse, barotropic) and the validation problems
 `poisson_test`, `grav_analytic`, `jeans_wave`, `grav_slab`, `polytrope`, `profile1d`, `eos_test`, `fofc_scalar`.
-Fluid: `glmmhd` only. `collapse_be` refuses `eos = hydrogen` (its barotropic cooling would overwrite the table energy).
+Fluid: `glmmhd` only. With `eos = hydrogen`, `collapse_be`'s barotropic step prescribes the temperature,
+T = T0 sqrt(1 + (rho/rhocrit)^(2(gamma-1))), and takes the internal energy from the table at that temperature
+(with `eos = adiabatic` it is the usual ideal-gas barotropic energy).
 
 ## Build
 ```bash
