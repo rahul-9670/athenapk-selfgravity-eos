@@ -1,0 +1,7 @@
+# D4 homologous compression x101 with transverse B (centre cell vs the table adiabat; eos_interp p)
+D4_b1      on  x102.7: e/e_ad-1 +7.580e-03 (max over leg 7.580e-03) | B_y/rho +3.8e-15 | beta 9.9e-01 -> 1.8e-01 | centre switched 0 | uniformity 7.0e-06 | nTfloor 0 npfloor 0
+D4_b1      off x102.7: e/e_ad-1 +7.580e-03 (max over leg 7.580e-03) | B_y/rho +3.8e-15 | beta 9.9e-01 -> 1.8e-01 | centre switched 0 | uniformity 7.0e-06 | nTfloor 0 npfloor 0
+D4_b0.01   on  x101.0: e/e_ad-1 -3.281e-06 (max over leg 3.281e-06) | B_y/rho -4.4e-16 | beta 9.9e-03 -> 1.8e-03 | centre switched 1 | uniformity 1.1e-14 | nTfloor 0 npfloor 0
+D4_b0.01   off x101.0: e/e_ad-1 +7.819e-03 (max over leg 7.819e-03) | B_y/rho -6.7e-16 | beta 9.9e-03 -> 1.8e-03 | centre switched 0 | uniformity 1.2e-08 | nTfloor 0 npfloor 0
+D4_b0.0001 on  x101.0: e/e_ad-1 -3.251e-06 (max over leg 3.251e-06) | B_y/rho -1.2e-15 | beta 9.9e-05 -> 1.8e-05 | centre switched 1 | uniformity 7.3e-15 | nTfloor 0 npfloor 0
+D4_b0.0001 off x101.0: e/e_ad-1 +7.562e-01 (max over leg 7.562e-01) | B_y/rho +1.1e-15 | beta 9.9e-05 -> 2.9e-05 | centre switched 0 | uniformity 6.6e-09 | nTfloor 0 npfloor 0

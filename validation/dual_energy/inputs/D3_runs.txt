@@ -1,0 +1,33 @@
+D3/D3_M3_N256_prod | D3_M3_N256.in |  | 1
+D3/D3_M3_N256_off | D3_M3_N256.in | hydro/dual_energy=false | 1
+D3/D3_M3_N256_eta2off | D3_M3_N256.in | hydro/dual_energy_eta2=0.0 | 1
+D3/D3_M3_N256_noexempt | D3_M3_N256.in | hydro/dual_energy_shock_comp=1.0e30 | 1
+D3/D3_M3_N1024_prod | D3_M3_N1024.in |  | 1
+D3/D3_M3_N1024_off | D3_M3_N1024.in | hydro/dual_energy=false | 1
+D3/D3_M3_N1024_eta2off | D3_M3_N1024.in | hydro/dual_energy_eta2=0.0 | 1
+D3/D3_M3_N1024_noexempt | D3_M3_N1024.in | hydro/dual_energy_shock_comp=1.0e30 | 1
+D3/D3_M3_N1024_mb32 | D3_M3_N1024.in | parthenon/meshblock/nx1=32 | 1
+D3/D3_M3_N1024_mb32_np8 | D3_M3_N1024.in | parthenon/meshblock/nx1=32 | 8
+D3/D3_M3_N1024_mb32_np8_noghost | D3_M3_N1024.in | parthenon/meshblock/nx1=32 hydro/dual_comp_ghost=false | 8
+D3/D3_M10_N256_prod | D3_M10_N256.in |  | 1
+D3/D3_M10_N256_off | D3_M10_N256.in | hydro/dual_energy=false | 1
+D3/D3_M10_N256_eta2off | D3_M10_N256.in | hydro/dual_energy_eta2=0.0 | 1
+D3/D3_M10_N256_noexempt | D3_M10_N256.in | hydro/dual_energy_shock_comp=1.0e30 | 1
+D3/D3_M10_N1024_prod | D3_M10_N1024.in |  | 1
+D3/D3_M10_N1024_off | D3_M10_N1024.in | hydro/dual_energy=false | 1
+D3/D3_M10_N1024_eta2off | D3_M10_N1024.in | hydro/dual_energy_eta2=0.0 | 1
+D3/D3_M10_N1024_noexempt | D3_M10_N1024.in | hydro/dual_energy_shock_comp=1.0e30 | 1
+D3/D3_M10_N1024_mb32 | D3_M10_N1024.in | parthenon/meshblock/nx1=32 | 1
+D3/D3_M10_N1024_mb32_np8 | D3_M10_N1024.in | parthenon/meshblock/nx1=32 | 8
+D3/D3_M10_N1024_mb32_np8_noghost | D3_M10_N1024.in | parthenon/meshblock/nx1=32 hydro/dual_comp_ghost=false | 8
+D3/D3_M30_N256_prod | D3_M30_N256.in |  | 1
+D3/D3_M30_N256_off | D3_M30_N256.in | hydro/dual_energy=false | 1
+D3/D3_M30_N256_eta2off | D3_M30_N256.in | hydro/dual_energy_eta2=0.0 | 1
+D3/D3_M30_N256_noexempt | D3_M30_N256.in | hydro/dual_energy_shock_comp=1.0e30 | 1
+D3/D3_M30_N1024_prod | D3_M30_N1024.in |  | 1
+D3/D3_M30_N1024_off | D3_M30_N1024.in | hydro/dual_energy=false | 1
+D3/D3_M30_N1024_eta2off | D3_M30_N1024.in | hydro/dual_energy_eta2=0.0 | 1
+D3/D3_M30_N1024_noexempt | D3_M30_N1024.in | hydro/dual_energy_shock_comp=1.0e30 | 1
+D3/D3_M30_N1024_mb32 | D3_M30_N1024.in | parthenon/meshblock/nx1=32 | 1
+D3/D3_M30_N1024_mb32_np8 | D3_M30_N1024.in | parthenon/meshblock/nx1=32 | 8
+D3/D3_M30_N1024_mb32_np8_noghost | D3_M30_N1024.in | parthenon/meshblock/nx1=32 hydro/dual_comp_ghost=false | 8

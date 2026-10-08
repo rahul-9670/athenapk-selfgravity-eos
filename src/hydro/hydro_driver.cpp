@@ -28,6 +28,8 @@
 #include "glmmhd/glmmhd.hpp"
 #include "hydro.hpp"
 #include "double_flux.hpp"
+#include "dual_flux_density.hpp"
+#include "dual_double_flux.hpp"
 #include "hydro_driver.hpp"
 #include "../diagnostics/cons_diag.hpp"
 #include "../self_gravity/self_gravity.hpp"
@@ -57,14 +59,13 @@ HydroDriver::HydroDriver(ParameterInput *pin, ApplicationInput *app_in, Mesh *pm
         hydro_pkg->AllParams().hasKey("collapse_be_rhocrit"),
         "collapse_be: Param 'collapse_be_rhocrit' is missing, so ApplyBarotropicCooling -- "
         "and with it the outside-sphere momentum BC -- would be SILENTLY skipped. Is "
-        "collapse_be::ProblemInitPackageData still wired up in main.cpp? See WP-13 "
-        "(docs/validation/WP13_restart_reproducibility.md).");
+        "collapse_be::ProblemInitPackageData still wired up in main.cpp?");
   }
 }
 
 
-// hydro/lean_registers (audit P-04, 2026-09-23). The integrator registers "u1" (VL2 snapshot) and
-// "MY0"/"Yjm2" (RKL2) used to be created with no variable list, and MeshBlockData::Initialize then
+// hydro/lean_registers (audit P-04, 2026-09-23). The integrator register "u1" (VL2 snapshot) used to be
+// created with no variable list, and MeshBlockData::Initialize then
 // allocates a private copy of EVERY non-OneCopy field, most of which nothing ever reads from a register.
 // Every reader of these registers packs either "cons"/"prim" by name or {WithFluxes, Cell} minus the
 // OperatorSplit user flag (parthenon Update::FluxDivergence / UpdateWithFluxDivergence), so a
@@ -97,7 +98,7 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
   // hydro/ghost_sync_rounds (default 0 = off): N rounds of (halo exchange + FillDerived) at the start
   // of every step. Coarse->fine messages carry the sender's own ghost cells, whose history differs
   // between a continued and a resumed run; one round makes the halo a function of the interior only
-  // (restart reproducibility, DEV_LOG 2026-09-22/23).
+  // (restart reproducibility, 2026-09-22/23).
   const int ghost_rounds = hydro_pkg->Param<int>("ghost_sync_rounds");
   // The ghost-sync FillDerived passes may build the Poisson RHS the next solve reads, so they
   // keep the multipole reduction on.
@@ -204,8 +205,21 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     // freezes the per-cell EOS from the step-start state. Off -> graph unchanged.
     const bool dflux = hydro_pkg->Param<bool>("double_flux");
     TaskID flx_done = first_order_flux_correct;
+    // hydro/dual_energy_flux = density (DE-F3): rebuild the dual flux from the reconstructed rho*e on PLM stages
+    // (the dc VL2 predictor already gives the legacy flux exactly), before the flux correction is sent.
+    if (hydro_pkg->Param<bool>("dual_energy_flux_density") &&
+        !(stage == 1 && flux_str == std::string("flux_first_stage") &&
+          hydro_pkg->Param<FluxFun_t *>("flux_first_stage") != hydro_pkg->Param<FluxFun_t *>("flux_other_stage")))
+      flx_done = tl.AddTask(flx_done, Hydro::DualEnergyDensityFlux, mu0.get());
     if (dflux)
       flx_done = flx_done | tl.AddTask(none, Hydro::DoubleFluxCoefficients, mu0.get(), stage);
+    // face volume fluxes of the dual double flux / face pdV (flux-corrected with the mass flux; dual_double_flux.cpp)
+    if (hydro_pkg->Param<bool>("dual_vflux")) {
+      const bool vdc = (stage == 1 && hydro_pkg->Param<FluxFun_t *>("flux_first_stage") !=
+                                          hydro_pkg->Param<FluxFun_t *>("flux_other_stage")) ||
+                       hydro_pkg->Param<Reconstruction>("reconstruction") == Reconstruction::dc;
+      flx_done = tl.AddTask(flx_done, Hydro::DualFaceVolumeFlux, mu0.get(), vdc);
+    }
     auto send_flx = tl.AddTask(flx_done, parthenon::LoadAndSendFluxCorrections, mu0);
     auto recv_flx = tl.AddTask(start_flxcor_recv, parthenon::ReceiveFluxCorrections, mu0);
     auto set_flx = tl.AddTask(recv_flx | flx_done, parthenon::SetFluxCorrections, mu0);
@@ -213,9 +227,7 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     // B1-remainder: clamp inward domain-boundary fluxes. MUST sit after SetFluxCorrections (so
     // the AMR flux-correction cannot reintroduce an inward flux the clamp already removed) and
     // before the divergence (so the clamped values are what is actually applied). Applied only
-    // on the MAIN hydro update, not on the RKL2 M(Y0) evaluations upstream: those carry the
-    // parabolic fluxes, whose IDN component is identically zero, so clamping there would be a
-    // no-op that only added a kernel launch per stage.
+    // on the MAIN hydro update.
     auto flx_ready = set_flx;
     if (hydro_pkg->Param<bool>("boundary_flux_clamp")) {
       flx_ready = tl.AddTask(set_flx, Hydro::ClampBoundaryFluxes, mu0.get());
@@ -229,6 +241,10 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     if (dflux)
       update = tl.AddTask(update, Hydro::DoubleFluxCorrect, mu0.get(),
                           integrator->beta[stage - 1] * integrator->dt);
+    // hydro/dual_energy_double_flux (DE-F3 part (b)): the same own-EOS treatment for the dual energy
+    if (dflux && hydro_pkg->Param<bool>("dual_energy_double_flux"))
+      update = tl.AddTask(update, Hydro::DualDoubleFluxCorrect, mu0.get(),
+                          integrator->beta[stage - 1] * integrator->dt, stage);
 
     // WP-6: accumulate the APPLIED domain-face mass flux here, the only point where the flux arrays
     // hold exactly what `update` consumed (later history callbacks see cleared fluxes). Weighted by
@@ -345,6 +361,21 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     pre = tl.AddTask(pre, SelfGravity::SetGravRhsConsumed, pmesh, rhs_consumed_r3);
     auto fill_derived =
         tl.AddTask(pre, parthenon::Update::FillDerived<MeshData<Real>>, mu0.get());
+  }
+
+  // hydro/dual_energy_sync_step_end: end the final stage with halo exchange + FillDerived so a
+  // continued run holds exactly the state a resumed run rebuilds (tabulated-EOS pressure floors made
+  // ConsToPrim non-idempotent). Default false.
+  if (stage == integrator->nstages && hydro_pkg->Param<bool>("dual_energy") &&
+      hydro_pkg->Param<bool>("dual_energy_sync_step_end")) {
+    TaskRegion &sync_region = tc.AddRegion(num_partitions);
+    for (int i = 0; i < num_partitions; i++) {
+      auto &tl = sync_region[i];
+      auto &mu0 = pmesh->mesh_data.GetOrAdd("base", i);
+      auto bnd = parthenon::AddBoundaryExchangeTasks(none, tl, mu0, pmesh->multilevel);
+      bnd = tl.AddTask(bnd, SelfGravity::SetGravRhsConsumed, pmesh, sync_rhs_consumed);
+      tl.AddTask(bnd, parthenon::Update::FillDerived<MeshData<Real>>, mu0.get());
+    }
   }
   // Single task in single (serial) region to reset global vars used in reductions in the
   // first stage.

@@ -1,0 +1,12 @@
+# X2: Noh M 10 N 1024, dual energy OFF, snapshots every 4.64e-4 (code time): minimum P/P0 among pre-shock cells (r/r_s > 1)
+# hst: Tfloor hits 10 in 5 of 27 rows, first at t 0.00465; Tfloor/T0 = 0.2726
+t 0.0019: min P/P0 8.202e-01 at r/r_s 1.219 (rho 1.000)
+t 0.0028: min P/P0 8.362e-01 at r/r_s 1.137 (rho 1.000)
+t 0.0037: min P/P0 4.640e-01 at r/r_s 1.097 (rho 1.000)
+t 0.0046: min P/P0 2.729e-01 at r/r_s 1.072 (rho 1.000)
+t 0.0056: min P/P0 2.795e-01 at r/r_s 1.056 (rho 1.025)
+t 0.0079: min P/P0 8.630e-01 at r/r_s 1.052 (rho 1.000)
+t 0.0088: min P/P0 2.731e-01 at r/r_s 1.044 (rho 1.000)
+t 0.0097: min P/P0 2.731e-01 at r/r_s 1.037 (rho 1.000)
+t 0.0107: min P/P0 2.804e-01 at r/r_s 1.032 (rho 1.028)
+undershoot (min P/P0 < 0.99) in 9 of 25 snapshots, all just ahead of the shock, r/r_s 1.03..1.22

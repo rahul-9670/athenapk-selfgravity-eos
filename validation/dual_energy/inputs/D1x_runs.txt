@@ -1,0 +1,34 @@
+D1x/D1x_M10_dc_on | D1a_M10.in | hydro/reconstruction=dc
+D1x/D1x_M10_dc_off | D1a_M10.in | hydro/dual_energy=false hydro/reconstruction=dc
+D1x/D1x_M10_x5_on | D1a_M10.in | parthenon/time/tlim=0.39078130209455036
+D1x/D1x_M10_x5_off | D1a_M10.in | hydro/dual_energy=false parthenon/time/tlim=0.39078130209455036
+D1x/D1x_M10_N64_on | D1a_M10.in | parthenon/mesh/nx1=64 parthenon/meshblock/nx1=64
+D1x/D1x_M10_N64_off | D1a_M10.in | hydro/dual_energy=false parthenon/mesh/nx1=64 parthenon/meshblock/nx1=64
+D1x/D1x_M10_N128_on | D1a_M10.in | parthenon/mesh/nx1=128 parthenon/meshblock/nx1=128
+D1x/D1x_M10_N128_off | D1a_M10.in | hydro/dual_energy=false parthenon/mesh/nx1=128 parthenon/meshblock/nx1=128
+D1x/D1x_M10_N512_on | D1a_M10.in | parthenon/mesh/nx1=512 parthenon/meshblock/nx1=512
+D1x/D1x_M10_N512_off | D1a_M10.in | hydro/dual_energy=false parthenon/mesh/nx1=512 parthenon/meshblock/nx1=512
+D1x/D1x_M10_N1024_on | D1a_M10.in | parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024
+D1x/D1x_M10_N1024_off | D1a_M10.in | hydro/dual_energy=false parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024
+D1x/D1x_M100_dc_on | D1a_M100.in | hydro/reconstruction=dc
+D1x/D1x_M100_dc_off | D1a_M100.in | hydro/dual_energy=false hydro/reconstruction=dc
+D1x/D1x_M100_x5_on | D1a_M100.in | parthenon/time/tlim=0.03907813020945503
+D1x/D1x_M100_x5_off | D1a_M100.in | hydro/dual_energy=false parthenon/time/tlim=0.03907813020945503
+D1x/D1x_M100_N64_on | D1a_M100.in | parthenon/mesh/nx1=64 parthenon/meshblock/nx1=64
+D1x/D1x_M100_N64_off | D1a_M100.in | hydro/dual_energy=false parthenon/mesh/nx1=64 parthenon/meshblock/nx1=64
+D1x/D1x_M100_N128_on | D1a_M100.in | parthenon/mesh/nx1=128 parthenon/meshblock/nx1=128
+D1x/D1x_M100_N128_off | D1a_M100.in | hydro/dual_energy=false parthenon/mesh/nx1=128 parthenon/meshblock/nx1=128
+D1x/D1x_M100_N512_on | D1a_M100.in | parthenon/mesh/nx1=512 parthenon/meshblock/nx1=512
+D1x/D1x_M100_N512_off | D1a_M100.in | hydro/dual_energy=false parthenon/mesh/nx1=512 parthenon/meshblock/nx1=512
+D1x/D1x_M100_N1024_on | D1a_M100.in | parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024
+D1x/D1x_M100_N1024_off | D1a_M100.in | hydro/dual_energy=false parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024
+D1x/D1x_M10_eta1e-3_on | D1a_M10.in | hydro/dual_energy_eta1=1e-3
+D1x/D1x_M10_eta1e-3_off | D1a_M10.in | hydro/dual_energy=false hydro/dual_energy_eta1=1e-3
+D1x/D1x_M10_r1.1_on | D1x_M10_r1.1.in | 
+D1x/D1x_M10_r1.1_off | D1x_M10_r1.1.in | hydro/dual_energy=false
+D1x/D1x_M100_r1.1_on | D1x_M100_r1.1.in | 
+D1x/D1x_M100_r1.1_off | D1x_M100_r1.1.in | hydro/dual_energy=false
+D1x/D1x_M10_r10_on | D1x_M10_r10.in | 
+D1x/D1x_M10_r10_off | D1x_M10_r10.in | hydro/dual_energy=false
+D1x/D1x_M100_r10_on | D1x_M100_r10.in | 
+D1x/D1x_M100_r10_off | D1x_M100_r10.in | hydro/dual_energy=false

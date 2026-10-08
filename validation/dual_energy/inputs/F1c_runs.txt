@@ -1,0 +1,1 @@
+F1b/D1x_M100_r10_smr_off | D1x_M100_r10.in | parthenon/mesh/nx1=128 parthenon/meshblock/nx1=32 parthenon/mesh/refinement=static parthenon/mesh/numlevel=2 parthenon/static_refinement0/x1min=0.375 parthenon/static_refinement0/x1max=0.625 parthenon/static_refinement0/level=1 hydro/dual_energy=false

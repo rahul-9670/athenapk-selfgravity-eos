@@ -1,0 +1,39 @@
+# D1z: + hydro/dual_energy_double_flux (DE-F3 part b) vs legacy (specific) flux with dual ON, and dual OFF; column density = density flux + dual double flux
+D1x_M10_x5                   contact | max|P/P0-1| density 4.39e-12 9.86e-12 9.83e-12 1.12e-11 1.02e-11  legacy 8.12e-03  off 3.06e-05 | L1(rho) density 3.151e-02 legacy 3.162e-02 off 3.151e-02
+D1x_M10_N64                  contact | max|P/P0-1| density 6.58e-13  legacy 2.58e-02  off 6.45e-13 | L1(rho) density 5.630e-02 legacy 5.678e-02 off 5.630e-02
+D1x_M10_N128                 contact | max|P/P0-1| density 2.38e-12  legacy 1.47e-02  off 2.44e-12 | L1(rho) density 3.399e-02 legacy 3.495e-02 off 3.399e-02
+D1x_M10_N512                 contact | max|P/P0-1| density 8.35e-12  legacy 6.22e-03  off 1.37e-05 | L1(rho) density 1.232e-02 legacy 1.283e-02 off 1.232e-02
+D1x_M10_N1024                contact | max|P/P0-1| density 1.60e-11  legacy 4.95e-03  off 1.52e-05 | L1(rho) density 7.418e-03 legacy 7.583e-03 off 7.417e-03
+D1x_M100_x5                  contact | max|P/P0-1| density 1.30e-10 2.16e-10 3.34e-10 4.24e-10 5.08e-10  legacy 6.63e-02  off 2.10e-05 | L1(rho) density 3.130e-02 legacy 3.187e-02 off 3.129e-02
+D1x_M100_N64                 contact | max|P/P0-1| density 4.97e-11  legacy 3.97e-02  off 1.54e-05 | L1(rho) density 5.623e-02 legacy 5.622e-02 off 5.623e-02
+D1x_M100_N128                contact | max|P/P0-1| density 6.61e-11  legacy 4.68e-02  off 1.59e-05 | L1(rho) density 3.392e-02 legacy 3.392e-02 off 3.392e-02
+D1x_M100_N512                contact | max|P/P0-1| density 2.53e-10  legacy 6.47e-02  off 1.60e-05 | L1(rho) density 1.227e-02 legacy 1.230e-02 off 1.227e-02
+D1x_M100_N1024               contact | max|P/P0-1| density 4.20e-10  legacy 6.77e-02  off 2.49e-05 | L1(rho) density 7.373e-03 legacy 7.459e-03 off 7.373e-03
+D1x_M10_r1.1                 contact | max|P/P0-1| density 1.72e-12  legacy 3.91e-04  off 1.49e-12 | L1(rho) density 2.047e-03 legacy 2.082e-03 off 2.047e-03
+D1x_M100_r1.1                contact | max|P/P0-1| density 3.17e-11  legacy 1.73e-03  off 1.61e-05 | L1(rho) density 2.041e-03 legacy 2.042e-03 off 2.041e-03
+D1x_M10_r10                  contact | max|P/P0-1| density 1.56e-13  legacy 2.00e-01  off 2.76e-13 | L1(rho) density 1.856e-01 legacy 3.701e-01 off 1.856e-01
+D1x_M100_r10                 contact | max|P/P0-1| density 8.01e-11  legacy 4.19e-01  off 1.20e-05 | L1(rho) density 1.839e-01 legacy 1.861e-01 off 1.839e-01
+D1a_M0                       contact | max|P/P0-1| density 6.66e-15  legacy 6.66e-15  off 6.66e-15 | L1(rho) density 1.062e-14 legacy 1.062e-14 off 1.062e-14
+D1a_M1                       contact | max|P/P0-1| density 3.54e-14  legacy 3.54e-14  off 3.54e-14 | L1(rho) density 2.103e-02 legacy 2.103e-02 off 2.103e-02
+D1a_M10                      contact | max|P/P0-1| density 4.40e-12  legacy 6.59e-03  off 4.93e-12 | L1(rho) density 2.047e-02 legacy 2.131e-02 off 2.047e-02
+D1a_M100                     contact | max|P/P0-1| density 1.30e-10  legacy 5.55e-02  off 1.63e-05 | L1(rho) density 2.041e-02 legacy 2.042e-02 off 2.041e-02
+D1a_M1000                    contact | max|P/P0-1| density 2.03e-09  legacy 5.68e-02  off 1.62e-05 | L1(rho) density 2.041e-02 legacy 2.041e-02 off 2.041e-02
+D1a_M10000                   contact | max|P/P0-1| density 1.15e-07  legacy 5.69e-02  off 1.70e-05 | L1(rho) density 2.041e-02 legacy 2.041e-02 off 2.041e-02
+D1b_M1_N1024                 smooth | t/tc 0.4 max/L1: density 7.01e-05/3.43e-06  legacy 7.01e-05/3.43e-06  off 7.01e-05/3.43e-06 | t/tc 0.8: density 2.47e-04/9.30e-06  legacy 2.47e-04/9.30e-06  off 2.47e-04/9.30e-06
+D1b_M1_N256_boost            smooth | t/tc 0.4 max/L1: density 2.17e-04/2.86e-05  legacy 1.72e-04/3.08e-05  off 8.78e-04/2.05e-04 | t/tc 0.8: density 4.14e-04/9.90e-05  legacy 8.72e-04/1.97e-04  off 2.02e-03/4.04e-04
+D1b_M3_N1024                 smooth | t/tc 0.4 max/L1: density 7.23e-05/1.33e-05  legacy 7.23e-05/1.33e-05  off 7.23e-05/1.33e-05 | t/tc 0.8: density 4.06e-04/3.39e-05  legacy 4.06e-04/3.39e-05  off 4.06e-04/3.39e-05
+D1b_M3_N256_boost            smooth | t/tc 0.4 max/L1: density 2.52e-04/3.31e-05  legacy 2.78e-04/3.63e-05  off 5.48e-03/1.52e-03 | t/tc 0.8: density 3.00e-03/2.45e-04  legacy 7.16e-03/5.47e-04  off 4.47e-02/4.42e-03
+D1b_M10_N1024                smooth | t/tc 0.4 max/L1: density 5.28e-04/1.13e-04  legacy 5.28e-04/1.12e-04  off 5.28e-04/1.42e-04 | t/tc 0.8: density 3.29e-03/2.20e-04  legacy 3.29e-03/2.18e-04  off 3.29e-03/2.92e-04
+D1b_M10_N4096                smooth | t/tc 0.4 max/L1: density 3.65e-05/7.05e-06  legacy 4.13e-05/7.05e-06  off 3.61e-05/1.07e-05 | t/tc 0.8: density 2.06e-04/1.39e-05  legacy 2.06e-04/1.38e-05  off 2.06e-04/2.03e-05
+D1b_M10_N256_boost           smooth | t/tc 0.4 max/L1: density 2.95e-04/3.79e-05  legacy 3.71e-04/4.01e-05  off 6.22e-02/1.71e-02 | t/tc 0.8: density 6.10e-03/3.72e-04  legacy 1.39e-02/7.88e-04  off 6.98e-01/5.84e-02
+D1b_M30_N1024                smooth | t/tc 0.4 max/L1: density 4.76e-03/2.95e-04  legacy 4.76e-03/2.95e-04  off 4.76e-03/1.31e-03 | t/tc 0.8: density 3.18e-02/7.55e-04  legacy 3.18e-02/7.52e-04  off 3.16e-02/2.68e-03
+D1b_M30_N4096                smooth | t/tc 0.4 max/L1: density 3.06e-04/1.88e-05  legacy 3.07e-04/1.87e-05  off 3.07e-04/8.23e-05 | t/tc 0.8: density 1.99e-03/4.75e-05  legacy 1.99e-03/4.73e-05  off 1.99e-03/1.68e-04
+D1b_M30_N256_boost           smooth | t/tc 0.4 max/L1: density 2.97e-04/3.86e-05  legacy 3.79e-04/4.07e-05  off 5.69e-01/1.55e-01 | t/tc 0.8: density 6.79e-03/3.91e-04  legacy 1.50e-02/8.19e-04  off 5.60e+00/3.74e-01
+D1b_M100_N1024               smooth | t/tc 0.4 max/L1: density 4.23e-02/8.64e-04  legacy 4.23e-02/8.65e-04  off 5.33e-02/1.47e-02 | t/tc 0.8: density 3.17e-01/2.43e-03  legacy 3.17e-01/2.43e-03  off 3.58e-01/3.00e-02
+D1b_M100_N4096               smooth | t/tc 0.4 max/L1: density 2.79e-03/5.40e-05  legacy 2.79e-03/5.40e-05  off 3.33e-03/9.17e-04 | t/tc 0.8: density 2.09e-02/1.49e-04  legacy 2.09e-02/1.49e-04  off 2.23e-02/1.88e-03
+D1b_M100_N256_boost          smooth | t/tc 0.4 max/L1: density 2.99e-04/3.87e-05  legacy 3.83e-04/4.08e-05  off 6.14e+00/1.22e+00 | t/tc 0.8: density 6.87e-03/3.92e-04  legacy 1.52e-02/8.25e-04  off 4.29e+01/2.60e+00
+D1b_M1000_N1024              smooth | t/tc 0.4 max/L1: density 2.94e+00/7.44e-03  legacy 2.94e+00/7.44e-03  off 5.27e+00/1.06e+00 | t/tc 0.8: density 1.25e+01/2.65e-02  legacy 1.25e+01/2.65e-02  off 2.27e+01/1.30e+00
+D1b_M1000_N4096              smooth | t/tc 0.4 max/L1: density 2.42e-01/5.15e-04  legacy 2.42e-01/5.15e-04  off 3.33e-01/9.20e-02 | t/tc 0.8: density 1.62e+00/1.60e-03  legacy 1.62e+00/1.60e-03  off 2.19e+00/1.88e-01
+D1b_M1000_N256_boost         smooth | t/tc 0.4 max/L1: density 2.99e-04/3.85e-05  legacy 3.82e-04/4.06e-05  off 1.02e+02/3.29e+01 | t/tc 0.8: density 6.88e-03/3.92e-04  legacy 1.52e-02/8.26e-04  off 5.61e+02/5.22e+01
+D1b_M10000_N1024             smooth | t/tc 0.4 max/L1: density 1.12e-04/3.71e-06  legacy 1.05e-04/3.36e-06  off 9.23e+01/1.97e+01 | t/tc 0.8: density 3.58e-04/1.31e-05  legacy 3.47e-04/9.26e-06  off 3.25e+02/1.80e+01
+D1b_M10000_N256_boost        smooth | t/tc 0.4 max/L1: density 2.99e-04/3.86e-05  legacy 3.82e-04/4.07e-05  off 3.45e+04/2.82e+03 | t/tc 0.8: density 6.88e-03/3.92e-04  legacy 1.52e-02/8.25e-04  off 8.43e+04/9.25e+03

@@ -1,0 +1,41 @@
+# D2a cold sinusoid M 3 + uniform field (par = Bx, perp = By), dP = P/P_ad(rho) - 1 at the last dump
+D2a_par_b1_N256          on  t/tc 0.80: max|dP| 3.039e-03 L1 4.373e-04 | switched 0 (max 0.00e+00) E-branch max 3.04e-03 | flux-freeze nan | rho_max 3.978 | nTfloor 0 npfloor 0
+D2a_par_b1_N256          off t/tc 0.80: max|dP| 3.039e-03 L1 4.373e-04 | switched 0 (max 0.00e+00) E-branch max 3.04e-03 | flux-freeze nan | rho_max 3.978 | nTfloor 0 npfloor 0
+D2a_par_b1_N1024         on  t/tc 0.80: max|dP| 4.023e-04 L1 3.362e-05 | switched 0 (max 0.00e+00) E-branch max 4.02e-04 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b1_N1024         off t/tc 0.80: max|dP| 4.023e-04 L1 3.362e-05 | switched 0 (max 0.00e+00) E-branch max 4.02e-04 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b0.1_N256        on  t/tc 0.80: max|dP| 3.112e-03 L1 4.187e-04 | switched 0 (max 0.00e+00) E-branch max 3.11e-03 | flux-freeze nan | rho_max 3.979 | nTfloor 0 npfloor 0
+D2a_par_b0.1_N256        off t/tc 0.80: max|dP| 3.112e-03 L1 4.187e-04 | switched 0 (max 0.00e+00) E-branch max 3.11e-03 | flux-freeze nan | rho_max 3.979 | nTfloor 0 npfloor 0
+D2a_par_b0.1_N1024       on  t/tc 0.80: max|dP| 3.623e-04 L1 3.216e-05 | switched 0 (max 0.00e+00) E-branch max 3.62e-04 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b0.1_N1024       off t/tc 0.80: max|dP| 3.623e-04 L1 3.216e-05 | switched 0 (max 0.00e+00) E-branch max 3.62e-04 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b0.01_N256       on  t/tc 0.80: max|dP| 1.755e-03 L1 1.571e-04 | switched 234 (max 5.49e-04) E-branch max 1.76e-03 | flux-freeze nan | rho_max 3.984 | nTfloor 0 npfloor 0
+D2a_par_b0.01_N256       off t/tc 0.80: max|dP| 3.637e-03 L1 4.657e-04 | switched 0 (max 0.00e+00) E-branch max 3.64e-03 | flux-freeze nan | rho_max 3.981 | nTfloor 0 npfloor 0
+D2a_par_b0.01_N1024      on  t/tc 0.80: max|dP| 3.347e-04 L1 1.061e-05 | switched 940 (max 5.24e-05) E-branch max 3.35e-04 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b0.01_N1024      off t/tc 0.80: max|dP| 3.529e-04 L1 3.489e-05 | switched 0 (max 0.00e+00) E-branch max 3.53e-04 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b0.001_N256      on  t/tc 0.80: max|dP| 7.686e-04 L1 1.140e-04 | switched 256 (max 7.69e-04) E-branch max 0.00e+00 | flux-freeze nan | rho_max 3.986 | nTfloor 0 npfloor 0
+D2a_par_b0.001_N256      off t/tc 0.80: max|dP| 4.536e-03 L1 5.308e-04 | switched 0 (max 0.00e+00) E-branch max 4.54e-03 | flux-freeze nan | rho_max 3.980 | nTfloor 0 npfloor 0
+D2a_par_b0.001_N1024     on  t/tc 0.80: max|dP| 7.960e-05 L1 6.981e-06 | switched 1024 (max 7.96e-05) E-branch max 0.00e+00 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b0.001_N1024     off t/tc 0.80: max|dP| 3.545e-04 L1 3.633e-05 | switched 0 (max 0.00e+00) E-branch max 3.54e-04 | flux-freeze nan | rho_max 3.997 | nTfloor 0 npfloor 0
+D2a_par_b0.0001_N256     on  t/tc 0.80: max|dP| 7.814e-04 L1 1.283e-04 | switched 256 (max 7.81e-04) E-branch max 0.00e+00 | flux-freeze nan | rho_max 3.985 | nTfloor 0 npfloor 0
+D2a_par_b0.0001_N256     off t/tc 0.80: max|dP| 7.344e-03 L1 8.042e-04 | switched 0 (max 0.00e+00) E-branch max 7.34e-03 | flux-freeze nan | rho_max 3.977 | nTfloor 0 npfloor 0
+D2a_par_b0.0001_N1024    on  MISSING
+D2a_par_b0.0001_N1024    off MISSING
+D2a_perp_b1_N256         on  t/tc 0.40: max|dP| 8.036e-04 L1 1.886e-04 | switched 0 (max 0.00e+00) E-branch max 8.04e-04 | flux-freeze 9.99e-16 | rho_max 1.652 | nTfloor 0 npfloor 0
+D2a_perp_b1_N256         off t/tc 0.40: max|dP| 8.036e-04 L1 1.886e-04 | switched 0 (max 0.00e+00) E-branch max 8.04e-04 | flux-freeze 9.99e-16 | rho_max 1.652 | nTfloor 0 npfloor 0
+D2a_perp_b1_N1024        on  t/tc 0.40: max|dP| 8.452e-05 L1 1.303e-05 | switched 0 (max 0.00e+00) E-branch max 8.45e-05 | flux-freeze 2.11e-15 | rho_max 1.652 | nTfloor 0 npfloor 0
+D2a_perp_b1_N1024        off t/tc 0.40: max|dP| 8.452e-05 L1 1.303e-05 | switched 0 (max 0.00e+00) E-branch max 8.45e-05 | flux-freeze 2.11e-15 | rho_max 1.652 | nTfloor 0 npfloor 0
+D2a_perp_b0.1_N256       on  t/tc 0.40: max|dP| 7.185e-04 L1 1.813e-04 | switched 0 (max 0.00e+00) E-branch max 7.18e-04 | flux-freeze 1.55e-15 | rho_max 1.588 | nTfloor 0 npfloor 0
+D2a_perp_b0.1_N256       off t/tc 0.40: max|dP| 7.185e-04 L1 1.813e-04 | switched 0 (max 0.00e+00) E-branch max 7.18e-04 | flux-freeze 1.55e-15 | rho_max 1.588 | nTfloor 0 npfloor 0
+D2a_perp_b0.1_N1024      on  t/tc 0.40: max|dP| 7.975e-05 L1 1.207e-05 | switched 0 (max 0.00e+00) E-branch max 7.98e-05 | flux-freeze 2.89e-15 | rho_max 1.589 | nTfloor 0 npfloor 0
+D2a_perp_b0.1_N1024      off t/tc 0.40: max|dP| 7.975e-05 L1 1.207e-05 | switched 0 (max 0.00e+00) E-branch max 7.98e-05 | flux-freeze 2.89e-15 | rho_max 1.589 | nTfloor 0 npfloor 0
+D2a_perp_b0.01_N256      on  t/tc 0.40: max|dP| 7.628e-04 L1 3.586e-05 | switched 256 (max 7.63e-04) E-branch max 0.00e+00 | flux-freeze 2.89e-15 | rho_max 1.285 | nTfloor 0 npfloor 0
+D2a_perp_b0.01_N256      off t/tc 0.40: max|dP| 4.283e-04 L1 1.968e-04 | switched 0 (max 0.00e+00) E-branch max 4.28e-04 | flux-freeze 2.22e-15 | rho_max 1.285 | nTfloor 0 npfloor 0
+D2a_perp_b0.01_N1024     on  t/tc 0.40: max|dP| 2.091e-04 L1 2.365e-06 | switched 1024 (max 2.09e-04) E-branch max 0.00e+00 | flux-freeze 5.11e-15 | rho_max 1.285 | nTfloor 0 npfloor 0
+D2a_perp_b0.01_N1024     off t/tc 0.40: max|dP| 2.781e-05 L1 1.175e-05 | switched 0 (max 0.00e+00) E-branch max 2.78e-05 | flux-freeze 8.22e-15 | rho_max 1.285 | nTfloor 0 npfloor 0
+D2a_perp_b0.001_N256     on  t/tc 0.40: max|dP| 2.953e-04 L1 1.018e-05 | switched 256 (max 2.95e-04) E-branch max 0.00e+00 | flux-freeze 3.77e-15 | rho_max 1.087 | nTfloor 0 npfloor 0
+D2a_perp_b0.001_N256     off t/tc 0.40: max|dP| 3.385e-04 L1 1.594e-04 | switched 0 (max 0.00e+00) E-branch max 3.38e-04 | flux-freeze 5.11e-15 | rho_max 1.087 | nTfloor 0 npfloor 0
+D2a_perp_b0.001_N1024    on  t/tc 0.40: max|dP| 7.539e-05 L1 6.912e-07 | switched 1024 (max 7.54e-05) E-branch max 0.00e+00 | flux-freeze 1.11e-14 | rho_max 1.087 | nTfloor 0 npfloor 0
+D2a_perp_b0.001_N1024    off t/tc 0.40: max|dP| 1.784e-05 L1 7.444e-06 | switched 0 (max 0.00e+00) E-branch max 1.78e-05 | flux-freeze 7.88e-15 | rho_max 1.087 | nTfloor 0 npfloor 0
+D2a_perp_b0.0001_N256    on  t/tc 0.40: max|dP| 1.049e-04 L1 4.349e-06 | switched 256 (max 1.05e-04) E-branch max 0.00e+00 | flux-freeze 1.04e-14 | rho_max 1.021 | nTfloor 0 npfloor 0
+D2a_perp_b0.0001_N256    off t/tc 0.40: max|dP| 4.790e-04 L1 3.234e-04 | switched 0 (max 0.00e+00) E-branch max 4.79e-04 | flux-freeze 9.10e-15 | rho_max 1.021 | nTfloor 0 npfloor 0
+D2a_perp_b0.0001_N1024   on  MISSING
+D2a_perp_b0.0001_N1024   off MISSING

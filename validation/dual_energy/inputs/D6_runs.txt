@@ -1,0 +1,42 @@
+D6/D1a_M100_eta1_1e-3 | D1a_M100.in | hydro/dual_energy_eta1=1e-3
+D6/D1a_M100_eta1_1e-2 | D1a_M100.in | hydro/dual_energy_eta1=1e-2
+D6/D1a_M100_eta1_5e-2 | D1a_M100.in | hydro/dual_energy_eta1=5e-2
+D6/D1a_M100_eta1_0.1 | D1a_M100.in | hydro/dual_energy_eta1=0.1
+D6/D1a_M100_eta1_0.2 | D1a_M100.in | hydro/dual_energy_eta1=0.2
+D6/D1a_M100_eta1_5e-2_eta2off | D1a_M100.in | hydro/dual_energy_eta1=5e-2 hydro/dual_energy_eta2=0.0
+D6/D1b_M100_N4096_eta1_1e-3 | D1b_M100_N4096.in | hydro/dual_energy_eta1=1e-3
+D6/D1b_M100_N4096_eta1_1e-2 | D1b_M100_N4096.in | hydro/dual_energy_eta1=1e-2
+D6/D1b_M100_N4096_eta1_5e-2 | D1b_M100_N4096.in | hydro/dual_energy_eta1=5e-2
+D6/D1b_M100_N4096_eta1_0.1 | D1b_M100_N4096.in | hydro/dual_energy_eta1=0.1
+D6/D1b_M100_N4096_eta1_0.2 | D1b_M100_N4096.in | hydro/dual_energy_eta1=0.2
+D6/D1b_M100_N4096_eta1_5e-2_eta2off | D1b_M100_N4096.in | hydro/dual_energy_eta1=5e-2 hydro/dual_energy_eta2=0.0
+D6/D1b_M1000_N1024_eta1_1e-3 | D1b_M1000_N1024.in | hydro/dual_energy_eta1=1e-3
+D6/D1b_M1000_N1024_eta1_1e-2 | D1b_M1000_N1024.in | hydro/dual_energy_eta1=1e-2
+D6/D1b_M1000_N1024_eta1_5e-2 | D1b_M1000_N1024.in | hydro/dual_energy_eta1=5e-2
+D6/D1b_M1000_N1024_eta1_0.1 | D1b_M1000_N1024.in | hydro/dual_energy_eta1=0.1
+D6/D1b_M1000_N1024_eta1_0.2 | D1b_M1000_N1024.in | hydro/dual_energy_eta1=0.2
+D6/D1b_M1000_N1024_eta1_5e-2_eta2off | D1b_M1000_N1024.in | hydro/dual_energy_eta1=5e-2 hydro/dual_energy_eta2=0.0
+D6/D1b_M100_N256_boost_eta1_1e-3 | D1b_M100_N256_boost.in | hydro/dual_energy_eta1=1e-3
+D6/D1b_M100_N256_boost_eta1_1e-2 | D1b_M100_N256_boost.in | hydro/dual_energy_eta1=1e-2
+D6/D1b_M100_N256_boost_eta1_5e-2 | D1b_M100_N256_boost.in | hydro/dual_energy_eta1=5e-2
+D6/D1b_M100_N256_boost_eta1_0.1 | D1b_M100_N256_boost.in | hydro/dual_energy_eta1=0.1
+D6/D1b_M100_N256_boost_eta1_0.2 | D1b_M100_N256_boost.in | hydro/dual_energy_eta1=0.2
+D6/D1b_M100_N256_boost_eta1_5e-2_eta2off | D1b_M100_N256_boost.in | hydro/dual_energy_eta1=5e-2 hydro/dual_energy_eta2=0.0
+D6/D3_M10_N1024_eta1_1e-3 | D3_M10_N1024.in | hydro/dual_energy_eta1=1e-3
+D6/D3_M10_N1024_eta1_1e-2 | D3_M10_N1024.in | hydro/dual_energy_eta1=1e-2
+D6/D3_M10_N1024_eta1_5e-2 | D3_M10_N1024.in | hydro/dual_energy_eta1=5e-2
+D6/D3_M10_N1024_eta1_0.1 | D3_M10_N1024.in | hydro/dual_energy_eta1=0.1
+D6/D3_M10_N1024_eta1_0.2 | D3_M10_N1024.in | hydro/dual_energy_eta1=0.2
+D6/D3_M10_N1024_eta1_5e-2_eta2off | D3_M10_N1024.in | hydro/dual_energy_eta1=5e-2 hydro/dual_energy_eta2=0.0
+D6/D3_M30_N1024_eta1_1e-3 | D3_M30_N1024.in | hydro/dual_energy_eta1=1e-3
+D6/D3_M30_N1024_eta1_1e-2 | D3_M30_N1024.in | hydro/dual_energy_eta1=1e-2
+D6/D3_M30_N1024_eta1_5e-2 | D3_M30_N1024.in | hydro/dual_energy_eta1=5e-2
+D6/D3_M30_N1024_eta1_0.1 | D3_M30_N1024.in | hydro/dual_energy_eta1=0.1
+D6/D3_M30_N1024_eta1_0.2 | D3_M30_N1024.in | hydro/dual_energy_eta1=0.2
+D6/D3_M30_N1024_eta1_5e-2_eta2off | D3_M30_N1024.in | hydro/dual_energy_eta1=5e-2 hydro/dual_energy_eta2=0.0
+D6/D2b_b0.01_br1_M0_N128_eta1_1e-3 | D2b_b0.01_br1_M0_N128.in | hydro/dual_energy_eta1=1e-3
+D6/D2b_b0.01_br1_M0_N128_eta1_1e-2 | D2b_b0.01_br1_M0_N128.in | hydro/dual_energy_eta1=1e-2
+D6/D2b_b0.01_br1_M0_N128_eta1_5e-2 | D2b_b0.01_br1_M0_N128.in | hydro/dual_energy_eta1=5e-2
+D6/D2b_b0.01_br1_M0_N128_eta1_0.1 | D2b_b0.01_br1_M0_N128.in | hydro/dual_energy_eta1=0.1
+D6/D2b_b0.01_br1_M0_N128_eta1_0.2 | D2b_b0.01_br1_M0_N128.in | hydro/dual_energy_eta1=0.2
+D6/D2b_b0.01_br1_M0_N128_eta1_5e-2_eta2off | D2b_b0.01_br1_M0_N128.in | hydro/dual_energy_eta1=5e-2 hydro/dual_energy_eta2=0.0

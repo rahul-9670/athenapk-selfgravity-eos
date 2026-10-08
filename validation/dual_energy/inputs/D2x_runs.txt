@@ -1,0 +1,4 @@
+D2x/D2b_b1e-4_br1_M10_N64_prod | D2b_b0.0001_br1_M10_N128.in | parthenon/mesh/nx1=64 parthenon/mesh/nx2=64 | 4
+D2x/D2b_b1e-4_br1_M10_N64_noexempt | D2b_b0.0001_br1_M10_N128.in | parthenon/mesh/nx1=64 parthenon/mesh/nx2=64 hydro/dual_energy_shock_comp=1.0e30 | 4
+D2x/D2b_b1e-4_br1_M10_N64_eta2off | D2b_b0.0001_br1_M10_N128.in | parthenon/mesh/nx1=64 parthenon/mesh/nx2=64 hydro/dual_energy_eta2=0.0 | 4
+D2x/D2b_b1e-4_br1_M10_N64_off | D2b_b0.0001_br1_M10_N128.in | parthenon/mesh/nx1=64 parthenon/mesh/nx2=64 hydro/dual_energy=false | 4

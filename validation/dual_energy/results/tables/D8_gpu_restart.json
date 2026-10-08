@@ -1,0 +1,68 @@
+{
+ "D8/D1a_M100_on_gpu": {
+  "cpu": "D1a/D1a_M100_on",
+  "t_gpu": 0.007815626041891007,
+  "t_cpu": 0.007815626041891007,
+  "maxrel_rho": 9.603429163007604e-13,
+  "maxrel_P": 1.2307932450994485e-12,
+  "metric_gpu": "max|P/P0-1| 5.548e-02",
+  "metric_cpu": "max|P/P0-1| 5.548e-02"
+ },
+ "D8/D1a_M100_on_gpu_mb256": {
+  "cpu": "D1a/D1a_M100_on",
+  "t_gpu": 0.007815626041891007,
+  "t_cpu": 0.007815626041891007,
+  "maxrel_rho": 9.603429163007604e-13,
+  "maxrel_P": 1.2307932450994485e-12,
+  "metric_gpu": "max|P/P0-1| 5.548e-02",
+  "metric_cpu": "max|P/P0-1| 5.548e-02"
+ },
+ "D8/D1a_M100_den_gpu": {
+  "cpu": "D1y/D1a_M100_den",
+  "t_gpu": 0.007815626041891007,
+  "t_cpu": 0.007815626041891007,
+  "maxrel_rho": 4.440892098500626e-16,
+  "maxrel_P": 6.439293542825908e-15,
+  "metric_gpu": "max|P/P0-1| 1.358e-03",
+  "metric_cpu": "max|P/P0-1| 1.358e-03"
+ },
+ "D8/D1b_M100_N4096_on_gpu": {
+  "cpu": "D1b/D1b_M100_N4096_on",
+  "t_gpu": 0.0009951164143397588,
+  "t_cpu": 0.0009951164143397588,
+  "maxrel_rho": 1.8962609260597674e-13,
+  "maxrel_P": 3.135269821541442e-13,
+  "metric_gpu": "max|dP| 2.090e-02 L1 1.492e-04",
+  "metric_cpu": "max|dP| 2.090e-02 L1 1.492e-04"
+ },
+ "D8/D1b_M1000_N1024_on_gpu": {
+  "cpu": "D1b/D1b_M1000_N1024_on",
+  "t_gpu": 9.951164143397586e-05,
+  "t_cpu": 9.951164143397586e-05,
+  "maxrel_rho": 5.839773109528323e-14,
+  "maxrel_P": 1.0169642905566434e-13,
+  "metric_gpu": "max|dP| 1.252e+01 L1 2.650e-02",
+  "metric_cpu": "max|dP| 1.252e+01 L1 2.650e-02"
+ },
+ "D8/D3_M30_N1024_prod_gpu": {
+  "cpu": "D3/D3_M30_N1024_prod",
+  "t_gpu": 0.09157351227941628,
+  "t_cpu": 0.09157351227941628,
+  "maxrel_rho": 1.014077710692618e-12,
+  "maxrel_P": 9.909850717804147e-13,
+  "metric_gpu": "plateau P/P2-1 +3.396e-04",
+  "metric_cpu": "plateau P/P2-1 +3.396e-04"
+ },
+ "D8/D2b_b0.01_br1_M0_N128_on_gpu": {
+  "cpu": "D2b/D2b_b0.01_br1_M0_N128_on",
+  "t_gpu": 0.19539065104727515,
+  "t_cpu": 0.19539065104727515,
+  "maxrel_rho": 7.549516567451064e-15,
+  "maxrel_P": 1.3877787807814457e-14,
+  "metric_gpu": "max|dP| 1.641e-01 L1 4.397e-03",
+  "metric_cpu": "max|dP| 1.641e-01 L1 4.397e-03"
+ },
+ "rst_D1b_M1000_N1024_A": "BITWISE",
+ "rst_D2b_b0.01_br1_M0_N128_A": "BITWISE",
+ "rst_D3_M30_N1024_A": "BITWISE"
+}

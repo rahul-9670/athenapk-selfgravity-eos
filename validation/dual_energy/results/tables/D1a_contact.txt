@@ -1,0 +1,25 @@
+# D1a pure contact rho 1|2 (10 K | ~5 K) at P0 (rho26 table, eos_interp p), N = 256, one box crossing; exact = IC
+D1a_M0       on        t 0.7816: max|P/P0-1| 6.661e-15  L1(rho-rho_exact) 1.062e-14  max|v/u-1| 3.42e-15  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M0       off       t 0.7816: max|P/P0-1| 6.661e-15  L1(rho-rho_exact) 1.062e-14  max|v/u-1| 3.42e-15  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M0       on_nodf   t 0.7816: max|P/P0-1| 7.327e-15  L1(rho-rho_exact) 2.242e-15  max|v/u-1| 1.34e-15  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M0       off_nodf  t 0.7816: max|P/P0-1| 7.327e-15  L1(rho-rho_exact) 2.242e-15  max|v/u-1| 1.34e-15  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M1       on        t 0.7816: max|P/P0-1| 3.542e-14  L1(rho-rho_exact) 2.103e-02  max|v/u-1| 1.54e-14  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M1       off       t 0.7816: max|P/P0-1| 3.542e-14  L1(rho-rho_exact) 2.103e-02  max|v/u-1| 1.54e-14  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M1       on_nodf   t 0.7816: max|P/P0-1| 3.194e-04  L1(rho-rho_exact) 2.106e-02  max|v/u-1| 8.25e-05  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M1       off_nodf  t 0.7816: max|P/P0-1| 3.194e-04  L1(rho-rho_exact) 2.106e-02  max|v/u-1| 8.25e-05  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M10      on        t 0.07816: max|P/P0-1| 6.588e-03  L1(rho-rho_exact) 2.131e-02  max|v/u-1| 1.16e-03  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M10      off       t 0.07816: max|P/P0-1| 4.933e-12  L1(rho-rho_exact) 2.047e-02  max|v/u-1| 8.10e-14  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M10      on_nodf   t 0.07816: max|P/P0-1| 6.588e-03  L1(rho-rho_exact) 2.131e-02  max|v/u-1| 1.16e-03  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M10      off_nodf  t 0.07816: max|P/P0-1| 6.322e-04  L1(rho-rho_exact) 2.050e-02  max|v/u-1| 1.57e-05  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M100     on        t 0.007816: max|P/P0-1| 5.548e-02  L1(rho-rho_exact) 2.042e-02  max|v/u-1| 5.61e-05  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M100     off       t 0.007816: max|P/P0-1| 1.635e-05  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 1.46e-08  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M100     on_nodf   t 0.007816: max|P/P0-1| 5.548e-02  L1(rho-rho_exact) 2.042e-02  max|v/u-1| 5.61e-05  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M100     off_nodf  t 0.007816: max|P/P0-1| 9.583e-04  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 6.26e-07  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M1000    on        t 0.0007816: max|P/P0-1| 5.683e-02  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 5.72e-07  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M1000    off       t 0.0007816: max|P/P0-1| 1.624e-05  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 1.38e-10  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M1000    on_nodf   t 0.0007816: max|P/P0-1| 5.683e-02  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 5.72e-07  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M1000    off_nodf  t 0.0007816: max|P/P0-1| 9.816e-04  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 6.18e-09  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M10000   on        t 7.816e-05: max|P/P0-1| 5.685e-02  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 5.72e-09  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M10000   off       t 7.816e-05: max|P/P0-1| 1.697e-05  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 1.23e-12  ndual(sum) 0 npfloor 0 nTfloor 0
+D1a_M10000   on_nodf   t 7.816e-05: max|P/P0-1| 5.685e-02  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 5.72e-09  ndual(sum) 51456 npfloor 0 nTfloor 0
+D1a_M10000   off_nodf  t 7.816e-05: max|P/P0-1| 9.910e-04  L1(rho-rho_exact) 2.041e-02  max|v/u-1| 6.36e-11  ndual(sum) 0 npfloor 0 nTfloor 0

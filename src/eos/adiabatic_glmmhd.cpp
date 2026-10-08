@@ -43,6 +43,17 @@ void AdiabaticGLMMHDEOS::ConservedToPrimitive(MeshData<Real> *md) const {
 
   auto this_on_device = (*this);
 
+  // hydro/dual_energy_unsigned_prim: the dual-energy switch flag lives in its own field
+  // (`dual_switched`, 1 = took the advected internal energy) instead of the sign of prim.
+  // Otherwise the pack is `prim` again and is never written (the lambda needs a capture).
+  const bool write_flag = dual_unsigned_ && dual_idx_ >= 0;
+  auto flag_pack = write_flag ? md->PackVariables(std::vector<std::string>{"dual_switched"})
+                              : prim_pack;
+  // hydro/dual_energy_eta2: per-cell stage compression written by DualEnergyPdV (aliases prim
+  // otherwise and is not read).
+  const bool use_comp = dual_eta2_ > 0.0 && dual_idx_ >= 0;
+  auto comp_pack = use_comp ? md->PackVariables(std::vector<std::string>{"dual_comp"}) : prim_pack;
+
   parthenon::par_for(
       DEFAULT_LOOP_PATTERN, "ConservedToPrimitive", parthenon::DevExecSpace(), 0,
       cons_pack.GetDim(5) - 1, kb.s, kb.e, jb.s, jb.e, ib.s, ib.e,
@@ -51,6 +62,8 @@ void AdiabaticGLMMHDEOS::ConservedToPrimitive(MeshData<Real> *md) const {
         auto &prim = prim_pack(b);
         // auto &nu = entropy_pack(b);
 
-        this_on_device.ConsToPrim(cons, prim, nhydro, nscalars, k, j, i);
+        const Real comp = use_comp ? comp_pack(b, 0, k, j, i) : 0.0;
+        const bool sw = this_on_device.ConsToPrim(cons, prim, nhydro, nscalars, k, j, i, comp);
+        if (write_flag) flag_pack(b, 0, k, j, i) = sw ? 1.0 : 0.0;
       });
 }

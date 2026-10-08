@@ -34,7 +34,7 @@
 //
 // SCOPE (refused otherwise at startup): eos = hydrogen, riemann = hlld, reconstruction plm or dc, integrator vl2
 // (both stages build on the step-start state, which is what the step-start freeze requires), no first-order flux
-// correction.
+// correction. Dual energy: no extra coupling (see hydro.cpp; switched cells keep the advected energy).
 //
 // Everything lives in this separate translation unit on purpose: the production flux kernel and the HLLD
 // header are untouched, so with the key off the build is bit-identical (E-F9: inline-body changes in shared

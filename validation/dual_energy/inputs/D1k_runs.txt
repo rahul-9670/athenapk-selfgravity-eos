@@ -1,0 +1,8 @@
+D1k/D1a_M10_on | D1a_M10.in | 
+D1k/D1a_M10_off | D1a_M10.in | hydro/dual_energy=false
+D1k/D1a_M100_on | D1a_M100.in | 
+D1k/D1a_M100_off | D1a_M100.in | hydro/dual_energy=false
+D1k/D1b_M100_N1024_on | D1b_M100_N1024.in | 
+D1k/D1b_M100_N1024_off | D1b_M100_N1024.in | hydro/dual_energy=false
+D1k/D1b_M10000_N256_boost_on | D1b_M10000_N256_boost.in | 
+D1k/D1b_M10000_N256_boost_off | D1b_M10000_N256_boost.in | hydro/dual_energy=false

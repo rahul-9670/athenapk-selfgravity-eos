@@ -14,6 +14,8 @@ add_executable(
         diagnostics/grav_diag.cpp
         diagnostics/grav_diag.hpp
         hydro/double_flux.cpp
+        hydro/dual_flux_density.cpp
+        hydro/dual_double_flux.cpp
         hydro/hydro_driver.cpp
         hydro/hydro.cpp
         hydro/glmmhd/dedner_source.cpp

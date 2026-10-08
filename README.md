@@ -1,7 +1,7 @@
-# AthenaPK with self-gravity and a tabulated protostellar EOS
+# AthenaPK with self-gravity, a tabulated protostellar EOS and dual energy
 
 A modified copy of [AthenaPK](https://github.com/parthenon-hpc-lab/athenapk) (Parthenon + Kokkos, CPU and GPU) that
-contains two validated additions:
+contains three validated additions:
 
 * **Self-gravity** (`src/self_gravity/`): multigrid-preconditioned BiCGSTAB Poisson solver over the AMR hierarchy,
   multipole (monopole + quadrupole) isolated boundary conditions, Jeans swindle for periodic boxes, flux-weighted
@@ -11,12 +11,17 @@ contains two validated additions:
   H2 rotational/vibrational levels, two tables shipped (`TABLE_PROVENANCE.md`), optional double-flux energy update
   for pressure-exact contacts (`hydro/double_flux`). Report:
   [`validation/eos_tabulated/EOS_VALIDATION.md`](validation/eos_tabulated/EOS_VALIDATION.md).
+* **Dual energy** (`hydro/dual_energy`): the internal energy is carried as an extra advected variable (with the
+  -P div v source and a two-sided switch) and used where E - KE - ME is ill-conditioned, i.e. in cold hypersonic and
+  magnetically dominated gas. Report:
+  [`validation/dual_energy/DUAL_ENERGY_VALIDATION.md`](validation/dual_energy/DUAL_ENERGY_VALIDATION.md).
 
 Problem generators: `collapse_be` (magnetized Bonnor-Ebert sphere collapse, barotropic) and the validation problems
 `poisson_test`, `grav_analytic`, `jeans_wave`, `grav_slab`, `polytrope`, `profile1d`, `eos_test`, `fofc_scalar`.
 Fluid: `glmmhd` only. With `eos = hydrogen`, `collapse_be`'s barotropic step prescribes the temperature,
 T = T0 sqrt(1 + (rho/rhocrit)^(2(gamma-1))), and takes the internal energy from the table at that temperature
-(with `eos = adiabatic` it is the usual ideal-gas barotropic energy).
+(with `eos = adiabatic` it is the usual ideal-gas barotropic energy). The dual energy is not wired into that
+barotropic step and is refused for `collapse_be`.
 
 ## Build
 ```bash

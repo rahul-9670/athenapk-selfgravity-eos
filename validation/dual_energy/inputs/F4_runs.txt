@@ -1,0 +1,4 @@
+F4/D1b_M10_N1024_ext | D1b_M10_N1024.in | hydro/glmmhd_source=dedner_extended
+F4/D1b_M10_N1024_plain | D1b_M10_N1024.in | 
+F4/D1a_M100_clamp | D1a_M100.in | hydro/boundary_flux_clamp=true
+F4/D1a_M100_noclamp | D1a_M100.in | 

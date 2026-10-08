@@ -1,0 +1,6 @@
+D4/D4_b1_on | D4_b1.in | 
+D4/D4_b1_off | D4_b1.in | hydro/dual_energy=false
+D4/D4_b0.01_on | D4_b0.01.in | 
+D4/D4_b0.01_off | D4_b0.01.in | hydro/dual_energy=false
+D4/D4_b0.0001_on | D4_b0.0001.in | 
+D4/D4_b0.0001_off | D4_b0.0001.in | hydro/dual_energy=false

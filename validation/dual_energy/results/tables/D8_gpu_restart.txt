@@ -1,0 +1,11 @@
+# D8: GPU (H100, 07357f75) vs CPU, and restart exactness (CPU 4b5393c2)
+D1a_M100_on_gpu                  GPU-CPU max rel rho 9.6e-13 P 1.2e-12 | GPU: max|P/P0-1| 5.548e-02 | CPU: max|P/P0-1| 5.548e-02
+D1a_M100_on_gpu_mb256            GPU-CPU max rel rho 9.6e-13 P 1.2e-12 | GPU: max|P/P0-1| 5.548e-02 | CPU: max|P/P0-1| 5.548e-02
+D1a_M100_den_gpu                 GPU-CPU max rel rho 4.4e-16 P 6.4e-15 | GPU: max|P/P0-1| 1.358e-03 | CPU: max|P/P0-1| 1.358e-03
+D1b_M100_N4096_on_gpu            GPU-CPU max rel rho 1.9e-13 P 3.1e-13 | GPU: max|dP| 2.090e-02 L1 1.492e-04 | CPU: max|dP| 2.090e-02 L1 1.492e-04
+D1b_M1000_N1024_on_gpu           GPU-CPU max rel rho 5.8e-14 P 1.0e-13 | GPU: max|dP| 1.252e+01 L1 2.650e-02 | CPU: max|dP| 1.252e+01 L1 2.650e-02
+D3_M30_N1024_prod_gpu            GPU-CPU max rel rho 1.0e-12 P 9.9e-13 | GPU: plateau P/P2-1 +3.396e-04 | CPU: plateau P/P2-1 +3.396e-04
+D2b_b0.01_br1_M0_N128_on_gpu     GPU-CPU max rel rho 7.5e-15 P 1.4e-14 | GPU: max|dP| 1.641e-01 L1 4.397e-03 | CPU: max|dP| 1.641e-01 L1 4.397e-03
+rst_D1b_M1000_N1024              restart at tlim/2 vs uninterrupted: BITWISE
+rst_D2b_b0.01_br1_M0_N128        restart at tlim/2 vs uninterrupted: BITWISE
+rst_D3_M30_N1024                 restart at tlim/2 vs uninterrupted: BITWISE

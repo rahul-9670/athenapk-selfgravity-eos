@@ -1,0 +1,3 @@
+T3/D3_M10_clamp_prod | D3_M10_N1024.in | hydro/boundary_flux_clamp=true
+T3/D3_M10_clamp_legacy | D3_M10_N1024.in | hydro/boundary_flux_clamp=true hydro/boundary_clamp_dual=false
+T3/D3_M10_clamp_off | D3_M10_N1024.in | hydro/boundary_flux_clamp=true hydro/dual_energy=false

@@ -1,0 +1,4 @@
+# T3 (P-10): Noh M 10 with boundary_flux_clamp = true (inflow clamped at x = 0, 1); outer region x < 0.15 or > 0.85 must stay on the adiabat
+prod    outer cells: max|dP| 2.28e+01 L1 2.26e+01, rho 0.497..0.564 | 3 edge cells dP +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 | mass -4.11e-01 Tfloor 14462
+legacy  outer cells: max|dP| 2.29e+01 L1 2.26e+01, rho 0.496..0.563 | 3 edge cells dP +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 | mass -4.13e-01 Tfloor 13088
+off     outer cells: max|dP| 2.31e+01 L1 2.28e+01, rho 0.496..0.562 | 3 edge cells dP +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 +2.3e+01 | mass -4.13e-01 Tfloor 13806

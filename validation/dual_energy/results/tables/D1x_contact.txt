@@ -1,0 +1,35 @@
+# D1x: isolation of the dual-energy contact pressure error (DE-F3); base D1a (rho 1|2, N 256), one change per run
+D1x_M10_dc         on  max|P/P0-1| per dump: 1.34e-03 | L1(rho) 9.972e-02 | ndual 51456 nTfloor 0
+D1x_M10_dc         off max|P/P0-1| per dump: 1.11e-12 | L1(rho) 9.971e-02 | ndual 0 nTfloor 0
+D1x_M10_x5         on  max|P/P0-1| per dump: 6.71e-03 6.10e-03 6.22e-03 5.55e-03 8.12e-03 | L1(rho) 3.162e-02 | ndual 256256 nTfloor 0
+D1x_M10_x5         off max|P/P0-1| per dump: 4.92e-12 1.23e-05 2.11e-05 2.64e-05 3.06e-05 | L1(rho) 3.151e-02 | ndual 0 nTfloor 0
+D1x_M10_N64        on  max|P/P0-1| per dump: 2.58e-02 | L1(rho) 5.678e-02 | ndual 12864 nTfloor 0
+D1x_M10_N64        off max|P/P0-1| per dump: 6.45e-13 | L1(rho) 5.630e-02 | ndual 0 nTfloor 0
+D1x_M10_N128       on  max|P/P0-1| per dump: 1.47e-02 | L1(rho) 3.495e-02 | ndual 25728 nTfloor 0
+D1x_M10_N128       off max|P/P0-1| per dump: 2.44e-12 | L1(rho) 3.399e-02 | ndual 0 nTfloor 0
+D1x_M10_N512       on  max|P/P0-1| per dump: 6.22e-03 | L1(rho) 1.283e-02 | ndual 102912 nTfloor 0
+D1x_M10_N512       off max|P/P0-1| per dump: 1.37e-05 | L1(rho) 1.232e-02 | ndual 0 nTfloor 0
+D1x_M10_N1024      on  max|P/P0-1| per dump: 4.95e-03 | L1(rho) 7.583e-03 | ndual 205824 nTfloor 0
+D1x_M10_N1024      off max|P/P0-1| per dump: 1.52e-05 | L1(rho) 7.417e-03 | ndual 0 nTfloor 0
+D1x_M100_dc        on  max|P/P0-1| per dump: 1.45e-03 | L1(rho) 9.971e-02 | ndual 51456 nTfloor 0
+D1x_M100_dc        off max|P/P0-1| per dump: 6.84e-05 | L1(rho) 9.971e-02 | ndual 0 nTfloor 0
+D1x_M100_x5        on  max|P/P0-1| per dump: 5.57e-02 6.47e-02 6.72e-02 6.72e-02 6.63e-02 | L1(rho) 3.187e-02 | ndual 256256 nTfloor 0
+D1x_M100_x5        off max|P/P0-1| per dump: 1.63e-05 1.65e-05 1.70e-05 1.66e-05 2.10e-05 | L1(rho) 3.129e-02 | ndual 0 nTfloor 0
+D1x_M100_N64       on  max|P/P0-1| per dump: 3.97e-02 | L1(rho) 5.622e-02 | ndual 12864 nTfloor 0
+D1x_M100_N64       off max|P/P0-1| per dump: 1.54e-05 | L1(rho) 5.623e-02 | ndual 0 nTfloor 0
+D1x_M100_N128      on  max|P/P0-1| per dump: 4.68e-02 | L1(rho) 3.392e-02 | ndual 25728 nTfloor 0
+D1x_M100_N128      off max|P/P0-1| per dump: 1.59e-05 | L1(rho) 3.392e-02 | ndual 0 nTfloor 0
+D1x_M100_N512      on  max|P/P0-1| per dump: 6.47e-02 | L1(rho) 1.230e-02 | ndual 102912 nTfloor 0
+D1x_M100_N512      off max|P/P0-1| per dump: 1.60e-05 | L1(rho) 1.227e-02 | ndual 0 nTfloor 0
+D1x_M100_N1024     on  max|P/P0-1| per dump: 6.77e-02 | L1(rho) 7.459e-03 | ndual 205824 nTfloor 0
+D1x_M100_N1024     off max|P/P0-1| per dump: 2.49e-05 | L1(rho) 7.373e-03 | ndual 0 nTfloor 0
+D1x_M10_eta1e-3    on  max|P/P0-1| per dump: 4.93e-12 | L1(rho) 2.047e-02 | ndual 0 nTfloor 0
+D1x_M10_eta1e-3    off max|P/P0-1| per dump: 4.93e-12 | L1(rho) 2.047e-02 | ndual 0 nTfloor 0
+D1x_M10_r1.1       on  max|P/P0-1| per dump: 3.91e-04 | L1(rho) 2.082e-03 | ndual 51456 nTfloor 0
+D1x_M10_r1.1       off max|P/P0-1| per dump: 1.49e-12 | L1(rho) 2.047e-03 | ndual 0 nTfloor 0
+D1x_M100_r1.1      on  max|P/P0-1| per dump: 1.73e-03 | L1(rho) 2.042e-03 | ndual 51456 nTfloor 0
+D1x_M100_r1.1      off max|P/P0-1| per dump: 1.61e-05 | L1(rho) 2.041e-03 | ndual 0 nTfloor 0
+D1x_M10_r10        on  max|P/P0-1| per dump: 2.00e-01 | L1(rho) 3.701e-01 | ndual 26603 nTfloor 0
+D1x_M10_r10        off max|P/P0-1| per dump: 2.76e-13 | L1(rho) 1.856e-01 | ndual 0 nTfloor 0
+D1x_M100_r10       on  max|P/P0-1| per dump: 4.19e-01 | L1(rho) 1.861e-01 | ndual 51456 nTfloor 0
+D1x_M100_r10       off max|P/P0-1| per dump: 1.20e-05 | L1(rho) 1.839e-01 | ndual 0 nTfloor 0

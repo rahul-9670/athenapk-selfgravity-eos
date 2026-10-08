@@ -505,6 +505,12 @@ struct par_dispatch_impl<Tag, Pattern, Function, TypeList<Bounds...>, TypeList<A
     for (int i = 0; i < Nouter - 1; i++)
       tiling[i] = 1;
     tiling[Nouter - 1] = bound_arr[Nouter - 1].e + 1 - bound_arr[Nouter - 1].s;
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || defined(KOKKOS_ENABLE_SYCL)
+    // AthenaPK E-F8b (2026-10-07): a full-row tile is one thread block per row; on a GPU rows > 2048 abort and a
+    // 1024-row reduction silently did not execute (validation_tests/dual_energy). Cap as AthenaPK's RowTile; rows
+    // <= 256 keep the unchanged policy. Host builds: unchanged.
+    if (tiling[Nouter - 1] > 256) tiling[Nouter - 1] = 256;
+#endif
     kokkos_dispatch(Tag(), name,
                     Kokkos::Experimental::require(
                         Kokkos::MDRangePolicy<Kokkos::Rank<Rank>>(

@@ -11,6 +11,7 @@
 #include "../eos/adiabatic_glmmhd.hpp"
 #include "../main.hpp"
 #include "cons_diag.hpp"
+#include "../utils/row_tile.hpp"
 
 namespace Diagnostics {
 
@@ -33,6 +34,15 @@ Real ConsDiagReduce(MeshData<Real> *md, ConsDiag which) {
 
   const Real dfloor = hydro_pkg->Param<Real>("cons_diag_dfloor");
   const Real pfloor = hydro_pkg->Param<Real>("cons_diag_pfloor");
+  const int idual = hydro_pkg->Param<int>("dual_idx");
+  // hydro/dual_energy_unsigned_prim: the switch flag is the `dual_switched` field, not the
+  // sign of prim (the flag pack aliases prim otherwise and is not read).
+  const bool dual_flag_field = hydro_pkg->AllParams().hasKey("dual_energy_unsigned_prim") &&
+                               hydro_pkg->Param<bool>("dual_energy_unsigned_prim");
+  const auto &dual_flag =
+      (dual_flag_field && which == ConsDiag::ndual)
+          ? md->PackVariables(std::vector<std::string>{"dual_switched"})
+          : prim;
   const bool mhd = hydro_pkg->Param<bool>("cons_diag_mhd");
   // nTfloor: the floor pressure ConsToPrim applies for hydro/Tfloor, P_fl(rho) = P(rho, rho e_floor) (table) or
   // (gamma-1) rho e_floor (ideal gas). The EOS is copied only for that column (a dummy otherwise, never evaluated).
@@ -54,12 +64,18 @@ Real ConsDiagReduce(MeshData<Real> *md, ConsDiag which) {
   IndexRange jb = md->GetBlockData(0)->GetBoundsJ(IndexDomain::interior);
   IndexRange kb = md->GetBlockData(0)->GetBoundsK(IndexDomain::interior);
 
+  // validation_tests/dual_energy DE-F1 (2026-10-06): in 1D/2D the X2/X3 face-flux arrays are not allocated, but
+  // the y/z "boundary face" tests below are always true for a single cell along y/z, so the solver-flux columns
+  // (cons-Mout-solver*) dereferenced a null flux pointer at the first history output (segfault in every 1D run
+  // with cons_diag = true). Read a solver flux only along an existing dimension. 3D (production): unchanged.
+  const int ndim_cd = pmb->pmy_mesh->ndim;
+  const bool has2 = ndim_cd > 1, has3 = ndim_cd > 2;
   Real sum = 0.0;
   Kokkos::parallel_reduce(
       "ConsDiagReduce",
       Kokkos::MDRangePolicy<Kokkos::Rank<4>>(
           DevExecSpace(), {0, kb.s, jb.s, ib.s},
-          {prim.GetDim(5), kb.e + 1, jb.e + 1, ib.e + 1}, {1, 1, 1, ib.e + 1 - ib.s}),
+          {prim.GetDim(5), kb.e + 1, jb.e + 1, ib.e + 1}, {1, 1, 1, RowTile(ib.e + 1 - ib.s)}),
       KOKKOS_LAMBDA(const int b, const int k, const int j, const int i, Real &lsum) {
         const auto &w = prim(b);
         const auto &coords = prim.GetCoords(b);
@@ -90,6 +106,16 @@ Real ConsDiagReduce(MeshData<Real> *md, ConsDiag which) {
           if (pfloor > 0.0 && w(IPR, k, j, i) <= pfloor * (1.0 + 1.0e-9)) lsum += 1.0;
           return;
         }
+        if (which == ConsDiag::ndual) {
+          // Cells that took the advected value in the last ConsToPrim. Legacy: ConsToPrim marks
+          // them with a negative prim sign (AdiabaticGLMMHDEOS::ConsToPrim).
+          if (dual_flag_field) {
+            if (dual_flag(b, 0, k, j, i) > 0.5) lsum += 1.0;
+          } else if (idual >= 0 && w(idual, k, j, i) < 0.0) {
+            lsum += 1.0;
+          }
+          return;
+        }
 
         const Real dx = coords.Dxc<1>(k, j, i);
         const Real dy = coords.Dxc<2>(k, j, i);
@@ -107,16 +133,16 @@ Real ConsDiagReduce(MeshData<Real> *md, ConsDiag which) {
           if (inner) {
             if (std::fabs(coords.Xf<1>(i) - xlo) < 1.0e-9 * dx)
               f += -(solver ? cf.flux(X1DIR, IDN, k, j, i) : rho * vx) * (dV / dx);
-            if (std::fabs(coords.Xf<2>(j) - ylo) < 1.0e-9 * dy)
+            if ((has2 || !solver) && std::fabs(coords.Xf<2>(j) - ylo) < 1.0e-9 * dy)
               f += -(solver ? cf.flux(X2DIR, IDN, k, j, i) : rho * vy) * (dV / dy);
-            if (std::fabs(coords.Xf<3>(k) - zlo) < 1.0e-9 * dz)
+            if ((has3 || !solver) && std::fabs(coords.Xf<3>(k) - zlo) < 1.0e-9 * dz)
               f += -(solver ? cf.flux(X3DIR, IDN, k, j, i) : rho * vz) * (dV / dz);
           } else {
             if (std::fabs(coords.Xf<1>(i + 1) - xhi) < 1.0e-9 * dx)
               f += (solver ? cf.flux(X1DIR, IDN, k, j, i + 1) : rho * vx) * (dV / dx);
-            if (std::fabs(coords.Xf<2>(j + 1) - yhi) < 1.0e-9 * dy)
+            if ((has2 || !solver) && std::fabs(coords.Xf<2>(j + 1) - yhi) < 1.0e-9 * dy)
               f += (solver ? cf.flux(X2DIR, IDN, k, j + 1, i) : rho * vy) * (dV / dy);
-            if (std::fabs(coords.Xf<3>(k + 1) - zhi) < 1.0e-9 * dz)
+            if ((has3 || !solver) && std::fabs(coords.Xf<3>(k + 1) - zhi) < 1.0e-9 * dz)
               f += (solver ? cf.flux(X3DIR, IDN, k + 1, j, i) : rho * vz) * (dV / dz);
           }
           lsum += f;
@@ -133,13 +159,13 @@ Real ConsDiagReduce(MeshData<Real> *md, ConsDiag which) {
             f += -cf.flux(X1DIR, IDN, k, j, i) * (dV / dx);
           if (std::fabs(coords.Xf<1>(i + 1) - xhi) < 1.0e-9 * dx)
             f += cf.flux(X1DIR, IDN, k, j, i + 1) * (dV / dx);
-          if (std::fabs(coords.Xf<2>(j) - ylo) < 1.0e-9 * dy)
+          if (has2 && std::fabs(coords.Xf<2>(j) - ylo) < 1.0e-9 * dy)
             f += -cf.flux(X2DIR, IDN, k, j, i) * (dV / dy);
-          if (std::fabs(coords.Xf<2>(j + 1) - yhi) < 1.0e-9 * dy)
+          if (has2 && std::fabs(coords.Xf<2>(j + 1) - yhi) < 1.0e-9 * dy)
             f += cf.flux(X2DIR, IDN, k, j + 1, i) * (dV / dy);
-          if (std::fabs(coords.Xf<3>(k) - zlo) < 1.0e-9 * dz)
+          if (has3 && std::fabs(coords.Xf<3>(k) - zlo) < 1.0e-9 * dz)
             f += -cf.flux(X3DIR, IDN, k, j, i) * (dV / dz);
-          if (std::fabs(coords.Xf<3>(k + 1) - zhi) < 1.0e-9 * dz)
+          if (has3 && std::fabs(coords.Xf<3>(k + 1) - zhi) < 1.0e-9 * dz)
             f += cf.flux(X3DIR, IDN, k + 1, j, i) * (dV / dz);
           lsum += f;
           return;

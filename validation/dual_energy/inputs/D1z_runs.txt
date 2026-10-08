@@ -1,0 +1,44 @@
+D1z/D1z_M10_x5_on | D1a_M10.in | parthenon/time/tlim=0.39078130209455036 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M10_N64_on | D1a_M10.in | parthenon/mesh/nx1=64 parthenon/meshblock/nx1=64 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M10_N128_on | D1a_M10.in | parthenon/mesh/nx1=128 parthenon/meshblock/nx1=128 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M10_N512_on | D1a_M10.in | parthenon/mesh/nx1=512 parthenon/meshblock/nx1=512 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M10_N1024_on | D1a_M10.in | parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M100_x5_on | D1a_M100.in | parthenon/time/tlim=0.03907813020945503 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M100_N64_on | D1a_M100.in | parthenon/mesh/nx1=64 parthenon/meshblock/nx1=64 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M100_N128_on | D1a_M100.in | parthenon/mesh/nx1=128 parthenon/meshblock/nx1=128 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M100_N512_on | D1a_M100.in | parthenon/mesh/nx1=512 parthenon/meshblock/nx1=512 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M100_N1024_on | D1a_M100.in | parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024 hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M10_r1.1_on | D1x_M10_r1.1.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M100_r1.1_on | D1x_M100_r1.1.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M10_r10_on | D1x_M10_r10.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1z_M100_r10_on | D1x_M100_r10.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1a_M0_den | D1a_M0.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1a_M1_den | D1a_M1.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1a_M10_den | D1a_M10.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1a_M100_den | D1a_M100.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1a_M1000_den | D1a_M1000.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1a_M10000_den | D1a_M10000.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M1_N1024_den | D1b_M1_N1024.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M1_N256_boost_den | D1b_M1_N256_boost.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M3_N1024_den | D1b_M3_N1024.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M3_N256_boost_den | D1b_M3_N256_boost.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M10_N1024_den | D1b_M10_N1024.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M10_N4096_den | D1b_M10_N4096.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M10_N256_boost_den | D1b_M10_N256_boost.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M30_N1024_den | D1b_M30_N1024.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M30_N4096_den | D1b_M30_N4096.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M30_N256_boost_den | D1b_M30_N256_boost.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M100_N1024_den | D1b_M100_N1024.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M100_N4096_den | D1b_M100_N4096.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M100_N256_boost_den | D1b_M100_N256_boost.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M1000_N1024_den | D1b_M1000_N1024.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M1000_N4096_den | D1b_M1000_N4096.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M1000_N256_boost_den | D1b_M1000_N256_boost.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M10000_N1024_den | D1b_M10000_N1024.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D1z/D1b_M10000_N256_boost_den | D1b_M10000_N256_boost.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D2z/D2c_par_b1_den | D2c_par_b1.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D2z/D2c_par_b0.01_den | D2c_par_b0.01.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D2z/D2c_par_b0.0001_den | D2c_par_b0.0001.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D2z/D2c_perp_b1_den | D2c_perp_b1.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D2z/D2c_perp_b0.01_den | D2c_perp_b0.01.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true
+D2z/D2c_perp_b0.0001_den | D2c_perp_b0.0001.in | hydro/dual_energy_flux=density hydro/dual_energy_double_flux=true

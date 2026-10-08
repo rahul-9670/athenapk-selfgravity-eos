@@ -1,0 +1,1 @@
+X2/D3_M10_tfloor_scan | D3_M10_N1024.in | hydro/dual_energy=false parthenon/time/tlim=0.012 parthenon/output0/dt=0.00046358844721949144 parthenon/output0/variables=prim

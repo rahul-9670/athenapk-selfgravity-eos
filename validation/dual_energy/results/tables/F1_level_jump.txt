@@ -1,0 +1,10 @@
+# F1: dual double flux on refined meshes, max|P/P0-1| at t_end (contact at u = 100 cs). Builds: F1b = 3555dfa3/dcf73f36 era (no fill),
+#     F1d = a96a12ac (+ dual-aware EOS-consistent ghost fill), F1e = 0445a0fb (+ dual_vflux: flux-corrected face fluxes)
+rho 1|2  SMR               no fill 3.00e-05                 fill 5.97e-05                 vflux 1.40e-10                 | dual off 1.74e-05
+rho 1|10 SMR               no fill 2.18e-04                 fill 2.28e-04                 vflux 6.40e-11                 | dual off 1.36e-05
+rho 1|2  AMR               no fill -                        fill 3.91e-04                 vflux 2.56e-10                 | dual off 1.58e-05
+rho 1|10 AMR               no fill -                        fill -                        vflux 1.41e-10                 | dual off 1.15e-05
+rho 1|10 SMR + pdv=face    no fill -                        fill -                        vflux 5.76e-11                 | dual off -
+rho 1|2  AMR + pdv=face    no fill -                        fill -                        vflux 2.33e-10                 | dual off -
+rho 1|2  3D oblique 64^3   no fill 1.41e-11                 fill 1.41e-11                 vflux 1.64e-11                 | dual off 2.03e-05
+rho 1|10 uniform N 128     no fill -                        fill -                        vflux 7.30e-11                 | dual off -

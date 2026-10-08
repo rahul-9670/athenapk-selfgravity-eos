@@ -1,0 +1,3 @@
+T3b/D3_M10_b1e-4_clamp_prod | D3_M10_N1024.in | hydro/boundary_flux_clamp=true problem/eos_test/B0x=140.1706851073678
+T3b/D3_M10_b1e-4_clamp_legacy | D3_M10_N1024.in | hydro/boundary_flux_clamp=true hydro/boundary_clamp_dual=false problem/eos_test/B0x=140.1706851073678
+T3b/D3_M10_b1e-4_noclamp_prod | D3_M10_N1024.in | problem/eos_test/B0x=140.1706851073678

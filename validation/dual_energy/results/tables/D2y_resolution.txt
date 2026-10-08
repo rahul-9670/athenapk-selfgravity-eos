@@ -1,0 +1,19 @@
+# D2y: D2a resolution study (max/L1 of dP at the last dump) and D2c contacts with dual_energy_flux = density
+D2a_par_b0.01   on   max/L1 N256: 1.76e-03/1.57e-04 N1024: 3.35e-04/1.06e-05 N2048: 1.18e-04/2.92e-06 N4096: 1.19e-04/1.03e-06 | order(max) 1.20 1.50 -0.01
+D2a_par_b0.01   off  max/L1 N256: 3.64e-03/4.66e-04 N1024: 3.53e-04/3.49e-05 N2048: 1.38e-04/1.01e-05 N4096: 1.19e-04/3.63e-06 | order(max) 1.68 1.36 0.21
+D2a_par_b0.01   den  max/L1 N256: 1.75e-03/1.84e-04 N1024: 3.34e-04/1.22e-05 N2048: 1.20e-04/3.28e-06 N4096: 1.20e-04/1.09e-06 | order(max) 1.19 1.48 -0.00
+D2a_par_b0.001  on   max/L1 N256: 7.69e-04/1.14e-04 N1024: 7.96e-05/6.98e-06 N2048: 3.43e-05/2.10e-06 N4096: 1.61e-05/6.30e-07 | order(max) 1.64 1.22 1.09
+D2a_par_b0.001  off  max/L1 N256: 4.54e-03/5.31e-04 N1024: 3.54e-04/3.63e-05 N2048: 1.30e-04/9.91e-06 N4096: 1.16e-04/3.22e-06 | order(max) 1.84 1.44 0.16
+D2a_par_b0.001  den  max/L1 N256: 1.01e-03/1.60e-04 N1024: 8.03e-05/9.54e-06 N2048: 3.47e-05/2.65e-06 N4096: 1.67e-05/7.45e-07 | order(max) 1.82 1.21 1.06
+D2a_perp_b0.01   on   max/L1 N256: 7.63e-04/3.59e-05 N1024: 2.09e-04/2.36e-06 N2048: 1.15e-04/6.20e-07 N4096: 7.15e-05/1.74e-07 | order(max) 0.93 0.86 0.69
+D2a_perp_b0.01   off  max/L1 N256: 4.28e-04/1.97e-04 N1024: 2.78e-05/1.17e-05 N2048: 1.03e-05/3.23e-06 N4096: 1.43e-05/1.79e-06 | order(max) 1.97 1.43 -0.48
+D2a_perp_b0.01   den  max/L1 N256: 7.72e-04/3.64e-05 N1024: 2.09e-04/2.39e-06 N2048: 1.15e-04/6.26e-07 N4096: 7.14e-05/1.75e-07 | order(max) 0.94 0.86 0.69
+D2a_perp_b0.001  on   max/L1 N256: 2.95e-04/1.02e-05 N1024: 7.54e-05/6.91e-07 N2048: 3.96e-05/1.83e-07 N4096: 2.19e-05/5.00e-08 | order(max) 0.98 0.93 0.86
+D2a_perp_b0.001  off  max/L1 N256: 3.38e-04/1.59e-04 N1024: 1.78e-05/7.44e-06 N2048: 7.79e-06/1.89e-06 N4096: 1.04e-05/9.98e-07 | order(max) 2.12 1.20 -0.41
+D2a_perp_b0.001  den  max/L1 N256: 2.96e-04/1.02e-05 N1024: 7.53e-05/6.92e-07 N2048: 3.96e-05/1.83e-07 N4096: 2.19e-05/5.01e-08 | order(max) 0.99 0.93 0.86
+D2c_par_b1         contact max|P/P0-1|: density 1.12e-03  legacy 6.59e-03  off 1.07e-05
+D2c_par_b0.01      contact max|P/P0-1|: density 1.16e-03  legacy 6.36e-03  off 9.48e-06
+D2c_par_b0.0001    contact max|P/P0-1|: density 1.24e-03  legacy nan  off nan
+D2c_perp_b1        contact max|P/P0-1|: density 1.30e-03  legacy 3.54e-02  off 7.14e-06
+D2c_perp_b0.01     contact max|P/P0-1|: density 1.40e-03  legacy 6.20e-02  off 7.61e-06
+D2c_perp_b0.0001   contact max|P/P0-1|: density 1.35e-03  legacy nan  off nan

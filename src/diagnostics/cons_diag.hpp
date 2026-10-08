@@ -37,6 +37,8 @@
 //   cons-nfloor   = number of cells sitting at the density floor        (see CAVEAT)
 //   cons-Mfloor   = int rho dV over those cells                         (see CAVEAT)
 //   cons-npfloor  = number of cells sitting at the pressure floor       (see CAVEAT)
+//   cons-ndual    = number of cells whose internal energy came from the advected variable
+//                   instead of E - KE - ME (hydro/dual_energy; 0 when the scheme is off)
 //
 // with the momentum flux tensor
 //
@@ -169,6 +171,7 @@ enum class ConsDiag {
   nfloor,  // count of cells at the density floor
   Mfloor,  // int rho dV over cells at the density floor
   npfloor, // count of cells at the pressure floor
+  ndual,   // count of cells that took the dual-energy branch this cons->prim pass
   // The SOLVER's own mass flux through the domain faces, read from the cons flux array
   // rather than reconstructed from the cell-centred primitives. See the note below.
   MoutSolver,

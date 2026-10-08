@@ -52,6 +52,9 @@ void DednerSource(MeshData<Real> *md, const Real beta_dt) {
   // good for a cell-centred GLM scheme. Undocumented choice, not a defect.
   const auto coeff = std::exp(-alpha * c_h * beta_dt / mindx);
 
+  // EOS E-F3 (fixed 2026-10-07, validation_tests/dual_energy): in 1D the x2-derivatives read j+-1, which do not
+  // exist (segfault); j_offset = 0 there makes them exactly zero, as k_offset does for x3 in 2D. 3D: unchanged.
+  const int j_offset = (cons_pack.GetNdim() < 2) ? 0 : 1;
   int k_offset = 1;
   // In 2D, offset is 0 so that the second order x3-derivatives are zero
   // Should (untested) not introduce a performance penalty, as vals at k,j,i are
@@ -74,7 +77,7 @@ void DednerSource(MeshData<Real> *md, const Real beta_dt) {
           const Real divB =
               0.5 * ((prim(IB1, k, j, i + 1) - prim(IB1, k, j, i - 1)) /
                          coords.Dxc<1>(k, j, i) +
-                     (prim(IB2, k, j + 1, i) - prim(IB2, k, j - 1, i)) /
+                     (prim(IB2, k, j + j_offset, i) - prim(IB2, k, j - j_offset, i)) /
                          coords.Dxc<2>(k, j, i) +
                      (prim(IB3, k + k_offset, j, i) - prim(IB3, k - k_offset, j, i)) /
                          coords.Dxc<3>(k, j, i));
@@ -85,7 +88,7 @@ void DednerSource(MeshData<Real> *md, const Real beta_dt) {
               0.5 * beta_dt *
               (prim(IB1, k, j, i) * (prim(IPS, k, j, i + 1) - prim(IPS, k, j, i - 1)) /
                    coords.Dxc<1>(k, j, i) +
-               prim(IB2, k, j, i) * (prim(IPS, k, j + 1, i) - prim(IPS, k, j - 1, i)) /
+               prim(IB2, k, j, i) * (prim(IPS, k, j + j_offset, i) - prim(IPS, k, j - j_offset, i)) /
                    coords.Dxc<2>(k, j, i) +
                prim(IB3, k, j, i) *
                    (prim(IPS, k + k_offset, j, i) - prim(IPS, k - k_offset, j, i)) /

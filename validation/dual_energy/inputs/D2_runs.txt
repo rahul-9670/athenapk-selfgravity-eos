@@ -1,0 +1,78 @@
+D2a/D2a_par_b1_N256_on | D2a_par_b1_N256.in |  | 1
+D2a/D2a_par_b1_N256_off | D2a_par_b1_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b1_N1024_on | D2a_par_b1_N1024.in |  | 1
+D2a/D2a_par_b1_N1024_off | D2a_par_b1_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.1_N256_on | D2a_par_b0.1_N256.in |  | 1
+D2a/D2a_par_b0.1_N256_off | D2a_par_b0.1_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.1_N1024_on | D2a_par_b0.1_N1024.in |  | 1
+D2a/D2a_par_b0.1_N1024_off | D2a_par_b0.1_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.01_N256_on | D2a_par_b0.01_N256.in |  | 1
+D2a/D2a_par_b0.01_N256_off | D2a_par_b0.01_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.01_N1024_on | D2a_par_b0.01_N1024.in |  | 1
+D2a/D2a_par_b0.01_N1024_off | D2a_par_b0.01_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.001_N256_on | D2a_par_b0.001_N256.in |  | 1
+D2a/D2a_par_b0.001_N256_off | D2a_par_b0.001_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.001_N1024_on | D2a_par_b0.001_N1024.in |  | 1
+D2a/D2a_par_b0.001_N1024_off | D2a_par_b0.001_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.0001_N256_on | D2a_par_b0.0001_N256.in |  | 1
+D2a/D2a_par_b0.0001_N256_off | D2a_par_b0.0001_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_par_b0.0001_N1024_on | D2a_par_b0.0001_N1024.in |  | 1
+D2a/D2a_par_b0.0001_N1024_off | D2a_par_b0.0001_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b1_N256_on | D2a_perp_b1_N256.in |  | 1
+D2a/D2a_perp_b1_N256_off | D2a_perp_b1_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b1_N1024_on | D2a_perp_b1_N1024.in |  | 1
+D2a/D2a_perp_b1_N1024_off | D2a_perp_b1_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.1_N256_on | D2a_perp_b0.1_N256.in |  | 1
+D2a/D2a_perp_b0.1_N256_off | D2a_perp_b0.1_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.1_N1024_on | D2a_perp_b0.1_N1024.in |  | 1
+D2a/D2a_perp_b0.1_N1024_off | D2a_perp_b0.1_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.01_N256_on | D2a_perp_b0.01_N256.in |  | 1
+D2a/D2a_perp_b0.01_N256_off | D2a_perp_b0.01_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.01_N1024_on | D2a_perp_b0.01_N1024.in |  | 1
+D2a/D2a_perp_b0.01_N1024_off | D2a_perp_b0.01_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.001_N256_on | D2a_perp_b0.001_N256.in |  | 1
+D2a/D2a_perp_b0.001_N256_off | D2a_perp_b0.001_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.001_N1024_on | D2a_perp_b0.001_N1024.in |  | 1
+D2a/D2a_perp_b0.001_N1024_off | D2a_perp_b0.001_N1024.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.0001_N256_on | D2a_perp_b0.0001_N256.in |  | 1
+D2a/D2a_perp_b0.0001_N256_off | D2a_perp_b0.0001_N256.in | hydro/dual_energy=false | 1
+D2a/D2a_perp_b0.0001_N1024_on | D2a_perp_b0.0001_N1024.in |  | 1
+D2a/D2a_perp_b0.0001_N1024_off | D2a_perp_b0.0001_N1024.in | hydro/dual_energy=false | 1
+D2c/D2c_par_b1_on | D2c_par_b1.in |  | 1
+D2c/D2c_par_b1_off | D2c_par_b1.in | hydro/dual_energy=false | 1
+D2c/D2c_par_b0.01_on | D2c_par_b0.01.in |  | 1
+D2c/D2c_par_b0.01_off | D2c_par_b0.01.in | hydro/dual_energy=false | 1
+D2c/D2c_par_b0.0001_on | D2c_par_b0.0001.in |  | 1
+D2c/D2c_par_b0.0001_off | D2c_par_b0.0001.in | hydro/dual_energy=false | 1
+D2c/D2c_perp_b1_on | D2c_perp_b1.in |  | 1
+D2c/D2c_perp_b1_off | D2c_perp_b1.in | hydro/dual_energy=false | 1
+D2c/D2c_perp_b0.01_on | D2c_perp_b0.01.in |  | 1
+D2c/D2c_perp_b0.01_off | D2c_perp_b0.01.in | hydro/dual_energy=false | 1
+D2c/D2c_perp_b0.0001_on | D2c_perp_b0.0001.in |  | 1
+D2c/D2c_perp_b0.0001_off | D2c_perp_b0.0001.in | hydro/dual_energy=false | 1
+D2b/D2b_b1_br0.1_M0_N128_on | D2b_b1_br0.1_M0_N128.in |  | 1
+D2b/D2b_b1_br0.1_M0_N128_off | D2b_b1_br0.1_M0_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b1_br0.1_M10_N128_on | D2b_b1_br0.1_M10_N128.in |  | 1
+D2b/D2b_b1_br0.1_M10_N128_off | D2b_b1_br0.1_M10_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b1_br1_M0_N128_on | D2b_b1_br1_M0_N128.in |  | 1
+D2b/D2b_b1_br1_M0_N128_off | D2b_b1_br1_M0_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b1_br1_M10_N128_on | D2b_b1_br1_M10_N128.in |  | 1
+D2b/D2b_b1_br1_M10_N128_off | D2b_b1_br1_M10_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.01_br0.1_M0_N128_on | D2b_b0.01_br0.1_M0_N128.in |  | 1
+D2b/D2b_b0.01_br0.1_M0_N128_off | D2b_b0.01_br0.1_M0_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.01_br0.1_M10_N128_on | D2b_b0.01_br0.1_M10_N128.in |  | 1
+D2b/D2b_b0.01_br0.1_M10_N128_off | D2b_b0.01_br0.1_M10_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.01_br1_M0_N128_on | D2b_b0.01_br1_M0_N128.in |  | 1
+D2b/D2b_b0.01_br1_M0_N128_off | D2b_b0.01_br1_M0_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.01_br1_M10_N128_on | D2b_b0.01_br1_M10_N128.in |  | 1
+D2b/D2b_b0.01_br1_M10_N128_off | D2b_b0.01_br1_M10_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.0001_br0.1_M0_N128_on | D2b_b0.0001_br0.1_M0_N128.in |  | 1
+D2b/D2b_b0.0001_br0.1_M0_N128_off | D2b_b0.0001_br0.1_M0_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.0001_br0.1_M0_N256_on | D2b_b0.0001_br0.1_M0_N256.in |  | 16
+D2b/D2b_b0.0001_br0.1_M0_N256_off | D2b_b0.0001_br0.1_M0_N256.in | hydro/dual_energy=false | 16
+D2b/D2b_b0.0001_br0.1_M10_N128_on | D2b_b0.0001_br0.1_M10_N128.in |  | 1
+D2b/D2b_b0.0001_br0.1_M10_N128_off | D2b_b0.0001_br0.1_M10_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.0001_br1_M0_N128_on | D2b_b0.0001_br1_M0_N128.in |  | 1
+D2b/D2b_b0.0001_br1_M0_N128_off | D2b_b0.0001_br1_M0_N128.in | hydro/dual_energy=false | 1
+D2b/D2b_b0.0001_br1_M10_N128_on | D2b_b0.0001_br1_M10_N128.in |  | 1
+D2b/D2b_b0.0001_br1_M10_N128_off | D2b_b0.0001_br1_M10_N128.in | hydro/dual_energy=false | 1

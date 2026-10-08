@@ -1,0 +1,17 @@
+F3b/D2a_perp_b0.01_N1024_face | D2a_perp_b0.01_N1024.in | parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024 hydro/dual_energy_pdv=face
+F3b/D2a_perp_b0.001_N1024_face | D2a_perp_b0.001_N1024.in | parthenon/mesh/nx1=1024 parthenon/meshblock/nx1=1024 hydro/dual_energy_pdv=face
+F3b/D2a_perp_b0.01_N2048_face | D2a_perp_b0.01_N1024.in | parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048 hydro/dual_energy_pdv=face
+F3b/D2a_perp_b0.001_N2048_face | D2a_perp_b0.001_N1024.in | parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048 hydro/dual_energy_pdv=face
+F3b/D2a_perp_b0.01_N4096_face | D2a_perp_b0.01_N1024.in | parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096 hydro/dual_energy_pdv=face
+F3b/D2a_perp_b0.001_N4096_face | D2a_perp_b0.001_N1024.in | parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096 hydro/dual_energy_pdv=face
+F3b/D1b_M10_N1024_face | D1b_M10_N1024.in | hydro/dual_energy_pdv=face
+F3b/D1b_M10_N4096_face | D1b_M10_N4096.in | hydro/dual_energy_pdv=face
+F3b/D1b_M100_N4096_face | D1b_M100_N4096.in | hydro/dual_energy_pdv=face
+F3b/D1b_M100_N16384_face | D1b_M100_N16384.in | hydro/dual_energy_pdv=face
+F3b/D1b_M1000_N1024_face | D1b_M1000_N1024.in | hydro/dual_energy_pdv=face
+F3b/D1b_M100_N256_boost_face | D1b_M100_N256_boost.in | hydro/dual_energy_pdv=face
+F3b/D2a_par_b0.0001_N256_face | D2a_par_b0.0001_N256.in | hydro/dual_energy_pdv=face
+F3b/D4_b0.01_face | D4_b0.01.in | hydro/dual_energy_pdv=face
+F3b/D4_b0.0001_face | D4_b0.0001.in | hydro/dual_energy_pdv=face
+F3b/D3_M10_N1024_face | D3_M10_N1024.in | hydro/dual_energy_pdv=face
+F3b/D3_M30_N1024_face | D3_M30_N1024.in | hydro/dual_energy_pdv=face

@@ -1,0 +1,34 @@
+# D3 planar Noh (colliding cold streams, T0 10 K, u = +-M cs0), exact star state from riemann_exact.py on the runtime interpolant
+D3_M3_N256     prod               plateau rho +9.75e-05 (max 2.2e-03) P +2.74e-05 (max 3.2e-03) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.7 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N256     off                plateau rho +9.75e-05 (max 2.2e-03) P +2.74e-05 (max 3.2e-03) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.7 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N256     eta2off            plateau rho +9.75e-05 (max 2.2e-03) P +2.74e-05 (max 3.2e-03) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.7 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N256     noexempt           plateau rho +9.75e-05 (max 2.2e-03) P +2.74e-05 (max 3.2e-03) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.7 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N1024    prod               plateau rho -5.52e-07 (max 2.8e-04) P +1.65e-07 (max 7.9e-06) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.3 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N1024    off                plateau rho -5.52e-07 (max 2.8e-04) P +1.65e-07 (max 7.9e-06) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.3 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N1024    eta2off            plateau rho -5.52e-07 (max 2.8e-04) P +1.65e-07 (max 7.9e-06) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.3 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N1024    noexempt           plateau rho -5.52e-07 (max 2.8e-04) P +1.65e-07 (max 7.9e-06) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.3 cells | wall -0.01 | switched in shocked 0 | nTfloor 0
+D3_M3_N1024    mb32               plateau rho -5.52e-07 (max 2.8e-04) P +1.65e-07 (max 7.9e-06) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.3 cells | wall -0.01 | switched in shocked 0 | nTfloor 0 | vs 1 block: BITWISE
+D3_M3_N1024    mb32_np8           plateau rho -5.52e-07 (max 2.8e-04) P +1.65e-07 (max 7.9e-06) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.3 cells | wall -0.01 | switched in shocked 0 | nTfloor 0 | vs 1 block: BITWISE
+D3_M3_N1024    mb32_np8_noghost   plateau rho -5.52e-07 (max 2.8e-04) P +1.65e-07 (max 7.9e-06) | pre-shock max|P/P0-1| 1.6e-15 | shock +0.3 cells | wall -0.01 | switched in shocked 0 | nTfloor 0 | vs 1 block: BITWISE
+D3_M10_N256    prod               plateau rho +4.50e-04 (max 4.8e-03) P +4.21e-05 (max 3.4e-03) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.7 cells | wall -0.14 | switched in shocked 0 | nTfloor 112
+D3_M10_N256    off                plateau rho -4.70e-03 (max 7.5e-03) P +1.21e-03 (max 3.8e-03) | pre-shock max|P/P0-1| 4.0e-15 | shock +0.7 cells | wall -0.14 | switched in shocked 0 | nTfloor 86
+D3_M10_N256    eta2off            plateau rho +4.50e-04 (max 4.8e-03) P +4.21e-05 (max 3.4e-03) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.7 cells | wall -0.14 | switched in shocked 0 | nTfloor 112
+D3_M10_N256    noexempt           plateau rho +1.86e-01 (max 8.0e-01) P -1.55e-01 (max 1.0e+00) | pre-shock max|P/P0-1| 1.1e-16 | shock -20.3 cells | wall +0.09 | switched in shocked 26 | nTfloor 22
+D3_M10_N1024   prod               plateau rho +4.44e-04 (max 2.8e-03) P -1.09e-04 (max 3.2e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.3 cells | wall -0.14 | switched in shocked 0 | nTfloor 104
+D3_M10_N1024   off                plateau rho -4.58e-03 (max 5.3e-03) P +1.16e-03 (max 1.2e-03) | pre-shock max|P/P0-1| 4.0e-15 | shock +2.3 cells | wall -0.14 | switched in shocked 0 | nTfloor 86
+D3_M10_N1024   eta2off            plateau rho +4.44e-04 (max 2.8e-03) P -1.09e-04 (max 3.2e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.3 cells | wall -0.14 | switched in shocked 0 | nTfloor 104
+D3_M10_N1024   noexempt           plateau rho +1.75e-01 (max 8.0e-01) P -1.62e-01 (max 1.0e+00) | pre-shock max|P/P0-1| 1.1e-16 | shock -82.7 cells | wall +0.08 | switched in shocked 104 | nTfloor 26
+D3_M10_N1024   mb32               plateau rho +4.44e-04 (max 2.8e-03) P -1.09e-04 (max 3.2e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.3 cells | wall -0.14 | switched in shocked 0 | nTfloor 104 | vs 1 block: BITWISE
+D3_M10_N1024   mb32_np8           plateau rho +4.44e-04 (max 2.8e-03) P -1.09e-04 (max 3.2e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.3 cells | wall -0.14 | switched in shocked 0 | nTfloor 104 | vs 1 block: BITWISE
+D3_M10_N1024   mb32_np8_noghost   plateau rho +1.12e-03 (max 2.7e-02) P -9.24e-04 (max 5.9e-03) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.3 cells | wall -0.13 | switched in shocked 0 | nTfloor 102 | vs 1 block: DIFFER(prim: max rel 1.6e+03)
+D3_M30_N256    prod               plateau rho -3.64e-03 (max 4.4e-03) P +5.61e-04 (max 6.0e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.7 cells | wall +0.00 | switched in shocked 0 | nTfloor 120
+D3_M30_N256    off                plateau rho -5.87e-03 (max 6.2e-03) P +7.44e-04 (max 7.8e-04) | pre-shock max|P/P0-1| 3.5e-14 | shock +0.7 cells | wall -0.00 | switched in shocked 0 | nTfloor 144
+D3_M30_N256    eta2off            plateau rho -3.64e-03 (max 4.4e-03) P +5.61e-04 (max 6.0e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +0.7 cells | wall +0.00 | switched in shocked 0 | nTfloor 120
+D3_M30_N256    noexempt           plateau rho +5.18e-02 (max 5.5e-02) P -3.93e-03 (max 5.0e-03) | pre-shock max|P/P0-1| 1.1e-16 | shock -3.3 cells | wall +0.01 | switched in shocked 0 | nTfloor 0
+D3_M30_N1024   prod               plateau rho -3.90e-03 (max 4.2e-03) P +3.40e-04 (max 3.7e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +2.3 cells | wall +0.00 | switched in shocked 0 | nTfloor 120
+D3_M30_N1024   off                plateau rho -6.13e-03 (max 6.2e-03) P +5.28e-04 (max 5.3e-04) | pre-shock max|P/P0-1| 3.5e-14 | shock +2.3 cells | wall -0.00 | switched in shocked 0 | nTfloor 148
+D3_M30_N1024   eta2off            plateau rho -3.90e-03 (max 4.2e-03) P +3.40e-04 (max 3.7e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +2.3 cells | wall +0.00 | switched in shocked 0 | nTfloor 120
+D3_M30_N1024   noexempt           plateau rho +5.10e-02 (max 5.4e-02) P -4.13e-03 (max 4.9e-03) | pre-shock max|P/P0-1| 1.1e-16 | shock -15.7 cells | wall +0.01 | switched in shocked 0 | nTfloor 0
+D3_M30_N1024   mb32               plateau rho -3.90e-03 (max 4.2e-03) P +3.40e-04 (max 3.7e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +2.3 cells | wall +0.00 | switched in shocked 0 | nTfloor 120 | vs 1 block: BITWISE
+D3_M30_N1024   mb32_np8           plateau rho -3.90e-03 (max 4.2e-03) P +3.40e-04 (max 3.7e-04) | pre-shock max|P/P0-1| 1.1e-16 | shock +2.3 cells | wall +0.00 | switched in shocked 0 | nTfloor 120 | vs 1 block: BITWISE
+D3_M30_N1024   mb32_np8_noghost   plateau rho -4.20e-03 (max 1.2e-02) P -4.71e-04 (max 7.8e-03) | pre-shock max|P/P0-1| 1.1e-16 | shock +2.3 cells | wall +0.00 | switched in shocked 0 | nTfloor 120 | vs 1 block: DIFFER(prim: max rel 4.5e+03)

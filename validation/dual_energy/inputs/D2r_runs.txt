@@ -1,0 +1,5 @@
+D2b/D2b_b0.0001_br0.1_M0_N256_on | D2b_b0.0001_br0.1_M0_N256.in |  | 16
+D2b/D2b_b0.0001_br0.1_M0_N256_off | D2b_b0.0001_br0.1_M0_N256.in | hydro/dual_energy=false | 16
+D2b/D2b_b0.0001_br1_M0_N128_on | D2b_b0.0001_br1_M0_N128.in |  | 16
+D2b/D2b_b0.0001_br1_M0_N128_off | D2b_b0.0001_br1_M0_N128.in | hydro/dual_energy=false | 16
+D2b/D2b_b0.0001_br1_M10_N128_on | D2b_b0.0001_br1_M10_N128.in |  | 16

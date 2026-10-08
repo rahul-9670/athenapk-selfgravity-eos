@@ -1,0 +1,21 @@
+# D2x: strong div B blob (beta 1e-4, bamp = B0z, |v| = 10 cs0), N 64^2; production vs shock exemption off vs eta2 off vs dual off
+prod      t/tlim 0.25: max|dP| 1.13e-01 | cells>1e-2   752 (switched 752, of them compressing 363; E-branch 0, compressing 0) | max |v - v0|/cs0 11.1 | heat/E_B,exc +1.4e-05
+prod      t/tlim 0.50: max|dP| 1.27e-01 | cells>1e-2  1232 (switched 1232, of them compressing 625; E-branch 0, compressing 0) | max |v - v0|/cs0 7.3 | heat/E_B,exc +5.6e-05
+prod      t/tlim 0.75: max|dP| 8.35e-01 | cells>1e-2  1790 (switched 1790, of them compressing 705; E-branch 0, compressing 0) | max |v - v0|/cs0 4.1 | heat/E_B,exc +1.9e-04
+prod      t/tlim 1.00: max|dP| 1.37e+00 | cells>1e-2  2047 (switched 2047, of them compressing 869; E-branch 0, compressing 0) | max |v - v0|/cs0 3.9 | heat/E_B,exc +3.8e-04
+prod      totals: Tfloor hits 0, mean switched cells 4096 of 4096
+noexempt  t/tlim 0.25: max|dP| 1.13e-01 | cells>1e-2   752 (switched 752, of them compressing 363; E-branch 0, compressing 0) | max |v - v0|/cs0 11.1 | heat/E_B,exc +1.4e-05
+noexempt  t/tlim 0.50: max|dP| 1.27e-01 | cells>1e-2  1232 (switched 1232, of them compressing 625; E-branch 0, compressing 0) | max |v - v0|/cs0 7.3 | heat/E_B,exc +5.6e-05
+noexempt  t/tlim 0.75: max|dP| 8.35e-01 | cells>1e-2  1790 (switched 1790, of them compressing 705; E-branch 0, compressing 0) | max |v - v0|/cs0 4.1 | heat/E_B,exc +1.9e-04
+noexempt  t/tlim 1.00: max|dP| 1.37e+00 | cells>1e-2  2047 (switched 2047, of them compressing 869; E-branch 0, compressing 0) | max |v - v0|/cs0 3.9 | heat/E_B,exc +3.8e-04
+noexempt  totals: Tfloor hits 0, mean switched cells 4096 of 4096
+eta2off   t/tlim 0.25: max|dP| 1.13e-01 | cells>1e-2   752 (switched 752, of them compressing 363; E-branch 0, compressing 0) | max |v - v0|/cs0 11.1 | heat/E_B,exc +1.4e-05
+eta2off   t/tlim 0.50: max|dP| 1.27e-01 | cells>1e-2  1232 (switched 1232, of them compressing 625; E-branch 0, compressing 0) | max |v - v0|/cs0 7.3 | heat/E_B,exc +5.6e-05
+eta2off   t/tlim 0.75: max|dP| 8.35e-01 | cells>1e-2  1790 (switched 1790, of them compressing 705; E-branch 0, compressing 0) | max |v - v0|/cs0 4.1 | heat/E_B,exc +1.9e-04
+eta2off   t/tlim 1.00: max|dP| 1.37e+00 | cells>1e-2  2047 (switched 2047, of them compressing 869; E-branch 0, compressing 0) | max |v - v0|/cs0 3.9 | heat/E_B,exc +3.8e-04
+eta2off   totals: Tfloor hits 0, mean switched cells 4096 of 4096
+off       t/tlim 0.25: max|dP| 1.69e+02 | cells>1e-2  4096 (switched 0, of them compressing 0; E-branch 4096, compressing 1955) | max |v - v0|/cs0 11.1 | heat/E_B,exc +nan
+off       t/tlim 0.50: max|dP| 1.43e+02 | cells>1e-2  4096 (switched 0, of them compressing 0; E-branch 4096, compressing 2055) | max |v - v0|/cs0 7.2 | heat/E_B,exc +nan
+off       t/tlim 0.75: max|dP| 1.45e+02 | cells>1e-2  4096 (switched 0, of them compressing 0; E-branch 4096, compressing 1908) | max |v - v0|/cs0 4.1 | heat/E_B,exc +nan
+off       t/tlim 1.00: max|dP| 1.54e+02 | cells>1e-2  4095 (switched 0, of them compressing 0; E-branch 4095, compressing 1923) | max |v - v0|/cs0 3.7 | heat/E_B,exc +nan
+off       totals: Tfloor hits 4452, mean switched cells 0 of 4096

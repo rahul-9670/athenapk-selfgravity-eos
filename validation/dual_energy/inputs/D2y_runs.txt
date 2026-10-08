@@ -1,0 +1,38 @@
+D2y/D2a_par_b0.01_N2048_on | D2a_par_b0.01_N1024.in | parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_par_b0.01_N2048_off | D2a_par_b0.01_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_par_b0.01_N2048_den | D2a_par_b0.01_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_par_b0.01_N4096_on | D2a_par_b0.01_N1024.in | parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_par_b0.01_N4096_off | D2a_par_b0.01_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_par_b0.01_N4096_den | D2a_par_b0.01_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_par_b0.01_N1024_den | D2a_par_b0.01_N1024.in | hydro/dual_energy_flux=density
+D2y/D2a_par_b0.01_N256_den | D2a_par_b0.01_N256.in | hydro/dual_energy_flux=density
+D2y/D2a_par_b0.001_N2048_on | D2a_par_b0.001_N1024.in | parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_par_b0.001_N2048_off | D2a_par_b0.001_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_par_b0.001_N2048_den | D2a_par_b0.001_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_par_b0.001_N4096_on | D2a_par_b0.001_N1024.in | parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_par_b0.001_N4096_off | D2a_par_b0.001_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_par_b0.001_N4096_den | D2a_par_b0.001_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_par_b0.001_N1024_den | D2a_par_b0.001_N1024.in | hydro/dual_energy_flux=density
+D2y/D2a_par_b0.001_N256_den | D2a_par_b0.001_N256.in | hydro/dual_energy_flux=density
+D2y/D2a_perp_b0.01_N2048_on | D2a_perp_b0.01_N1024.in | parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_perp_b0.01_N2048_off | D2a_perp_b0.01_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_perp_b0.01_N2048_den | D2a_perp_b0.01_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_perp_b0.01_N4096_on | D2a_perp_b0.01_N1024.in | parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_perp_b0.01_N4096_off | D2a_perp_b0.01_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_perp_b0.01_N4096_den | D2a_perp_b0.01_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_perp_b0.01_N1024_den | D2a_perp_b0.01_N1024.in | hydro/dual_energy_flux=density
+D2y/D2a_perp_b0.01_N256_den | D2a_perp_b0.01_N256.in | hydro/dual_energy_flux=density
+D2y/D2a_perp_b0.001_N2048_on | D2a_perp_b0.001_N1024.in | parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_perp_b0.001_N2048_off | D2a_perp_b0.001_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_perp_b0.001_N2048_den | D2a_perp_b0.001_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048
+D2y/D2a_perp_b0.001_N4096_on | D2a_perp_b0.001_N1024.in | parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_perp_b0.001_N4096_off | D2a_perp_b0.001_N1024.in | hydro/dual_energy=false parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_perp_b0.001_N4096_den | D2a_perp_b0.001_N1024.in | hydro/dual_energy_flux=density parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096
+D2y/D2a_perp_b0.001_N1024_den | D2a_perp_b0.001_N1024.in | hydro/dual_energy_flux=density
+D2y/D2a_perp_b0.001_N256_den | D2a_perp_b0.001_N256.in | hydro/dual_energy_flux=density
+D2y/D2c_par_b1_den | D2c_par_b1.in | hydro/dual_energy_flux=density
+D2y/D2c_par_b0.01_den | D2c_par_b0.01.in | hydro/dual_energy_flux=density
+D2y/D2c_par_b0.0001_den | D2c_par_b0.0001.in | hydro/dual_energy_flux=density
+D2y/D2c_perp_b1_den | D2c_perp_b1.in | hydro/dual_energy_flux=density
+D2y/D2c_perp_b0.01_den | D2c_perp_b0.01.in | hydro/dual_energy_flux=density
+D2y/D2c_perp_b0.0001_den | D2c_perp_b0.0001.in | hydro/dual_energy_flux=density

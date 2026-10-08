@@ -1,0 +1,1 @@
+D2x/D2b_b1e-4_br1_M10_N64_density | D2b_b0.0001_br1_M10_N128.in | parthenon/mesh/nx1=64 parthenon/mesh/nx2=64 hydro/dual_energy_flux=density | 4

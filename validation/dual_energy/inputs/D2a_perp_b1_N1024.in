@@ -1,0 +1,86 @@
+<comment>
+problem = D2a cold sinusoid M 3, perp field beta 1 (B0 1.40171), N 1024, to 0.4 t_c
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = sinus
+rho0 = 1.0
+T0 = 10.0
+vamp = 3.8384641024535817
+u0 = 0.0
+mx = 1
+B0x = 0.0
+B0y = 1.4017068510736783
+
+<parthenon/mesh>
+refinement = none
+nx1 = 1024
+x1min = 0.0
+x1max = 1.0
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 1024
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.016585273572329313
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold_rho26.bin
+gamma = 1.4
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_plain   # 1D: dedner_extended segfaults (E-F3); B.grad(psi) needs >= 2D
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+Tfloor = 0.2726   # code T units (10.0 K) -> 2.73 K, production 2026-10-06
+boundary_flux_clamp = false   # production = true, but it zeroes inflow on EVERY mesh-edge face without checking the BC type: a periodic box loses its through-flow (DE-F2)
+cons_diag = true
+eos_floor_consistent = true
+eos_interp = p
+vl2_predictor_recon = dc
+double_flux = true
+dual_energy = true
+dual_energy_eta1 = 5e-2
+dual_energy_sync_step_end = true
+dual_energy_unsigned_prim = true
+dual_energy_exact_resync = true
+dual_energy_eta2 = 0.1
+dual_energy_kappa = 3.0
+dual_energy_shock_comp = 0.02
+dual_comp_ghost = true
+boundary_clamp_dual = true
+ghost_sync_rounds = 1
+
+
+<physics>
+self_gravity = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, cons, dual_switched
+dt = 0.004146318393082328
+
+<parthenon/output1>
+file_type = hst
+dt = 0.00016585273572329313

@@ -1,0 +1,5 @@
+# F4: E-F3 / DE-F2 fixes (bitwise pairs, binary 57775503) and the C-1 blob with all candidate keys (cells below the adiabat = second-law violations)
+BITWISE  F4/D1b_M10_N1024_ext  vs  F4/D1b_M10_N1024_plain
+BITWISE  F4/D1a_M100_clamp  vs  F4/D1a_M100_noclamp
+C-1 prod (D2x, earlier)  max|dP| 1.37e+00 L1 4.65e-02 cells>1e-2 2047 (above adiabat 1687, BELOW 360, min dP -2.14e-02)
+C-1 all new keys         max|dP| 1.49e+00 L1 4.65e-02 cells>1e-2 1394 (above adiabat 1384, BELOW 10, min dP -1.51e-02)

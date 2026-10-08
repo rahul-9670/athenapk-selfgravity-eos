@@ -1,0 +1,2 @@
+D8b/D1a_M100_den_cpu64 | D1a_M100.in | hydro/dual_energy_flux=density parthenon/meshblock/nx1=64 | 1
+D8b/D3_M30_N1024_density_cpu64 | D3_M30_N1024.in | hydro/dual_energy_flux=density parthenon/meshblock/nx1=64 | 1

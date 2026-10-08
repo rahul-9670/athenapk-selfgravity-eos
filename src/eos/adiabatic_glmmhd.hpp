@@ -33,11 +33,17 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
                      Real velocity_ceiling, Real internal_e_ceiling, Real gamma,
                      bool use_h2diss = false,
                      EOSTable::EosTable eos_tab = EOSTable::EosTable(),
-                     bool floor_consistent = false)
+                     int dual_energy_idx = -1, Real dual_energy_eta1 = 1.0e-2,
+                     bool floor_consistent = false, bool dual_unsigned = false,
+                     bool dual_exact = false, Real dual_eta2 = 0.0, Real dual_kappa = 3.0,
+                     Real dual_shock = 0.02, bool dual_shock_eta1 = false)
       : EquationOfState(pressure_floor, density_floor, internal_e_floor, velocity_ceiling,
                         internal_e_ceiling),
-        floor_consistent_{floor_consistent}, gamma_{gamma}, use_h2diss_{use_h2diss},
-        eos_tab_{eos_tab} {}
+        gamma_{gamma}, use_h2diss_{use_h2diss}, eos_tab_{eos_tab},
+        dual_idx_{dual_energy_idx}, dual_eta1_{dual_energy_eta1},
+        floor_consistent_{floor_consistent}, dual_unsigned_{dual_unsigned},
+        dual_exact_{dual_exact}, dual_eta2_{dual_eta2}, dual_kappa_{dual_kappa},
+        dual_shock_{dual_shock}, dual_shock_eta1_{dual_shock_eta1} {}
 
   void ConservedToPrimitive(MeshData<Real> *md) const override;
 
@@ -56,7 +62,7 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
     return pres / (gamma_ - 1.0);
   }
 
-  // Accessor so other code (diagnostics, double flux) can share the same table.
+  // Accessor so other code (diagnostics, double flux, problem generators) can share the same table.
   KOKKOS_INLINE_FUNCTION
   const EOSTable::EosTable &GetEosTable() const { return eos_tab_; }
 
@@ -90,9 +96,10 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
   // int& j, const int& i) \brief Fills an array of primitives given an array of
   // conserveds, potentially updating the conserved with floors
   template <typename View4D>
-  KOKKOS_INLINE_FUNCTION void ConsToPrim(View4D cons, View4D prim, const int &nhydro,
+  // Returns whether the cell took the advected internal energy (dual-energy switch).
+  KOKKOS_INLINE_FUNCTION bool ConsToPrim(View4D cons, View4D prim, const int &nhydro,
                                          const int &nscalars, const int &k, const int &j,
-                                         const int &i) const {
+                                         const int &i, const Real comp = 0.0) const {
     auto gam = GetGamma();
     auto gm1 = gam - 1.0;
     auto density_floor_ = GetDensityFloor();
@@ -145,6 +152,56 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
     Real e_B = 0.5 * (SQR(u_b1) + SQR(u_b2) + SQR(u_b3));
     Real e_int = u_e - e_k - e_B;
 
+    // DUAL ENERGY (hydro/dual_energy). e_int = E - KE - ME is a small difference wherever the
+    // magnetic or kinetic energy dominates: in low-beta gas it goes to zero or negative and the
+    // pressure floor then injects energy (measured: up to ~2e4 floored cells per step in a
+    // magnetized collapse). When that happens, take the separately advected internal energy
+    // instead and make the total energy consistent with it; otherwise keep the conservative
+    // value and re-sync the advected one. dual_idx_ < 0 (default) compiles this out at runtime
+    // and the run is bit-identical to the single-energy scheme.
+    bool dual_switched = false;
+    Real dual_keep = 0.0;         // the advected e_int a switched cell used (dual_exact_)
+    bool energy_rewritten = false; // a floor/ceiling below rewrote u_e after the switch
+    if (dual_idx_ >= 0) {
+      Real &u_ie = cons(dual_idx_, k, j, i);
+      // hydro/dual_energy_eta2 > 0 (default 0 = off): the switch above is ONE-SIDED -- it catches an
+      // E - KE - ME that is too SMALL, not one that is wrong by being too LARGE. In low-beta cells the
+      // VL2 predictor's E - KE - ME swings by +-1e5 around a true ~1e3-1e4 (measured in a cell
+      // trace, 2026-09-23); a positive swing passed eta1, overwrote e_dual and inflated P 11x. So ALSO take
+      // the advected value when the cell is thermally negligible by its own advected estimate
+      // (u_ie < eta2*E) and E - KE - ME exceeds it by more than kappa -- UNLESS the cell compressed
+      // by more than dual_shock this stage (comp = -div v * dt from DualEnergyPdV): shock heating
+      // is real, never reaches the advected energy, and must keep coming from E.
+      const bool distrust_high = (dual_eta2_ > 0.0) && (u_ie > 0.0) && (u_ie < dual_eta2_ * u_e) &&
+                                 (e_int > dual_kappa_ * u_ie) && (comp < dual_shock_);
+      // hydro/dual_energy_shock_eta1 (validation_tests/dual_energy F2, 2026-10-07, default false): a cell compressing
+      // by more than shock_comp this stage keeps E also when e_int <= eta1 E, unless it is magnetically dominated
+      // (e_int <= eta1 (e_int + e_B): there E - KE - ME is noise even in a shock). Without it, shock-front cells of a
+      // kinetically dominated flow take the cold advected energy and the shock under-heats as eta1 grows (D6: Noh
+      // M 10 plateau -5.2e-3 / -1.7e-2 at eta1 0.1 / 0.2).
+      const bool shock_keep =
+          dual_shock_eta1_ && (comp >= dual_shock_) && (e_int > dual_eta1_ * (e_int + e_B));
+      if ((e_int > dual_eta1_ * u_e || shock_keep) && !distrust_high) {
+        u_ie = e_int; // total energy is trustworthy here: it stays authoritative
+      } else {
+        e_int = (u_ie > 0.0) ? u_ie : e_floor_ * u_d;
+        dual_keep = e_int;
+        u_e = e_int + e_k + e_B; // local, bounded non-conservation, counted by cons_diag
+        dual_switched = true;
+        // hydro/dual_energy_exact_resync: settle on the state a SECOND pass would reach. The
+        // rewritten cell re-evaluates with e2 = u_e - e_k - e_B (= u_ie to ~1e-14); if that is now
+        // above the threshold, a second pass takes the conservative branch with e_int = e2, so
+        // take it here already. Otherwise the second pass switches again, reads back dual_keep
+        // (stored exactly, see the re-sync below) and rebuilds the identical u_e.
+        if (dual_exact_) {
+          const Real e2 = u_e - e_k - e_B;
+          if (e2 > dual_eta1_ * u_e) {
+            e_int = e2;
+            dual_switched = false;
+          }
+        }
+      }
+    }
     // Table lookup interpolates in log10(e_int/rho): for e_int <= 0 it would return NaN,
     // and NaN compares false against every floor below (silently poisoning the cell).
     // Hand non-positive e_int to the ideal-gamma expression instead so w_p goes negative
@@ -169,6 +226,7 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
 
       Real e_k_new = 0.5 * u_d * SQR(velocity_ceiling_);
       u_e -= e_k - e_k_new;
+      energy_rewritten = true;
       e_k = e_k_new;
     }
 
@@ -185,6 +243,7 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
       // bit-identical to the old expression; table: Saha inversion).
       const Real e_fl = InternalEnergyFromPres(u_d, pressure_floor_);
       u_e = e_fl + e_k + e_B;
+      energy_rewritten = true;
       // hydro/eos_floor_consistent (2026-09-22, default false). Under the tabulated EOS the
       // inversion CLAMPS at the table's bottom esp edge, where the pressure OF the stored energy is
       // far above pressure_floor_ (measured: e = 38.4 -> P = 25.6 against a 1e-8 floor). Writing
@@ -206,6 +265,7 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
     if (w_p < eff_pressure_floor) {
       // apply temperature floor, correct total energy
       u_e = (u_d * e_floor_) + e_k + e_B;
+      energy_rewritten = true;
       w_p = eff_pressure_floor;
     }
 
@@ -219,17 +279,83 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
     if (w_p > eff_pressure_ceiling) {
       // apply temperature ceiling, correct total energy
       u_e = (u_d * e_ceiling_) + e_k + e_B;
+      energy_rewritten = true;
       w_p = eff_pressure_ceiling;
+    }
+
+    // Dual energy: the floors/ceilings above may have rewritten u_e; keep the advected internal
+    // energy consistent with what the cell ended up with.
+    if (dual_idx_ >= 0) {
+      // hydro/dual_energy_exact_resync (default false = legacy). A SWITCHED cell computed its
+      // pressure from dual_keep = u_ie and set u_e = u_ie + e_k + e_B. Re-deriving the advected
+      // energy as u_e - e_k - e_B does NOT return u_ie: with KE+ME ~99.5 % of E the subtraction
+      // loses ~1e-14 relative, so the next ConsToPrim evaluates P at a different e_int. That made
+      // ConsToPrim non-idempotent (period-2 oscillation) and was the last source of restart
+      // non-reproducibility: a few switched cells grew into a whole-mesh difference within one step
+      // (found by per-stage state hashing, 2026-09-22). With the key on, a switched cell
+      // that no floor/ceiling touched keeps u_ie itself, so P and the stored energy come from the
+      // same number and a second pass reproduces the first exactly.
+      cons(dual_idx_, k, j, i) = (dual_exact_ && dual_switched && !energy_rewritten)
+                                     ? dual_keep
+                                     : u_e - e_k - e_B;
+      // The primitive carries the specific internal energy. LEGACY (dual_unsigned_ = false): with
+      // a NEGATIVE SIGN when this cell took the advected value, as a flag for cons-ndual. That
+      // comment used to say "nothing reads this component except the diagnostics" -- WRONG: the
+      // hydro flux advects the dual component like a passive scalar, flux = mass flux times the
+      // RECONSTRUCTED prim (hydro.cpp "Passive scalar fluxes"), so every switched cell exported
+      // NEGATIVE internal energy and PLM took slopes between +e and -e. It was also a restart
+      // seed: a cell switched by the last ConsToPrim of a step is usually NOT switched when a
+      // resumed run re-derives prim from the same cons (E was rewritten), so the sign -- and
+      // with it the next step's dual flux -- differed (2026-09-22).
+      // hydro/dual_energy_unsigned_prim = true stores the magnitude only; the flag goes to the
+      // separate `dual_switched` field (written by ConservedToPrimitive from the return value).
+      prim(dual_idx_, k, j, i) =
+          ((dual_switched && !dual_unsigned_) ? -1.0 : 1.0) * cons(dual_idx_, k, j, i) * di;
     }
 
     // Convert passive scalars
     for (auto n = nhydro; n < nhydro + nscalars; ++n) {
       prim(n, k, j, i) = cons(n, k, j, i) * di;
     }
+    return dual_switched;
+  }
+
+  bool DualUnsigned() const { return dual_unsigned_; }
+
+  //! The internal energy ConsToPrim's dual-energy switch would select, WITHOUT touching any state.
+  //! For operator-split source terms that act on `cons` between a hydro update and the next
+  //! ConsToPrim and need the gas internal energy: they must use the same two-sided rule as
+  //! ConsToPrim, or writing their result back into the dual energy would disable the eta2 test.
+  //! (No such source term is part of this repository.) Same branches as ConsToPrim above (the
+  //! exact-resync refinement is left to the ConsToPrim that follows). `comp` is the stage
+  //! compression (`dual_comp`), 0 when eta2 is off. `e_B` = magnetic energy density, used only by the
+  //! hydro/dual_energy_shock_eta1 exemption (as in ConsToPrim; 2026-10-07).
+  KOKKOS_INLINE_FUNCTION
+  Real DualSelectEint(const Real e_E, const Real E, const Real u_ie, const Real rho,
+                      const Real comp, const Real e_B) const {
+    const bool distrust_high = (dual_eta2_ > 0.0) && (u_ie > 0.0) && (u_ie < dual_eta2_ * E) &&
+                               (e_E > dual_kappa_ * u_ie) && (comp < dual_shock_);
+    const bool shock_keep =
+        dual_shock_eta1_ && (comp >= dual_shock_) && (e_E > dual_eta1_ * (e_E + e_B));
+    if ((e_E > dual_eta1_ * E || shock_keep) && !distrust_high) return e_E;
+    return (u_ie > 0.0) ? u_ie : GetInternalEFloor() * rho;
   }
 
  private:
+  int dual_idx_ = -1;         // cons/prim component holding rho*e_int (dual energy), -1 = off
+  Real dual_eta1_ = 1.0e-2;   // switch threshold on e_int/E. Measured 2026-09-23 with all fixes on
+                              // (production restart, 10 cycles): 5e-2 leaves 1 cell < 8 K, 1e-2 leaves 41; the
+                              // 09-19 "5e-2 is worse than off" was the signed-prim advection bug.
   bool floor_consistent_ = false; // hydro/eos_floor_consistent, see the pressure-floor branch
+  bool dual_unsigned_ = false;    // hydro/dual_energy_unsigned_prim, see the dual re-sync in ConsToPrim
+  bool dual_exact_ = false;       // hydro/dual_energy_exact_resync, idem
+  Real dual_eta2_ = 0.0;          // hydro/dual_energy_eta2: two-sided switch (0 = off)
+  Real dual_kappa_ = 3.0;         // hydro/dual_energy_kappa
+  Real dual_shock_ = 0.02;        // hydro/dual_energy_shock_comp: -div v dt above this = shock
+  bool dual_shock_eta1_ = false;  // hydro/dual_energy_shock_eta1: the shock exemption also from eta1 (F2)
+public:
+  Real DualEta2() const { return dual_eta2_; }
+private:
   Real gamma_; // ratio of specific heats
   bool use_h2diss_;            // enable tabulated protostellar EOS (second-core physics)
   EOSTable::EosTable eos_tab_; // interpolated table (View handles; device-copyable)

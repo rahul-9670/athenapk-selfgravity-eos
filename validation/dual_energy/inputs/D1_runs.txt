@@ -1,0 +1,140 @@
+D1a/D1a_M0_on | D1a_M0.in | 
+D1a/D1a_M0_off | D1a_M0.in | hydro/dual_energy=false
+D1a/D1a_M0_on_nodf | D1a_M0.in | hydro/double_flux=false
+D1a/D1a_M0_off_nodf | D1a_M0.in | hydro/dual_energy=false hydro/double_flux=false
+D1a/D1a_M1_on | D1a_M1.in | 
+D1a/D1a_M1_off | D1a_M1.in | hydro/dual_energy=false
+D1a/D1a_M1_on_nodf | D1a_M1.in | hydro/double_flux=false
+D1a/D1a_M1_off_nodf | D1a_M1.in | hydro/dual_energy=false hydro/double_flux=false
+D1a/D1a_M10_on | D1a_M10.in | 
+D1a/D1a_M10_off | D1a_M10.in | hydro/dual_energy=false
+D1a/D1a_M10_on_nodf | D1a_M10.in | hydro/double_flux=false
+D1a/D1a_M10_off_nodf | D1a_M10.in | hydro/dual_energy=false hydro/double_flux=false
+D1a/D1a_M100_on | D1a_M100.in | 
+D1a/D1a_M100_off | D1a_M100.in | hydro/dual_energy=false
+D1a/D1a_M100_on_nodf | D1a_M100.in | hydro/double_flux=false
+D1a/D1a_M100_off_nodf | D1a_M100.in | hydro/dual_energy=false hydro/double_flux=false
+D1a/D1a_M1000_on | D1a_M1000.in | 
+D1a/D1a_M1000_off | D1a_M1000.in | hydro/dual_energy=false
+D1a/D1a_M1000_on_nodf | D1a_M1000.in | hydro/double_flux=false
+D1a/D1a_M1000_off_nodf | D1a_M1000.in | hydro/dual_energy=false hydro/double_flux=false
+D1a/D1a_M10000_on | D1a_M10000.in | 
+D1a/D1a_M10000_off | D1a_M10000.in | hydro/dual_energy=false
+D1a/D1a_M10000_on_nodf | D1a_M10000.in | hydro/double_flux=false
+D1a/D1a_M10000_off_nodf | D1a_M10000.in | hydro/dual_energy=false hydro/double_flux=false
+D1b/D1b_M1_N64_on | D1b_M1_N64.in | 
+D1b/D1b_M1_N64_off | D1b_M1_N64.in | hydro/dual_energy=false
+D1b/D1b_M1_N128_on | D1b_M1_N128.in | 
+D1b/D1b_M1_N128_off | D1b_M1_N128.in | hydro/dual_energy=false
+D1b/D1b_M1_N256_on | D1b_M1_N256.in | 
+D1b/D1b_M1_N256_off | D1b_M1_N256.in | hydro/dual_energy=false
+D1b/D1b_M1_N512_on | D1b_M1_N512.in | 
+D1b/D1b_M1_N512_off | D1b_M1_N512.in | hydro/dual_energy=false
+D1b/D1b_M1_N1024_on | D1b_M1_N1024.in | 
+D1b/D1b_M1_N1024_off | D1b_M1_N1024.in | hydro/dual_energy=false
+D1b/D1b_M1_N256_boost_on | D1b_M1_N256_boost.in | 
+D1b/D1b_M1_N256_boost_off | D1b_M1_N256_boost.in | hydro/dual_energy=false
+D1b/D1b_M3_N64_on | D1b_M3_N64.in | 
+D1b/D1b_M3_N64_off | D1b_M3_N64.in | hydro/dual_energy=false
+D1b/D1b_M3_N128_on | D1b_M3_N128.in | 
+D1b/D1b_M3_N128_off | D1b_M3_N128.in | hydro/dual_energy=false
+D1b/D1b_M3_N256_on | D1b_M3_N256.in | 
+D1b/D1b_M3_N256_off | D1b_M3_N256.in | hydro/dual_energy=false
+D1b/D1b_M3_N512_on | D1b_M3_N512.in | 
+D1b/D1b_M3_N512_off | D1b_M3_N512.in | hydro/dual_energy=false
+D1b/D1b_M3_N1024_on | D1b_M3_N1024.in | 
+D1b/D1b_M3_N1024_off | D1b_M3_N1024.in | hydro/dual_energy=false
+D1b/D1b_M3_N256_boost_on | D1b_M3_N256_boost.in | 
+D1b/D1b_M3_N256_boost_off | D1b_M3_N256_boost.in | hydro/dual_energy=false
+D1b/D1b_M10_N64_on | D1b_M10_N64.in | 
+D1b/D1b_M10_N64_off | D1b_M10_N64.in | hydro/dual_energy=false
+D1b/D1b_M10_N128_on | D1b_M10_N128.in | 
+D1b/D1b_M10_N128_off | D1b_M10_N128.in | hydro/dual_energy=false
+D1b/D1b_M10_N256_on | D1b_M10_N256.in | 
+D1b/D1b_M10_N256_off | D1b_M10_N256.in | hydro/dual_energy=false
+D1b/D1b_M10_N512_on | D1b_M10_N512.in | 
+D1b/D1b_M10_N512_off | D1b_M10_N512.in | hydro/dual_energy=false
+D1b/D1b_M10_N1024_on | D1b_M10_N1024.in | 
+D1b/D1b_M10_N1024_off | D1b_M10_N1024.in | hydro/dual_energy=false
+D1b/D1b_M10_N2048_on | D1b_M10_N2048.in | 
+D1b/D1b_M10_N2048_off | D1b_M10_N2048.in | hydro/dual_energy=false
+D1b/D1b_M10_N4096_on | D1b_M10_N4096.in | 
+D1b/D1b_M10_N4096_off | D1b_M10_N4096.in | hydro/dual_energy=false
+D1b/D1b_M10_N8192_on | D1b_M10_N8192.in | 
+D1b/D1b_M10_N8192_off | D1b_M10_N8192.in | hydro/dual_energy=false
+D1b/D1b_M10_N16384_on | D1b_M10_N16384.in | 
+D1b/D1b_M10_N16384_off | D1b_M10_N16384.in | hydro/dual_energy=false
+D1b/D1b_M10_N256_boost_on | D1b_M10_N256_boost.in | 
+D1b/D1b_M10_N256_boost_off | D1b_M10_N256_boost.in | hydro/dual_energy=false
+D1b/D1b_M30_N64_on | D1b_M30_N64.in | 
+D1b/D1b_M30_N64_off | D1b_M30_N64.in | hydro/dual_energy=false
+D1b/D1b_M30_N128_on | D1b_M30_N128.in | 
+D1b/D1b_M30_N128_off | D1b_M30_N128.in | hydro/dual_energy=false
+D1b/D1b_M30_N256_on | D1b_M30_N256.in | 
+D1b/D1b_M30_N256_off | D1b_M30_N256.in | hydro/dual_energy=false
+D1b/D1b_M30_N512_on | D1b_M30_N512.in | 
+D1b/D1b_M30_N512_off | D1b_M30_N512.in | hydro/dual_energy=false
+D1b/D1b_M30_N1024_on | D1b_M30_N1024.in | 
+D1b/D1b_M30_N1024_off | D1b_M30_N1024.in | hydro/dual_energy=false
+D1b/D1b_M30_N2048_on | D1b_M30_N2048.in | 
+D1b/D1b_M30_N2048_off | D1b_M30_N2048.in | hydro/dual_energy=false
+D1b/D1b_M30_N4096_on | D1b_M30_N4096.in | 
+D1b/D1b_M30_N4096_off | D1b_M30_N4096.in | hydro/dual_energy=false
+D1b/D1b_M30_N8192_on | D1b_M30_N8192.in | 
+D1b/D1b_M30_N8192_off | D1b_M30_N8192.in | hydro/dual_energy=false
+D1b/D1b_M30_N16384_on | D1b_M30_N16384.in | 
+D1b/D1b_M30_N16384_off | D1b_M30_N16384.in | hydro/dual_energy=false
+D1b/D1b_M30_N256_boost_on | D1b_M30_N256_boost.in | 
+D1b/D1b_M30_N256_boost_off | D1b_M30_N256_boost.in | hydro/dual_energy=false
+D1b/D1b_M100_N64_on | D1b_M100_N64.in | 
+D1b/D1b_M100_N64_off | D1b_M100_N64.in | hydro/dual_energy=false
+D1b/D1b_M100_N128_on | D1b_M100_N128.in | 
+D1b/D1b_M100_N128_off | D1b_M100_N128.in | hydro/dual_energy=false
+D1b/D1b_M100_N256_on | D1b_M100_N256.in | 
+D1b/D1b_M100_N256_off | D1b_M100_N256.in | hydro/dual_energy=false
+D1b/D1b_M100_N512_on | D1b_M100_N512.in | 
+D1b/D1b_M100_N512_off | D1b_M100_N512.in | hydro/dual_energy=false
+D1b/D1b_M100_N1024_on | D1b_M100_N1024.in | 
+D1b/D1b_M100_N1024_off | D1b_M100_N1024.in | hydro/dual_energy=false
+D1b/D1b_M100_N2048_on | D1b_M100_N2048.in | 
+D1b/D1b_M100_N2048_off | D1b_M100_N2048.in | hydro/dual_energy=false
+D1b/D1b_M100_N4096_on | D1b_M100_N4096.in | 
+D1b/D1b_M100_N4096_off | D1b_M100_N4096.in | hydro/dual_energy=false
+D1b/D1b_M100_N8192_on | D1b_M100_N8192.in | 
+D1b/D1b_M100_N8192_off | D1b_M100_N8192.in | hydro/dual_energy=false
+D1b/D1b_M100_N16384_on | D1b_M100_N16384.in | 
+D1b/D1b_M100_N16384_off | D1b_M100_N16384.in | hydro/dual_energy=false
+D1b/D1b_M100_N256_boost_on | D1b_M100_N256_boost.in | 
+D1b/D1b_M100_N256_boost_off | D1b_M100_N256_boost.in | hydro/dual_energy=false
+D1b/D1b_M1000_N64_on | D1b_M1000_N64.in | 
+D1b/D1b_M1000_N64_off | D1b_M1000_N64.in | hydro/dual_energy=false
+D1b/D1b_M1000_N128_on | D1b_M1000_N128.in | 
+D1b/D1b_M1000_N128_off | D1b_M1000_N128.in | hydro/dual_energy=false
+D1b/D1b_M1000_N256_on | D1b_M1000_N256.in | 
+D1b/D1b_M1000_N256_off | D1b_M1000_N256.in | hydro/dual_energy=false
+D1b/D1b_M1000_N512_on | D1b_M1000_N512.in | 
+D1b/D1b_M1000_N512_off | D1b_M1000_N512.in | hydro/dual_energy=false
+D1b/D1b_M1000_N1024_on | D1b_M1000_N1024.in | 
+D1b/D1b_M1000_N1024_off | D1b_M1000_N1024.in | hydro/dual_energy=false
+D1b/D1b_M1000_N2048_on | D1b_M1000_N2048.in | 
+D1b/D1b_M1000_N2048_off | D1b_M1000_N2048.in | hydro/dual_energy=false
+D1b/D1b_M1000_N4096_on | D1b_M1000_N4096.in | 
+D1b/D1b_M1000_N4096_off | D1b_M1000_N4096.in | hydro/dual_energy=false
+D1b/D1b_M1000_N8192_on | D1b_M1000_N8192.in | 
+D1b/D1b_M1000_N8192_off | D1b_M1000_N8192.in | hydro/dual_energy=false
+D1b/D1b_M1000_N16384_on | D1b_M1000_N16384.in | 
+D1b/D1b_M1000_N16384_off | D1b_M1000_N16384.in | hydro/dual_energy=false
+D1b/D1b_M1000_N256_boost_on | D1b_M1000_N256_boost.in | 
+D1b/D1b_M1000_N256_boost_off | D1b_M1000_N256_boost.in | hydro/dual_energy=false
+D1b/D1b_M10000_N64_on | D1b_M10000_N64.in | 
+D1b/D1b_M10000_N64_off | D1b_M10000_N64.in | hydro/dual_energy=false
+D1b/D1b_M10000_N128_on | D1b_M10000_N128.in | 
+D1b/D1b_M10000_N128_off | D1b_M10000_N128.in | hydro/dual_energy=false
+D1b/D1b_M10000_N256_on | D1b_M10000_N256.in | 
+D1b/D1b_M10000_N256_off | D1b_M10000_N256.in | hydro/dual_energy=false
+D1b/D1b_M10000_N512_on | D1b_M10000_N512.in | 
+D1b/D1b_M10000_N512_off | D1b_M10000_N512.in | hydro/dual_energy=false
+D1b/D1b_M10000_N1024_on | D1b_M10000_N1024.in | 
+D1b/D1b_M10000_N1024_off | D1b_M10000_N1024.in | hydro/dual_energy=false
+D1b/D1b_M10000_N256_boost_on | D1b_M10000_N256_boost.in | 
+D1b/D1b_M10000_N256_boost_off | D1b_M10000_N256_boost.in | hydro/dual_energy=false

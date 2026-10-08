@@ -1,0 +1,13 @@
+# G/H: GPU (GH200) vs CPU; max relative difference of rho and P (cells matched by x). 38cd94ec = CPU 72ae3011 source;
+#      4f64c1e5 = CPU c69ee834 source (FINAL: + row-tile cap, AthenaPK RowTile + Parthenon md pattern, device builds only)
+G2_D1a_M10_r10_smr_ddf           GPU - CPU: max rel rho 2.0e-12 P 1.2e-11  (38cd94ec: dual double flux, SMR)
+G3_D2a_perp_b0.01_amr_face       GPU - CPU: max rel rho 8.8e-15 P 1.5e-14  (38cd94ec: face pdV, AMR)
+G4_D3_M30_N1024_eta1_0.2_sk      GPU - CPU: max rel rho 1.0e+00 P 1.0e+00  (38cd94ec: ONE 1024-cell block -> dt reduction did not run (E-F8b))
+H2_D1a_M10_r10_smr_ddf           GPU - CPU: max rel rho 2.0e-12 P 1.2e-11  (4f64c1e5 FINAL: dual double flux, SMR)
+H3_D2a_perp_b0.01_amr_face       GPU - CPU: max rel rho 8.8e-15 P 1.5e-14  (4f64c1e5 FINAL: face pdV, AMR)
+H4_D3_M30_N1024_eta1_0.2_sk      GPU - CPU: max rel rho 4.9e-07 P 2.9e-06  (4f64c1e5 FINAL: ONE 1024-cell block (E-F8, E-F8b))
+H1_D1b_M100_N16384_tenth         GPU - CPU: max rel rho 7.9e-14 P 1.3e-13  (4f64c1e5 FINAL: ONE 16384-cell block (E-F8b))
+G5 = G4 deck on b7a27d0d (before E-F8 fallback): binary b7a27d0d: ABORTED after 1 cycle lines -- what():  Kokkos::Impl::ParallelFor<Cuda, TeamPolicy> could not find a valid execution configuration.
+E-F8b D1b_M100_N16384_tenth_old        binary b7a27d0d: ABORTED after 0 cycle lines -- Product of tile dimensions exceed maximum limit: 2048
+E-F8b D1b_M100_N16384_tenth_new        binary 38cd94ec: ABORTED after 0 cycle lines -- Product of tile dimensions exceed maximum limit: 2048
+E-F8b D1b_M100_N16384_tenth_rowtile    binary 4736ebde: ABORTED after 1 cycle lines -- Product of tile dimensions exceed maximum limit: 2048

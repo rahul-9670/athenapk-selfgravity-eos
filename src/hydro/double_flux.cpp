@@ -99,12 +99,18 @@ void Coeffs1D(MeshData<Real> *md) {
   IndexRange jb = pmb->cellbounds.GetBoundsJ(IndexDomain::interior);
   IndexRange kb = pmb->cellbounds.GetBoundsK(IndexDomain::interior);
   const int nx1 = pmb->cellbounds.ncellsi(IndexDomain::entire);
-  const int scratch_level = pkg->Param<int>("scratch_level");
-  // Reconstruct writes EVERY prim component (passive scalars included): size the scratch rows from prim, as
+  int scratch_level = pkg->Param<int>("scratch_level");
+  // Reconstruct writes EVERY prim component (passive scalars, dual energy): size the scratch rows from prim, as
   // the flux kernel does (nhydro + nscalars). Sized by the hydro count before 2026-10-06, which overran wl/wlb into
-  // the next scratch array whenever a passive scalar existed.
+  // the next scratch array whenever a scalar or the dual energy existed (E7s: 2.8e-4 differences with dual on).
   const int nvar = prim_in.GetDim(4);
   const size_t scratch = ScratchPad2D<Real>::shmem_size(nvar, nx1) * 3;
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
+  // E-F8 (2026-10-07): fall back to level-1 scratch when level 0 exceeds the device limit (see CalculateFluxes)
+  if (scratch_level == 0 &&
+      scratch > static_cast<size_t>(Kokkos::TeamPolicy<parthenon::DevExecSpace>::scratch_size_max(0)))
+    scratch_level = 1;
+#endif
   // faces: x1 i in [is, ie+1] for j,k interior; x2 j in [js, je+1]; x3 k in [ks, ke+1]
   const int kl = kb.s, ku = (XNDIR == X3DIR) ? kb.e + 1 : kb.e;
   const int jl = jb.s, ju = (XNDIR == X2DIR) ? jb.e + 1 : jb.e;
@@ -322,6 +328,23 @@ KOKKOS_INLINE_FUNCTION void FixE(const EOSTable::EosTable &tab, U &u, const Real
 // Contact test of the double-flux sensor on the TRANSPORTED pressure: every neighbour inside the array (ghosts
 // included) has |dP|/P <= kappa |drho|/rho, or both jumps at round-off. Used to restrict the fill to contacts
 // (hydro/double_flux_fill_sensor): elsewhere the conservative interpolation of Parthenon is kept.
+// hydro/dual_energy_double_flux (DE-F3 part (b), 2026-10-07): the same EOS-consistent fill for the dual energy. A
+// dual-switched cell takes its pressure from the dual energy, so a ghost/prolongated cell whose E was set from the
+// transported pressure but whose dual energy kept the separately interpolated value would carry a different pressure
+// (measured: contact rho 1|10 across a level jump 2.2e-4 with the dual energy vs 1.4e-5 without). Sets E and the dual
+// energy from the same table energy at pt.
+template <class U>
+KOKKOS_INLINE_FUNCTION void FixEDual(const EOSTable::EosTable &tab, U &u, const Real pt, const int k, const int j,
+                                     const int i, const int idual) {
+  if (!(pt > 0.0)) return;
+  const Real rho = u(IDN, k, j, i);
+  const Real ek = 0.5 * (SQR(u(IM1, k, j, i)) + SQR(u(IM2, k, j, i)) + SQR(u(IM3, k, j, i))) / rho;
+  const Real eb = 0.5 * (SQR(u(IB1, k, j, i)) + SQR(u(IB2, k, j, i)) + SQR(u(IB3, k, j, i)));
+  const Real re = rho * EspFromPRefined(tab, rho, pt);
+  u(IEN, k, j, i) = re + ek + eb;
+  u(idual, k, j, i) = re;
+}
+
 template <class U, class PT>
 KOKKOS_INLINE_FUNCTION bool ContactLike(const U &u, const PT &pt, const int k, const int j, const int i,
                                         const int ndim, const Real kappa, const IndexRange &eib,
@@ -380,6 +403,9 @@ TaskStatus DoubleFluxGhostFill(MeshData<Real> *md) {
   auto p_in = md->PackVariables(std::vector<std::string>{"dflux_p"});
   const bool use_sensor = pmb0->packages.Get("Hydro")->Param<bool>("dflux_fill_sensor");
   const Real kappa = pmb0->packages.Get("Hydro")->Param<Real>("double_flux_kappa");
+  const int idual_fill = pmb0->packages.Get("Hydro")->Param<bool>("dual_energy_double_flux")
+                             ? pmb0->packages.Get("Hydro")->Param<int>("dual_idx")
+                             : -1;
   const IndexRange ib = pmb0->cellbounds.GetBoundsI(IndexDomain::interior);
   const IndexRange jb = pmb0->cellbounds.GetBoundsJ(IndexDomain::interior);
   const IndexRange kb = pmb0->cellbounds.GetBoundsK(IndexDomain::interior);
@@ -401,7 +427,10 @@ TaskStatus DoubleFluxGhostFill(MeshData<Real> *md) {
           auto pt = [&](const int k2, const int j2, const int i2) { return p_in(b, 0, k2, j2, i2); };
           if (!ContactLike(u, pt, k, j, i, ndim, kappa, eib, ejb, ekb)) return;
         }
-        FixE(tab, u, p_in(b, 0, k, j, i), k, j, i);
+        if (idual_fill >= 0)
+          FixEDual(tab, u, p_in(b, 0, k, j, i), k, j, i, idual_fill);
+        else
+          FixE(tab, u, p_in(b, 0, k, j, i), k, j, i);
       });
   return TaskStatus::complete;
 }
@@ -421,6 +450,9 @@ void DoubleFluxPostRegrid(parthenon::Mesh *pm) {
     const bool use_sensor = pmb->packages.Get("Hydro")->Param<bool>("dflux_fill_sensor");
     const Real kappa = pmb->packages.Get("Hydro")->Param<Real>("double_flux_kappa");
     const int ndim = pm->ndim;
+    const int idual_fill = pmb->packages.Get("Hydro")->Param<bool>("dual_energy_double_flux")
+                               ? pmb->packages.Get("Hydro")->Param<int>("dual_idx")
+                               : -1;
     // interiors that the regrid prolongated (new fine blocks) or restricted (new coarse blocks) carry rho, momenta,
     // B and E interpolated separately; dflux_p came along through the same operators (minmod prolongation =
     // the same limited stencil applied to P; restriction = average of the children's P)
@@ -431,7 +463,10 @@ void DoubleFluxPostRegrid(parthenon::Mesh *pm) {
             auto pt = [&](const int k2, const int j2, const int i2) { return p(0, k2, j2, i2); };
             if (!ContactLike(u, pt, k, j, i, ndim, kappa, eib, ejb, ekb)) return;
           }
-          FixE(tab, u, p(0, k, j, i), k, j, i);
+          if (idual_fill >= 0)
+            FixEDual(tab, u, p(0, k, j, i), k, j, i, idual_fill);
+          else
+            FixE(tab, u, p(0, k, j, i), k, j, i);
         });
   }
 }
@@ -440,7 +475,7 @@ void ConsToPrimDoubleFlux(MeshData<Real> *md) {
   DoubleFluxGhostFill(md);
   md->GetBlockData(0)->GetBlockPointer()->packages.Get("Hydro")->Param<AdiabaticGLMMHDEOS>("eos").ConservedToPrimitive(
       md);
-  // ConservedToPrimitive may rewrite E (floors): the transported pressure follows cons
+  // ConservedToPrimitive may rewrite E (floors, dual-energy switch): the transported pressure follows cons
   DoubleFluxRefreshP(md);
 }
 

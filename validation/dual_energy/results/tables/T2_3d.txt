@@ -1,0 +1,13 @@
+# T2: 3D (64^3, 8 ranks, dedner_extended) oblique problems along k = 2 pi (1,1,1); 3D Noh 1024x8x8
+D1b_obl M 10   on   t 5.745e-03: max|dP| 6.56e-01 L1 6.79e-02 rho 0.553..4.327 switched 172032/262144
+D1b_obl M 10   off  t 5.745e-03: max|dP| 6.69e-01 L1 9.54e-02 rho 0.553..4.341 switched 0/262144
+D1b_obl M 10   new  t 5.745e-03: max|dP| 6.56e-01 L1 6.74e-02 rho 0.553..4.327 switched 172032/262144
+D1b_obl M 100  on   t 5.745e-04: max|dP| 2.63e+01 L1 8.45e-01 rho 0.549..4.411 switched 245760/262144
+D1b_obl M 100  off  t 5.745e-04: max|dP| 3.72e+01 L1 2.95e+00 rho 0.549..4.391 switched 0/262144
+D1b_obl M 100  new  t 5.745e-04: max|dP| 2.63e+01 L1 8.46e-01 rho 0.549..4.411 switched 245760/262144
+D1a_obl M 100  on   t 4.512e-03: max|P/P0-1| 4.16e-02
+D1a_obl M 100  off  t 4.512e-03: max|P/P0-1| 2.03e-05
+D1a_obl M 100  new  t 4.512e-03: max|P/P0-1| 1.09e-03
+D3_3d M 10    on   t 9.272e-02: plateau P/P2-1 -1.09e-04 (max 3.2e-04) pre-shock 1.1e-16 | transverse max dP/P 0.0e+00
+D3_3d M 10    off  t 9.272e-02: plateau P/P2-1 +1.16e-03 (max 1.2e-03) pre-shock 4.0e-15 | transverse max dP/P 0.0e+00
+D3_3d M 10    new  t 9.272e-02: plateau P/P2-1 -1.08e-04 (max 3.1e-04) pre-shock 1.1e-16 | transverse max dP/P 0.0e+00

@@ -1,0 +1,16 @@
+# F2: hydro/dual_energy_shock_eta1 (shock exemption also from eta1, not in magnetically dominated cells) vs without (D6), by eta1
+D3_M10_N1024           eta1 5e-2  without: plateau -1.09e-04              with shock_eta1: plateau +1.18e-03
+D3_M10_N1024           eta1 0.1   without: plateau -5.15e-03              with shock_eta1: plateau +1.18e-03
+D3_M10_N1024           eta1 0.2   without: plateau -1.73e-02              with shock_eta1: plateau +1.18e-03
+D3_M30_N1024           eta1 5e-2  without: plateau +3.40e-04              with shock_eta1: plateau +5.28e-04
+D3_M30_N1024           eta1 0.1   without: plateau -3.21e-04              with shock_eta1: plateau +5.28e-04
+D3_M30_N1024           eta1 0.2   without: plateau -2.10e-03              with shock_eta1: plateau +5.28e-04
+D1b_M100_N4096         eta1 5e-2  without: max 2.09e-02 L1 1.49e-04       with shock_eta1: max 2.09e-02 L1 1.49e-04
+D1b_M100_N4096         eta1 0.1   without: max 2.02e-02 L1 1.02e-04       with shock_eta1: max 2.02e-02 L1 1.02e-04
+D1b_M100_N4096         eta1 0.2   without: max 1.96e-02 L1 6.80e-05       with shock_eta1: max 1.96e-02 L1 6.80e-05
+D1b_M1000_N1024        eta1 5e-2  without: max 1.25e+01 L1 2.65e-02       with shock_eta1: max 1.25e+01 L1 2.65e-02
+D1b_M1000_N1024        eta1 0.1   without: max 1.25e+01 L1 2.64e-02       with shock_eta1: max 1.25e+01 L1 2.64e-02
+D1b_M1000_N1024        eta1 0.2   without: max 4.01e-01 L1 9.78e-04       with shock_eta1: max 4.01e-01 L1 9.78e-04
+D1b_M100_N256_boost    eta1 5e-2  without: max 1.52e-02 L1 8.25e-04       with shock_eta1: max 1.52e-02 L1 8.25e-04
+D1b_M100_N256_boost    eta1 0.1   without: max 1.52e-02 L1 8.25e-04       with shock_eta1: max 1.52e-02 L1 8.25e-04
+D1b_M100_N256_boost    eta1 0.2   without: max 1.52e-02 L1 8.25e-04       with shock_eta1: max 1.52e-02 L1 8.25e-04

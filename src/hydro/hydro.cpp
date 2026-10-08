@@ -37,6 +37,7 @@
 #include <solvers/mg_solver.hpp>
 #include "glmmhd/glmmhd.hpp"
 #include "double_flux.hpp"
+#include "dual_flux_density.hpp"
 #include "hydro.hpp"
 #include "interface/params.hpp"
 #include "outputs/outputs.hpp"
@@ -44,6 +45,7 @@
 #include "rsolvers/rsolvers.hpp"
 #include "utils/error_checking.hpp"
 #include "../self_gravity/self_gravity.hpp"
+#include "../utils/row_tile.hpp"
 
 using namespace parthenon::package::prelude;
 
@@ -174,7 +176,7 @@ void PreStepMeshUserWorkInLoop(Mesh *pmesh, ParameterInput *pin, SimTime &tm) {
 
   // D1 instrument (hydro/d1_meminfo, default false): per-rank block count, coarse-fine / same-level
   // neighbour counts, refinement-level range and free/total device memory, printed on every regrid
-  // and every d1_meminfo_every cycles. Measurement only (docs/validation D1_gpu_memory_imbalance).
+  // and every d1_meminfo_every cycles. Measurement only.
   if (hydro_pkg->Param<bool>("d1_meminfo")) {
     int nblocks = static_cast<int>(pmesh->block_list.size());
     int ncf = 0, nsame = 0;
@@ -292,7 +294,7 @@ Real HydroHst(MeshData<Real> *md) {
       Kokkos::MDRangePolicy<Kokkos::Rank<4>>(
           DevExecSpace(), {0, kb.s, jb.s, ib.s},
           {cons_pack.GetDim(5), kb.e + 1, jb.e + 1, ib.e + 1},
-          {1, 1, 1, ib.e + 1 - ib.s}),
+          {1, 1, 1, RowTile(ib.e + 1 - ib.s)}),
       KOKKOS_LAMBDA(const int b, const int k, const int j, const int i, Real &lsum) {
         const auto &cons = cons_pack(b);
         const auto &coords = cons_pack.GetCoords(b);
@@ -315,9 +317,9 @@ Real HydroHst(MeshData<Real> *md) {
           // was NOT guarded at all. In a 1-D mesh (nx2 = nx3 = 1) Parthenon allocates NO
           // ghost cells in x2, so `j+1` / `j-1` index outside the array and the run
           // SEGFAULTS -- in the history reduction, i.e. on the first output, immediately
-          // after "Setup complete, executing driver...". Found 2026-08-16 while trying to
-          // run the M1 diffusion benchmark (runs/ap_diffusion) in 1-D; it cost three
-          // debugging cycles because the crash looks like it is in the physics.
+          // after "Setup complete, executing driver...". Found 2026-08-16 running a 1-D test
+          // problem; it cost three debugging cycles because the crash looks like it is in the
+          // physics.
           // Latent for production (3-D), real for every 1-D test problem in this build.
           Real divb =
               (cons(IB1, k, j, i + 1) - cons(IB1, k, j, i - 1)) / coords.Dxc<1>(k, j, i);
@@ -372,7 +374,7 @@ Real HydroHstMaxDivB(MeshData<Real> *md) {
       Kokkos::MDRangePolicy<Kokkos::Rank<4>>(
           DevExecSpace(), {0, kb.s, jb.s, ib.s},
           {cons_pack.GetDim(5), kb.e + 1, jb.e + 1, ib.e + 1},
-          {1, 1, 1, ib.e + 1 - ib.s}),
+          {1, 1, 1, RowTile(ib.e + 1 - ib.s)}),
       KOKKOS_LAMBDA(const int b, const int k, const int j, const int i, Real &lmax) {
         const auto &cons = cons_pack(b);
         const auto &coords = cons_pack.GetCoords(b);
@@ -436,9 +438,27 @@ TaskStatus ClampBoundaryFluxes(MeshData<Real> *md) {
   const Real ylo = pm->mesh_size.xmin(X2DIR), yhi = pm->mesh_size.xmax(X2DIR);
   const Real zlo = pm->mesh_size.xmin(X3DIR), zhi = pm->mesh_size.xmax(X3DIR);
   const int ndim = pm->ndim;
+  // validation_tests/dual_energy DE-F2 (2026-10-07): clamp only PHYSICAL boundaries. A periodic mesh face is an
+  // interior face of the domain; clamping its inflow drained periodic test boxes to vacuum. Production: outflow
+  // on all faces -> unchanged.
+  using parthenon::BoundaryFace;
+  using parthenon::BoundaryFlag;
+  const auto &bcs = pm->mesh_bcs;
+  const bool c1l = bcs[BoundaryFace::inner_x1] != BoundaryFlag::periodic;
+  const bool c1u = bcs[BoundaryFace::outer_x1] != BoundaryFlag::periodic;
+  const bool c2l = bcs[BoundaryFace::inner_x2] != BoundaryFlag::periodic;
+  const bool c2u = bcs[BoundaryFace::outer_x2] != BoundaryFlag::periodic;
+  const bool c3l = bcs[BoundaryFace::inner_x3] != BoundaryFlag::periodic;
+  const bool c3u = bcs[BoundaryFace::outer_x3] != BoundaryFlag::periodic;
 
   const int nhydro = hydro_pkg->Param<int>("nhydro");
-  const int nscalars = hydro_pkg->Param<int>("nscalars");
+  // hydro/boundary_clamp_dual (audit P-10): with dual energy the advected internal energy sits in
+  // the slot after the passive scalars and its flux is mass flux x reconstructed e -- zeroing the
+  // mass flux but not that one left an energy inflow without mass. Legacy: scalars only.
+  const int nscalars = (hydro_pkg->AllParams().hasKey("boundary_clamp_dual") &&
+                        hydro_pkg->Param<bool>("boundary_clamp_dual"))
+                           ? hydro_pkg->Param<int>("nadvected")
+                           : hydro_pkg->Param<int>("nscalars");
 
   // Packed BY NAME: grav::phi is also Independent+WithFluxes, so a metadata-flag pack could put
   // phi's flux at the flat IDN index. Same trap cons_diag and SelfGravity::ApplyGravitySource
@@ -476,22 +496,68 @@ TaskStatus ClampBoundaryFluxes(MeshData<Real> *md) {
             cfb.flux(dir, nhydro + n, kk, jj, ii) = 0.0;
         };
 
-        if (fabs(coords.Xf<1>(i) - xlo) < 1.0e-9 * dx) clamp(X1DIR, k, j, i, -1.0);
-        if (fabs(coords.Xf<1>(i + 1) - xhi) < 1.0e-9 * dx) clamp(X1DIR, k, j, i + 1, 1.0);
+        if (c1l && fabs(coords.Xf<1>(i) - xlo) < 1.0e-9 * dx) clamp(X1DIR, k, j, i, -1.0);
+        if (c1u && fabs(coords.Xf<1>(i + 1) - xhi) < 1.0e-9 * dx) clamp(X1DIR, k, j, i + 1, 1.0);
         if (ndim > 1) {
-          if (fabs(coords.Xf<2>(j) - ylo) < 1.0e-9 * dy) clamp(X2DIR, k, j, i, -1.0);
-          if (fabs(coords.Xf<2>(j + 1) - yhi) < 1.0e-9 * dy) clamp(X2DIR, k, j + 1, i, 1.0);
+          if (c2l && fabs(coords.Xf<2>(j) - ylo) < 1.0e-9 * dy) clamp(X2DIR, k, j, i, -1.0);
+          if (c2u && fabs(coords.Xf<2>(j + 1) - yhi) < 1.0e-9 * dy) clamp(X2DIR, k, j + 1, i, 1.0);
         }
         if (ndim > 2) {
-          if (fabs(coords.Xf<3>(k) - zlo) < 1.0e-9 * dz) clamp(X3DIR, k, j, i, -1.0);
-          if (fabs(coords.Xf<3>(k + 1) - zhi) < 1.0e-9 * dz) clamp(X3DIR, k + 1, j, i, 1.0);
+          if (c3l && fabs(coords.Xf<3>(k) - zlo) < 1.0e-9 * dz) clamp(X3DIR, k, j, i, -1.0);
+          if (c3u && fabs(coords.Xf<3>(k + 1) - zhi) < 1.0e-9 * dz) clamp(X3DIR, k + 1, j, i, 1.0);
         }
       });
   return TaskStatus::complete;
 }
 
+//! \brief Dual energy: the pdV work, d(rho e)/dt = ... - P div v.
+//!
+//! The advected part (d(rho e)/dt + div(rho e v)) comes for free: the internal-energy density
+//! rides in the last conserved component and the flux loop upwinds it with the mass flux, like a
+//! passive scalar. This adds the remaining non-conservative term with the same centred velocity
+//! differences the rest of the unsplit sources use. Pressure is taken from `prim`, i.e. from the
+//! energy ConsToPrim selected for this cell, so the two energies stay consistent.
+void DualEnergyPdV(MeshData<Real> *md, const Real beta_dt) {
+  auto pkg = md->GetBlockData(0)->GetBlockPointer()->packages.Get("Hydro");
+  const int idual = pkg->Param<int>("dual_idx");
+  auto cons_pack = md->PackVariables(std::vector<std::string>{"cons"});
+  const auto &prim_pack = md->PackVariables(std::vector<std::string>{"prim"});
+  IndexRange ib = md->GetBlockData(0)->GetBoundsI(IndexDomain::interior);
+  IndexRange jb = md->GetBlockData(0)->GetBoundsJ(IndexDomain::interior);
+  IndexRange kb = md->GetBlockData(0)->GetBoundsK(IndexDomain::interior);
+  const int ndim = md->GetBlockData(0)->GetBlockPointer()->pmy_mesh->ndim;
+  // hydro/dual_energy_eta2: record the stage compression for ConsToPrim's shock detector.
+  const bool write_comp = pkg->Param<Real>("dual_energy_eta2") > 0.0;
+  // hydro/dual_energy_pdv = face: the work from the face velocities instead (dual_flux_density.cpp); the shock
+  // detector keeps the centred compression.
+  const bool pdv_face = pkg->Param<bool>("dual_energy_pdv_face");
+  auto comp_pack = write_comp ? md->PackVariables(std::vector<std::string>{"dual_comp"})
+                              : cons_pack;
+  parthenon::par_for(
+      DEFAULT_LOOP_PATTERN, "DualEnergyPdV", parthenon::DevExecSpace(), 0,
+      cons_pack.GetDim(5) - 1, kb.s, kb.e, jb.s, jb.e, ib.s, ib.e,
+      KOKKOS_LAMBDA(const int b, const int k, const int j, const int i) {
+        auto &cons = cons_pack(b);
+        const auto &prim = prim_pack(b);
+        const auto &coords = cons_pack.GetCoords(b);
+        Real divv = (prim(IV1, k, j, i + 1) - prim(IV1, k, j, i - 1)) /
+                    (2.0 * coords.template Dxc<1>(k, j, i));
+        if (ndim > 1)
+          divv += (prim(IV2, k, j + 1, i) - prim(IV2, k, j - 1, i)) /
+                  (2.0 * coords.template Dxc<2>(k, j, i));
+        if (ndim > 2)
+          divv += (prim(IV3, k + 1, j, i) - prim(IV3, k - 1, j, i)) /
+                  (2.0 * coords.template Dxc<3>(k, j, i));
+        if (!pdv_face) cons(idual, k, j, i) -= beta_dt * prim(IPR, k, j, i) * divv;
+        if (write_comp) comp_pack(b, 0, k, j, i) = -divv * beta_dt;
+      });
+  if (pdv_face) Hydro::DualEnergyPdVFace(md, beta_dt);
+}
+
 TaskStatus AddUnsplitSources(MeshData<Real> *md, const SimTime &tm, const Real beta_dt) {
   auto hydro_pkg = md->GetBlockData(0)->GetBlockPointer()->packages.Get("Hydro");
+  if (hydro_pkg->Param<bool>("dual_energy")) DualEnergyPdV(md, beta_dt);
+
   // GLM/Dedner sources.
   if (hydro_pkg->Param<Fluid>("fluid") == Fluid::glmmhd) {
     hydro_pkg->Param<GLMMHD::SourceFun_t>("glmmhd_source")(md, beta_dt);
@@ -552,6 +618,8 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   // MHD only (glmmhd): the pure-hydro `euler` path is not part of this tree, so the default is
   // glmmhd and a deck asking for euler fails loudly below rather than silently running a
   // different fluid.
+  const bool dual_energy = pin->GetOrAddBoolean("hydro", "dual_energy", false);
+  const Real dual_eta1 = pin->GetOrAddReal("hydro", "dual_energy_eta1", 1.0e-2);
 
   const auto fluid_str = pin->GetOrAddString("hydro", "fluid", "glmmhd");
   auto fluid = Fluid::undefined;
@@ -814,6 +882,10 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
       PARTHENON_REQUIRE(!first_order_flux_correct,
                         "hydro/double_flux: first_order_flux_correct not supported (it replaces the fluxes the "
                         "double-flux increments were built for)");
+      // Dual energy (2026-10-06): no extra coupling needed. ConsToPrim re-syncs the advected internal energy to
+      // E - KE - ME in every non-switched cell at every stage, so the double-flux reset of E carries over; a
+      // switched cell (e_int < dual_energy_eta1 E) rewrites E from the advected energy and discards the reset --
+      // there the thermal pressure is dynamically minor by construction. Validated: eos_tabulated E7s.
       pkg->AddField("dflux_frozen",
                     Metadata({Metadata::Cell, Metadata::Derived, Metadata::OneCopy}, std::vector<int>({2})));
       // Face sums X, Y, Z of the own-EOS energy-flux increments live in the FLUX slots of dflux_xyz (cell values
@@ -1023,13 +1095,48 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     pkg->AddParam<>("diffint", DiffInt::none);
 
     if (fluid == Fluid::glmmhd) {
+      // DUAL ENERGY. One extra conserved component holding rho*e_int, advected with the mass flux like a
+      // passive scalar and sourced by -P div v. ConsToPrim uses it instead of E - KE - ME wherever that
+      // difference is ill-conditioned (e_int <= eta1 * E). Off by default: the component is not registered
+      // and the EOS branch is inert.
+      const int nscalars_cfg = pin->GetOrAddInteger("hydro", "nscalars", 0);
+      const int dual_idx = dual_energy ? nhydro + nscalars_cfg : -1;
       const bool floor_consistent =
           pin->GetOrAddBoolean("hydro", "eos_floor_consistent", false);
       if (floor_consistent && use_h2diss && parthenon::Globals::my_rank == 0)
         std::cout << "## EOS pressure floor CONSISTENT with the table (hydro/eos_floor_consistent): "
                      "a floored cell stores the pressure of the energy it actually holds." << std::endl;
-      AdiabaticGLMMHDEOS eos(pfloor, dfloor, efloor, vceil, eceil, gamma, use_h2diss, eos_tab,
-                             floor_consistent);
+      // hydro/dual_energy_unsigned_prim (default false = legacy signed prim, bit-identical):
+      // prim's dual component carries the MAGNITUDE only and the switch flag moves to the
+      // `dual_switched` field. The signed legacy value is advected by the scalar flux; see
+      // AdiabaticGLMMHDEOS::ConsToPrim.
+      const bool dual_unsigned =
+          dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_unsigned_prim", false);
+      if (dual_unsigned && parthenon::Globals::my_rank == 0)
+        std::cout << "## Dual energy: UNSIGNED prim (hydro/dual_energy_unsigned_prim); the switch "
+                     "flag is the `dual_switched` field." << std::endl;
+      // hydro/dual_energy_exact_resync (default false = legacy, bit-identical): a switched cell
+      // stores back the advected energy it used instead of re-deriving it from E (restart seed,
+      // see AdiabaticGLMMHDEOS::ConsToPrim).
+      const bool dual_exact =
+          dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_exact_resync", false);
+      if (dual_exact && parthenon::Globals::my_rank == 0)
+        std::cout << "## Dual energy: EXACT re-sync in switched cells "
+                     "(hydro/dual_energy_exact_resync)." << std::endl;
+      const Real dual_eta2 =
+          dual_energy ? pin->GetOrAddReal("hydro", "dual_energy_eta2", 0.0) : 0.0;
+      const Real dual_kappa = pin->GetOrAddReal("hydro", "dual_energy_kappa", 3.0);
+      const Real dual_shock = pin->GetOrAddReal("hydro", "dual_energy_shock_comp", 0.02);
+      // F2 (2026-10-07): shock exemption also from the eta1 criterion (needs eta2 > 0: it reads dual_comp)
+      const bool dual_shock_eta1 =
+          dual_eta2 > 0.0 && pin->GetOrAddBoolean("hydro", "dual_energy_shock_eta1", false);
+      if (dual_eta2 > 0.0 && parthenon::Globals::my_rank == 0)
+        std::cout << "## Dual energy: TWO-SIDED switch eta2=" << dual_eta2 << " kappa=" << dual_kappa
+                  << " shock_comp=" << dual_shock << " (hydro/dual_energy_eta2)." << std::endl;
+      AdiabaticGLMMHDEOS eos(pfloor, dfloor, efloor, vceil, eceil, gamma, use_h2diss,
+                             eos_tab, dual_idx, dual_eta1,
+                             floor_consistent, dual_unsigned, dual_exact, dual_eta2, dual_kappa,
+                             dual_shock, dual_shock_eta1);
       pkg->AddParam<>("eos", eos);
       // Per-cycle [DTREPORT] line naming the binding dt constraint (see PreStepMeshUserWorkInLoop).
       pkg->AddParam<>("dt_report", pin->GetOrAddBoolean("hydro", "dt_report", false));
@@ -1062,13 +1169,106 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
 
   auto nscalars = pin->GetOrAddInteger("hydro", "nscalars", 0);
   pkg->AddParam("nscalars", nscalars);
-  // Advected components after `nhydro`: the passive scalars.
-  const int nadvected = nscalars;
+  // Advected components after `nhydro`: the passive scalars plus, with dual energy on, the
+  // internal-energy density in the LAST slot (so no scalar index shifts).
+  // GUARD. collapse_be's barotropic step overwrites the thermal energy every stage and does not update the
+  // advected internal energy, so the two energies would drift apart; dual energy is refused there.
+  if (dual_energy) {
+    PARTHENON_REQUIRE_THROWS(!(pin->DoesParameterExist("job", "problem_id") &&
+                               pin->GetString("job", "problem_id") == "collapse_be"),
+                             "hydro/dual_energy is not wired into collapse_be's barotropic step.");
+  }
+  const int nadvected = nscalars + (dual_energy ? 1 : 0);
+  pkg->AddParam("dual_energy", dual_energy);
+  // See hydro_driver.cpp (end of the final stage): re-sync cons_dual/prim at the end of the step so a
+  // continued run matches a resumed one. Default false == previous behaviour bit-for-bit.
+  pkg->AddParam("dual_energy_sync_step_end",
+                pin->GetOrAddBoolean("hydro", "dual_energy_sync_step_end", false));
+  pkg->AddParam("dual_idx", dual_energy ? nhydro + nscalars : -1);
+  // hydro/dual_energy_flux (validation_tests/dual_energy DE-F3, default "specific" = legacy, task graph unchanged):
+  // "density" rebuilds the dual flux from the reconstructed rho*e (hydro/dual_flux_density.cpp) so switched cells
+  // keep pressure equilibrium at contacts. PLM only; needs the unsigned prim (the legacy signed flag would flip q).
+  {
+    const auto dflx = pin->GetOrAddString("hydro", "dual_energy_flux", "specific");
+    PARTHENON_REQUIRE_THROWS(dflx == "specific" || dflx == "density",
+                             "hydro/dual_energy_flux must be 'specific' (default) or 'density'");
+    const bool dens = dual_energy && dflx == "density";
+    PARTHENON_REQUIRE_THROWS(!dens || (pin->GetString("hydro", "reconstruction") == "plm" &&
+                                       pin->GetOrAddBoolean("hydro", "dual_energy_unsigned_prim", false)),
+                             "hydro/dual_energy_flux = density needs reconstruction = plm and "
+                             "hydro/dual_energy_unsigned_prim = true");
+    pkg->AddParam("dual_energy_flux_density", dens);
+    // hydro/dual_energy_double_flux (DE-F3 part (b), default false): own-EOS dual-energy update in double-flux contact
+    // cells (hydro/dual_double_flux.cpp). Needs the density flux and hydro/double_flux.
+    const bool ddf = dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_double_flux", false);
+    PARTHENON_REQUIRE_THROWS(!ddf || (dens && pin->GetOrAddBoolean("hydro", "double_flux", false)),
+                             "hydro/dual_energy_double_flux needs hydro/dual_energy_flux = density and "
+                             "hydro/double_flux = true");
+    pkg->AddParam("dual_energy_double_flux", ddf);
+    const auto pdv = pin->GetOrAddString("hydro", "dual_energy_pdv", "centred");
+    PARTHENON_REQUIRE_THROWS(pdv == "centred" || pdv == "face", "hydro/dual_energy_pdv must be 'centred' or 'face'");
+    pkg->AddParam("dual_energy_pdv_face", dual_energy && pdv == "face");
+    // Face volume fluxes of the dual-energy terms that need u_f = F_mass/rho_f (dual_double_flux.cpp
+    // DualFaceVolumeFlux): component 0 = F_mass/rho_f, 1 = F_mass P_f/rho_f, in the FLUX slots so that Parthenon's
+    // flux correction replaces them at fine/coarse faces together with the mass flux. Built from the coarse cell's
+    // own reconstruction instead, a coarse cell next to a finer block mixed the fine mass flux with its own face
+    // density: contacts crossing a level jump kept max|P/P0-1| 2e-4 (SMR rho 1|10) vs 8e-11 on the uniform mesh.
+    // Metadata as dflux_xyz (OperatorSplit: never in a {WithFluxes, Cell} pack). Only registered when used.
+    const bool vflux = ddf || (dual_energy && pdv == "face");
+    pkg->AddParam("dual_vflux", vflux);
+    if (vflux) {
+      const parthenon::MetadataFlag OperatorSplit =
+          parthenon::Metadata::FlagNameExists("OperatorSplit")
+              ? parthenon::Metadata::GetUserFlag("OperatorSplit")
+              : parthenon::Metadata::AddUserFlag("OperatorSplit");
+      pkg->AddField("dual_vflux", Metadata({Metadata::Cell, Metadata::Independent, Metadata::WithFluxes,
+                                            OperatorSplit},
+                                           std::vector<int>({2})));
+    }
+  }
+  pkg->AddParam("dual_energy_eta1", pin->GetOrAddReal("hydro", "dual_energy_eta1", 1.0e-2));
+  const Real dual_eta2_p = dual_energy ? pin->GetOrAddReal("hydro", "dual_energy_eta2", 0.0) : 0.0;
+  pkg->AddParam("dual_energy_eta2", dual_eta2_p);
+  // hydro/dual_comp_ghost (audit P-02, default false = legacy). ConsToPrim runs over the ENTIRE
+  // block and reads `dual_comp` in ghost cells, where DualEnergyPdV never writes it (allocation
+  // zero). A ghost copy of a compressing cell could then take the dual branch while its owner keeps
+  // the E-derived energy, and the two blocks computed DIFFERENT fluxes on their shared same-level
+  // face (no flux correction there). With the key on the field is exchanged with the stage halo.
+  const bool dual_comp_ghost =
+      dual_eta2_p > 0.0 && pin->GetOrAddBoolean("hydro", "dual_comp_ghost", false);
+  pkg->AddParam("dual_comp_ghost", dual_comp_ghost);
+  if (dual_eta2_p > 0.0) {
+    // -div v * (stage dt) per cell, written by DualEnergyPdV, read by ConsToPrim (shock detector).
+    Metadata m_comp(dual_comp_ghost
+                        ? std::vector<parthenon::MetadataFlag>{Metadata::Cell, Metadata::Derived,
+                                                    Metadata::OneCopy, Metadata::FillGhost}
+                        : std::vector<parthenon::MetadataFlag>{Metadata::Cell, Metadata::Derived,
+                                                    Metadata::OneCopy});
+    pkg->AddField("dual_comp", m_comp);
+  }
+  // hydro/boundary_clamp_dual (audit P-10, default false = legacy): ClampBoundaryFluxes also zeroes
+  // the dual-energy flux of a clamped inflow face (it zeroed only the passive scalars before).
+  pkg->AddParam("boundary_clamp_dual",
+                dual_energy && pin->GetOrAddBoolean("hydro", "boundary_clamp_dual", false));
+  if (parthenon::Globals::my_rank == 0 && dual_energy &&
+      (dual_comp_ghost || pkg->Param<bool>("boundary_clamp_dual"))) {
+    std::cout << "## Dual energy keys: comp_ghost=" << dual_comp_ghost
+              << " clamp_dual=" << pkg->Param<bool>("boundary_clamp_dual") << std::endl;
+  }
+  const bool dual_unsigned_prim =
+      dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_unsigned_prim", false);
+  pkg->AddParam("dual_energy_unsigned_prim", dual_unsigned_prim);
   // See hydro_driver.cpp (start of stage 1): extra halo-exchange + FillDerived rounds so the ghost
   // zones a step starts from depend on the interior only (restart reproducibility). 0 = off.
   pkg->AddParam("ghost_sync_rounds", pin->GetOrAddInteger("hydro", "ghost_sync_rounds", 0));
   // See RegisterVarNames in hydro_driver.cpp. Default false = full register copies.
   pkg->AddParam("lean_registers", pin->GetOrAddBoolean("hydro", "lean_registers", false));
+  if (dual_unsigned_prim) {
+    // Written over IndexDomain::entire by every ConsToPrim; never exchanged or restarted
+    // (it is a pure function of cons at the last ConsToPrim, and only cons-ndual reads it).
+    Metadata m_sw({Metadata::Cell, Metadata::Derived, Metadata::OneCopy});
+    pkg->AddField("dual_switched", m_sw);
+  }
   pkg->AddParam("nadvected", nadvected);
 
   std::vector<std::string> cons_labels(nhydro);
@@ -1100,6 +1300,10 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   for (auto i = 0; i < nscalars; i++) {
     cons_labels.emplace_back("scalar_density_" + std::to_string(i));
     prim_labels.emplace_back("scalar_" + std::to_string(i));
+  }
+  if (dual_energy) {
+    cons_labels.emplace_back("dual_energy_density");
+    prim_labels.emplace_back("dual_specific_energy");
   }
 
   Metadata m(
@@ -1205,6 +1409,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     add_c(ConsDiag::nfloor, "cons-nfloor");
     add_c(ConsDiag::Mfloor, "cons-Mfloor");
     add_c(ConsDiag::npfloor, "cons-npfloor");
+    add_c(ConsDiag::ndual, "cons-ndual");
     // E-F5 (2026-10-05): cells held at the TEMPERATURE floor (hydro/Tfloor), by the same floor pressure ConsToPrim
     // applies; cons-npfloor only sees P <= pfloor. Registered only when the floor is on (history layout unchanged).
     if (fluid == Fluid::glmmhd && pkg->Param<AdiabaticGLMMHDEOS>("eos").GetInternalEFloor() > 0.0)
@@ -1315,7 +1520,7 @@ Real EstimateHyperbolicTimestep(MeshData<Real> *md) {
       Kokkos::MDRangePolicy<Kokkos::Rank<4>>(
           DevExecSpace(), {0, kb.s, jb.s, ib.s},
           {prim_pack.GetDim(5), kb.e + 1, jb.e + 1, ib.e + 1},
-          {1, 1, 1, ib.e + 1 - ib.s}),
+          {1, 1, 1, RowTile(ib.e + 1 - ib.s)}),
       KOKKOS_LAMBDA(const int b, const int k, const int j, const int i, Real &min_dt) {
         const auto &prim = prim_pack(b);
         const auto &coords = prim_pack.GetCoords(b);
@@ -1519,11 +1724,13 @@ TaskStatus CalculateFluxes(std::shared_ptr<MeshData<Real>> &md) {
 
   // Pack "cons" BY NAME: a flag pack is ordered by registration, so any Independent+WithFluxes
   // field registered before cons would take the leading slots
-  // and receive the hydro fluxes (measured mass loss, DEV_LOG 2026-09-19).
+  // and receive the hydro fluxes (measured mass loss, 2026-09-19).
   const std::vector<std::string> cons_name{"cons"};
   auto cons_in = md->PackVariablesAndFluxes(cons_name, cons_name);
   auto pkg = pmb->packages.Get("Hydro");
   const auto nhydro = pkg->Param<int>("nhydro");
+  // With dual energy on this also covers the internal-energy density (last component): it is
+  // advected exactly like a passive scalar, i.e. upwind specific value times the mass flux.
   const auto nscalars = pkg->Param<int>("nadvected");
 
   const auto &eos =
@@ -1539,9 +1746,18 @@ TaskStatus CalculateFluxes(std::shared_ptr<MeshData<Real>> &md) {
 
   auto const &prim_in = md->PackVariables(std::vector<std::string>{"prim"});
 
-  const int scratch_level =
-      pkg->Param<int>("scratch_level"); // 0 is actual scratch (tiny); 1 is HBM
   const int nx1 = pmb->cellbounds.ncellsi(IndexDomain::entire);
+  // 0 is actual scratch (tiny); 1 is HBM. EOS E-F8 / dual_energy D8 (2026-10-07): on a GPU a level-0 request above the
+  // device limit makes Kokkos abort ("could not find a valid execution configuration", 1D meshblocks >~ 200-400
+  // cells); fall back to level 1 for that call. The values are identical, only their memory location changes;
+  // production 32^3 blocks are far below the limit, so the selected level is unchanged there.
+  int scratch_level = pkg->Param<int>("scratch_level");
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
+  if (scratch_level == 0 &&
+      parthenon::ScratchPad2D<Real>::shmem_size(num_scratch_vars, nx1) * 3 >
+          static_cast<size_t>(Kokkos::TeamPolicy<parthenon::DevExecSpace>::scratch_size_max(0)))
+    scratch_level = 1;
+#endif
 
   size_t scratch_size_in_bytes =
       parthenon::ScratchPad2D<Real>::shmem_size(num_scratch_vars, nx1) * 2;
@@ -1747,7 +1963,7 @@ TaskStatus FirstOrderFluxCorrect(MeshData<Real> *u0_data, MeshData<Real> *u1_dat
         Kokkos::MDRangePolicy<Kokkos::Rank<4>>(
             DevExecSpace(), {0, kb.s, jb.s, ib.s},
             {u0_cons_pack.GetDim(5), kb.e + 1, jb.e + 1, ib.e + 1},
-            {1, 1, 1, ib.e + 1 - ib.s}),
+            {1, 1, 1, RowTile(ib.e + 1 - ib.s)}),
         KOKKOS_LAMBDA(const int b, const int k, const int j, const int i,
                       std::int64_t &lnum_corrected, std::int64_t &lnum_need_floor) {
           const auto &coords = u0_cons_pack.GetCoords(b);
