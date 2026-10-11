@@ -34,6 +34,7 @@
 #include "../diagnostics/cons_diag.hpp"
 #include "../self_gravity/self_gravity.hpp"
 #include "../pgen/pgen.hpp"
+#include "../radiation/radiation.hpp"
 
 using namespace parthenon::driver::prelude;
 
@@ -82,6 +83,29 @@ std::vector<std::string> RegisterVarNames(MeshBlockData<Real> *base, const bool 
   return names;
 }
 
+//! Speed option: hydro/lean_exchange = true -> the hydro-stage halo exchanges use a SHALLOW subset of
+//! "base" without the Sn transport's own fields (sn.*: the nfa-wide iterate sn.u and the coupled-solve Krylov vector
+//! sn.kc_y, most of the exchanged components with 8 groups), which the Sn solver exchanges itself before every use.
+//! Default false = "base" (every FillGhost field), unchanged.
+static std::shared_ptr<MeshData<Real>> &HydroExchangeData(Mesh *pmesh, const int i) {
+  auto &base = pmesh->mesh_data.GetOrAdd("base", i);
+  if (!pmesh->packages.Get("Hydro")->Param<bool>("lean_exchange")) return base;
+  // hydro/lean_exchange_rad (default false): ALSO drop the radiation moments rad.* (4 per
+  // group: 32 of ~48 exchanged components at 8 groups). Under transport = sn nothing reads their ghost cells (the Sn
+  // writeback, matter coupling, P1 seed and history reducers all work on the interior; the ghost fill was for the retired
+  // M1 transport), restarts and outputs store interiors only, and their AMR prolongation is piecewise constant.
+  static std::vector<std::string> names;   // the field set is fixed for the run
+  if (names.empty()) {
+    const bool drop_rad = pmesh->packages.Get("Hydro")->Param<bool>("lean_exchange_rad");
+    for (const auto &v : base->GetBlockData(0)->GetVariableVector()) {
+      if (!v->IsSet(parthenon::Metadata::FillGhost) || v->label().rfind("sn.", 0) == 0) continue;
+      if (drop_rad && v->label().rfind("rad.", 0) == 0) continue;
+      names.push_back(v->label());
+    }
+  }
+  return pmesh->mesh_data.AddShallow("base_hx", base, names);
+}
+
 TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
   TaskCollection tc;
   auto hydro_pkg = blocks[0]->packages.Get("Hydro");
@@ -109,7 +133,7 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
       for (int i = 0; i < num_partitions; i++) {
         auto &tl = gr[i];
         auto &mu0 = pmesh->mesh_data.GetOrAdd("base", i);
-        auto bnd = parthenon::AddBoundaryExchangeTasks(TaskID(0), tl, mu0, pmesh->multilevel);
+        auto bnd = parthenon::AddBoundaryExchangeTasks(TaskID(0), tl, HydroExchangeData(pmesh, i), pmesh->multilevel);
         bnd = tl.AddTask(bnd, SelfGravity::SetGravRhsConsumed, pmesh, sync_rhs_consumed);
         tl.AddTask(bnd, parthenon::Update::FillDerived<MeshData<Real>>, mu0.get());
       }
@@ -179,7 +203,7 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     auto &mu1 = pmesh->mesh_data.GetOrAdd("u1", i);
 
     const auto any = parthenon::BoundaryType::any;
-    auto start_bnd = tl.AddTask(none, parthenon::StartReceiveBoundBufs<any>, mu0);
+    auto start_bnd = tl.AddTask(none, parthenon::StartReceiveBoundBufs<any>, HydroExchangeData(pmesh, i));
     auto start_flxcor_recv =
         tl.AddTask(none, parthenon::StartReceiveFluxCorrections, mu0);
 
@@ -317,7 +341,7 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
           tl.AddTask(source_split_strang_final, AddSplitSourcesFirstOrder, mu0.get(), tm);
     }
 
-    parthenon::AddBoundaryExchangeTasks(source_split_first_order | start_bnd, tl, mu0,
+    parthenon::AddBoundaryExchangeTasks(source_split_first_order | start_bnd, tl, HydroExchangeData(pmesh, i),
                                         pmesh->multilevel);
   }
   // --- END of single_tasklist_per_pack_region loop ---
@@ -343,9 +367,18 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     }
   }
 
+  // Radiation (Sn): operator-split transport + matter coupling on the final stage only.
+  auto radiation_pkg = pmesh->packages.AllPackages().count("radiation") > 0
+                           ? pmesh->packages.Get("radiation")
+                           : nullptr;
+  if (stage == integrator->nstages && radiation_pkg != nullptr) {
+    // Adds its own TaskRegion.
+    Radiation::AddRadiationTasks(tc, pmesh, integrator->dt);
+  }
+
   TaskRegion &single_tasklist_per_pack_region_3 = tc.AddRegion(num_partitions);
   // Operator-split sources modify INTERIOR conserved variables AFTER the stage boundary exchange
-  // above (self-gravity on every stage). Refresh ghosts before FillDerived so the primitive ghosts
+  // above (self-gravity on every stage, radiation matter coupling on the final stage). Refresh ghosts before FillDerived so the primitive ghosts
   // (the gravity-updated momentum used by the next stage's reconstruction) reflect the sourced
   // interior, not stale ghosts. The final stage refreshes too, as in the validated code.
   const bool sourced_interior =
@@ -357,7 +390,7 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     auto &mu0 = pmesh->mesh_data.GetOrAdd("base", i);
     TaskID pre = none;
     if (sourced_interior)
-      pre = parthenon::AddBoundaryExchangeTasks(none, tl, mu0, pmesh->multilevel);
+      pre = parthenon::AddBoundaryExchangeTasks(none, tl, HydroExchangeData(pmesh, i), pmesh->multilevel);
     pre = tl.AddTask(pre, SelfGravity::SetGravRhsConsumed, pmesh, rhs_consumed_r3);
     auto fill_derived =
         tl.AddTask(pre, parthenon::Update::FillDerived<MeshData<Real>>, mu0.get());
@@ -372,7 +405,7 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     for (int i = 0; i < num_partitions; i++) {
       auto &tl = sync_region[i];
       auto &mu0 = pmesh->mesh_data.GetOrAdd("base", i);
-      auto bnd = parthenon::AddBoundaryExchangeTasks(none, tl, mu0, pmesh->multilevel);
+      auto bnd = parthenon::AddBoundaryExchangeTasks(none, tl, HydroExchangeData(pmesh, i), pmesh->multilevel);
       bnd = tl.AddTask(bnd, SelfGravity::SetGravRhsConsumed, pmesh, sync_rhs_consumed);
       tl.AddTask(bnd, parthenon::Update::FillDerived<MeshData<Real>>, mu0.get());
     }

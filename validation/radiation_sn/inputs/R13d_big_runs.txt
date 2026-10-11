@@ -1,0 +1,4 @@
+R13d/F10_T150 | R13/F10_T150.in | radiation/sn_precond_stencil=sou parthenon/mesh/ix1_bc=diode parthenon/mesh/ox1_bc=diode | 1
+R13d/F18_T150 | R13/F18_T150.in | radiation/sn_precond_stencil=sou parthenon/mesh/ix1_bc=diode parthenon/mesh/ox1_bc=diode | 1
+R13d/F10_T300 | R13/F10_T300.in | radiation/sn_precond_stencil=sou parthenon/mesh/ix1_bc=diode parthenon/mesh/ox1_bc=diode | 1
+R13d/F18_T300 | R13/F18_T300.in | radiation/sn_precond_stencil=sou parthenon/mesh/ix1_bc=diode parthenon/mesh/ox1_bc=diode | 1

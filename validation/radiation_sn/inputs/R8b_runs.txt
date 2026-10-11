@@ -1,0 +1,4 @@
+R8/shock_M2 | R8/shock_M2.in | radiation/sn_precond_stencil=sou | 1
+R8/shock_M2_step | R8/shock_M2.in | radiation/sn_precond_stencil=sou radiation/sn_spatial=step | 1
+R8/shock_M3 | R8/shock_M3.in | radiation/sn_precond_stencil=sou | 1
+R8/shock_M3_step | R8/shock_M3.in | radiation/sn_precond_stencil=sou radiation/sn_spatial=step | 1

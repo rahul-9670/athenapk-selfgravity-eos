@@ -1,0 +1,26 @@
+GATE G8 -- Sn thick-equilibrium unit calibration
+  --- arm planck (expect EQUILIBRIUM, target Er = 1) ---
+  parthenon.out0.final.phdf
+    t = 0.5   cycle = 35   cells = 4096
+    Er   min 1.000000000000e+00  max 1.000000000000e+00  mean 1.000000000000e+00
+    Er   relative error vs a_R T^4 = 1         : 0.000e+00   (tol 1e-06)
+    Er   cell-to-cell spread          : 0.000e+00
+    |Fr| max                          : 7.155e-15   (tol 1e-10)
+    PASS : Er == a_R T^4, uniform, zero flux
+  --- arm noabs (expect NO equilibrium, target Er = 1) ---
+  parthenon.out0.final.phdf
+    t = 0.5   cycle = 35   cells = 4096
+    Er   min 9.999999903114e-31  max 9.999999903114e-31  mean 9.999999903114e-31
+    Er   relative error vs a_R T^4 = 1         : 1.000e+00   (tol 1e-06)
+    Er   cell-to-cell spread          : 0.000e+00
+    |Fr| max                          : 1.047e-44   (tol 1e-10)
+    PASS : stayed away from equilibrium as required (Er_mean=1.000e-30)
+  --- arm t2 (expect EQUILIBRIUM, target Er = 48) ---
+  parthenon.out0.final.phdf
+    t = 0.5   cycle = 49   cells = 4096
+    Er   min 4.800000000000e+01  max 4.800000000000e+01  mean 4.800000000000e+01
+    Er   relative error vs a_R T^4 = 48        : 1.480e-16   (tol 1e-06)
+    Er   cell-to-cell spread          : 0.000e+00
+    |Fr| max                          : 3.363e-13   (tol 1e-10)
+    PASS : Er == a_R T^4, uniform, zero flux
+G8 PASS (0 arm failures)

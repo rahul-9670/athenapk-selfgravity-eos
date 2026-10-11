@@ -1,0 +1,63 @@
+arm_ref    arm_ref/parthenon.out0.final.phdf
+arm_kry0   arm_kry0/parthenon.out0.final.phdf
+arm_kry1   arm_kry1/parthenon.out0.final.phdf
+arm_tight  arm_tight/parthenon.out0.final.phdf
+
+--- PREMISE: do the arms solve the same problem? (gas state must match) ---
+  prim arm_kry0   vs arm_ref: max/cell = 0.000e+00   OK
+  prim arm_kry1   vs arm_ref: max/cell = 0.000e+00   OK
+  prim arm_tight  vs arm_ref: max/cell = 0.000e+00   OK
+
+--- CONTENT: source structure ---
+  Er spread (max-min)/mean = 1.2638   OK
+  variation along k(z): 4.8469e-01   OK
+  variation along j(y): 4.8466e-01   OK
+  variation along i(x): 4.8466e-01   OK
+
+--- UNUSED INPUT KEYS (a mistyped key is silently the default) ---
+  none
+
+--- OPERATOR: SnApplyA == SnResidual ---
+  96 PASS, 0 FAIL
+
+--- ANSWER vs arm_tight (sn_rel_tol=1e-13), both moments ---
+  rad.Er:  CONTROL arm_ref vs tight: L1=3.497e-10 max/cell=1.669e-08
+      arm_kry0 : L1=4.604e-11 (  0.13x)  max/cell=2.077e-09 (  0.12x)   PASS
+      arm_kry1 : L1=6.637e-12 (  0.02x)  max/cell=2.406e-10 (  0.01x)   PASS
+  rad.Fr1:  CONTROL arm_ref vs tight: L1=1.517e-09 max/cell=1.173e-06
+      arm_kry0 : L1=3.273e-10 (  0.22x)  max/cell=2.408e-07 (  0.21x)   PASS
+      arm_kry1 : L1=2.853e-11 (  0.02x)  max/cell=1.544e-08 (  0.01x)   PASS
+  rad.Fr2:  CONTROL arm_ref vs tight: L1=1.517e-09 max/cell=1.173e-06
+      arm_kry0 : L1=3.273e-10 (  0.22x)  max/cell=2.408e-07 (  0.21x)   PASS
+      arm_kry1 : L1=2.853e-11 (  0.02x)  max/cell=1.544e-08 (  0.01x)   PASS
+  rad.Fr3:  CONTROL arm_ref vs tight: L1=1.293e-09 max/cell=5.165e-07
+      arm_kry0 : L1=2.811e-10 (  0.22x)  max/cell=3.137e-07 (  0.61x)   PASS
+      arm_kry1 : L1=2.226e-11 (  0.02x)  max/cell=1.484e-08 (  0.03x)   PASS
+
+--- CONVERGENCE ---
+    [SN] converged in 11 iterations (rel 3.61e-14)
+    [SN] converged in 10 iterations (rel 9.49e-14)
+    [SN] converged in 10 iterations (rel 8.55e-14)
+    [SN] converged in 10 iterations (rel 8.20e-14)
+    [SN] converged in 10 iterations (rel 7.96e-14)
+    [SN] converged in 10 iterations (rel 7.58e-14)
+    [SN] converged in 9 iterations (rel 2.62e-11)
+    [SN] converged in 8 iterations (rel 6.66e-11)
+    [SN] converged in 8 iterations (rel 6.24e-11)
+    [SN] converged in 8 iterations (rel 6.04e-11)
+    [SN] converged in 8 iterations (rel 5.87e-11)
+    [SN] converged in 8 iterations (rel 5.52e-11)
+    [SN/bicgstab] group 0 converged in 32 iters, rel = 7.21e-11 (from 4.14e-02)
+    [SN/bicgstab] group 0 converged in 33 iters, rel = 3.70e-11 (from 3.80e-02)
+    [SN/bicgstab] group 0 converged in 29 iters, rel = 7.44e-11 (from 3.51e-02)
+    [SN/bicgstab] group 0 converged in 28 iters, rel = 7.95e-11 (from 3.25e-02)
+    [SN/bicgstab] group 0 converged in 27 iters, rel = 7.25e-11 (from 3.02e-02)
+    [SN/bicgstab] group 0 converged in 26 iters, rel = 8.30e-11 (from 2.82e-02)
+    [SN/bicgstab] group 0 converged in 5 iters, rel = 9.46e-13 (from 4.14e-02)
+    [SN/bicgstab] group 0 converged in 5 iters, rel = 1.06e-12 (from 3.80e-02)
+    [SN/bicgstab] group 0 converged in 5 iters, rel = 1.31e-12 (from 3.51e-02)
+    [SN/bicgstab] group 0 converged in 5 iters, rel = 1.53e-12 (from 3.25e-02)
+    [SN/bicgstab] group 0 converged in 5 iters, rel = 1.68e-12 (from 3.02e-02)
+    [SN/bicgstab] group 0 converged in 5 iters, rel = 1.70e-12 (from 2.82e-02)
+
+GATE K3 (AMR): PASS

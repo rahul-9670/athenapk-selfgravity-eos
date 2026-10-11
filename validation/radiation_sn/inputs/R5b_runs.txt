@@ -1,0 +1,4 @@
+R5/b_o4x8 | R5/b_P3_T300.in | radiation/sn_nzeta=4 radiation/sn_npsi=8 radiation/sn_precond_stencil=sou | 27
+R5/b_o6x12 | R5/b_P3_T300.in | radiation/sn_nzeta=6 radiation/sn_npsi=12 radiation/sn_precond_stencil=sou | 27
+R5/b_o8x16 | R5/b_P3_T300.in | radiation/sn_nzeta=8 radiation/sn_npsi=16 radiation/sn_precond_stencil=sou | 27
+R5/b_o12x24 | R5/b_P3_T300.in | radiation/sn_nzeta=12 radiation/sn_npsi=24 radiation/sn_precond_stencil=sou | 27

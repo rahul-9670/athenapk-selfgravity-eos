@@ -1,0 +1,16 @@
+GATE G9 -- Sn matter coupling: conservation + coupled equilibrium
+  --- arm creduc1 ---
+    t = 3  cycle = 182   c/chat = 1
+    total e_gas + (c/chat)Er :  1.49999992500000e+00 -> 1.49999992546252e+00   drift 3.083e-10  (tol 2e-07)
+    T  : 1.000000 -> 0.768032   equilibrium 0.768032   err 1.818e-10  (tol 1e-04)
+    Er : 1.000000e-30 -> 3.479512e-01   a_R T_eq^4  3.479512e-01   err 7.272e-10
+    gas actually moved: 23.2% of T0
+    PASS : conserved, and relaxed to the coupled equilibrium
+  --- arm creduc4 ---
+    t = 3  cycle = 166   c/chat = 4
+    total e_gas + (c/chat)Er :  1.49999992500000e+00 -> 1.49999992512115e+00   drift 8.076e-11  (tol 2e-07)
+    T  : 1.000000 -> 0.616011   equilibrium 0.616010   err 1.225e-06  (tol 1e-04)
+    Er : 1.000000e-30 -> 1.439959e-01   a_R T_eq^4  1.439962e-01   err 1.965e-06
+    gas actually moved: 38.4% of T0
+    PASS : conserved, and relaxed to the coupled equilibrium
+G9 PASS (0 arm failures)

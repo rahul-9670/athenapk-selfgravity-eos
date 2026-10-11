@@ -1,0 +1,33 @@
+THE DEFINITIVE TEST -- driven steady state, seam at the steepest gradient
+  --- amr ---
+    t = 2  cycle = 315  levels [0, 1]
+    total Er = 6.830105089131e-01   last-two-dump change 3.511e-14 (STEADY)
+    history: 8.941000e-01  6.830272e-01  6.830105e-01  6.830105e-01  6.830105e-01
+    PREMISE: max|v| = 0.000e+00   p spread = 0.000e+00 (both must be ~0)
+             T_max/T_min = 1.8571   <a_R T^4> = 8.941000000000e-01
+  --- coarse ---
+    t = 2  cycle = 158  levels [0]
+    total Er = 6.850160786837e-01   last-two-dump change 3.818e-13 (STEADY)
+    history: 8.941000e-01  6.850425e-01  6.850161e-01  6.850161e-01  6.850161e-01
+    PREMISE: max|v| = 0.000e+00   p spread = 0.000e+00 (both must be ~0)
+             T_max/T_min = 1.8571   <a_R T^4> = 8.941000000000e-01
+  --- fine ---
+    t = 2  cycle = 315  levels [0]
+    total Er = 6.847876172779e-01   last-two-dump change 8.058e-14 (STEADY)
+    history: 8.941000e-01  6.848042e-01  6.847876e-01  6.847876e-01  6.847876e-01
+    PREMISE: max|v| = 0.000e+00   p spread = 0.000e+00 (both must be ~0)
+             T_max/T_min = 1.8571   <a_R T^4> = 8.941000000000e-01
+
+  ================ VERDICT ================
+  source <a_R T^4> spread across arms: 3.725e-16
+  (sources identical to round-off: the arms differ ONLY in the mesh)
+
+  reference (uniform fine)   : 6.847876172779e-01
+  uniform coarse  error      : 3.336e-04   <- pure resolution error
+  static AMR      error      : 2.595e-03
+  ratio AMR/coarse           : 7.78
+
+  => THE SEAM DOMINATES (7.78x the coarse error). Refining makes the steady state
+     WORSE than leaving the mesh coarse, under a driver that never stops. This
+     OVERTURNS option D: the flux register becomes mandatory.
+  =========================================

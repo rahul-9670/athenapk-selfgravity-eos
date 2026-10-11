@@ -1,0 +1,26 @@
+# R7 O2/O3 (scripts/r7_opacity.py) lookup LOG table opacity_table_v10b_pollack_acc_fmt3.bin grid 201x1859: log10 rho [-20.000,0.000] d=0.1000, log10 T [-0.3242,5.4784] d=0.00312
+# generator src/radiation/gen_opacity_table.py (EVAP = pollack); independent quadrature = scipy.quad (epsrel 1e-11)
+O2a gray kappa_R(node) vs bell_lin_kappa(node): rel max 2.024e-12  p99 1.856e-12  median 5.107e-14
+O2b gray kappa_P/kappa_R (table) vs independent quadrature, all node T: rel max 5.160e-10  p99 2.706e-12  median 1.332e-15
+O2b per-group mP_g (table) vs independent quadrature (groups with frac > 1e-12): rel max 1.487e-11  p99 2.794e-13  median 7.735e-15
+O2c sum_g frac_g mP_g - 1 at nodes: table max 1.761e-08  p99 1.746e-08  median 2.542e-14 ; independent quadrature max 1.761e-08  p99 1.746e-08  median 2.554e-14
+    node T=    5.014 K: kP/kR tab 1.870818 rel -1.78e-12; mP tab [9.40028e-01 5.53990e+00 1.72606e+04] max rel 3.24e-14; sum-1 +6.33e-09
+    node T=   10.000 K: kP/kR tab 1.870818 rel +5.59e-13; mP tab [5.39801e-01 2.22711e+00 4.98199e+03] max rel 3.23e-14; sum-1 +1.75e-08
+    node T=   19.943 K: kP/kR tab 1.870818 rel -7.11e-15; mP tab [1.96960e-01 1.28807e+00 1.43797e+03] max rel 5.30e-14; sum-1 +8.53e-09
+    node T=   50.066 K: kP/kR tab 1.870818 rel -1.95e-13; mP tab [4.12279e-02 1.03069e+00 2.74291e+02] max rel 7.15e-14; sum-1 +1.22e-09
+    node T=   99.850 K: kP/kR tab 1.870818 rel +3.11e-15; mP tab [1.21806e-02 1.00470e+00 7.91694e+01] max rel 8.39e-14; sum-1 +2.02e-10
+    node T=  300.031 K: kP/kR tab 0.961079 rel -2.11e-15; mP tab [0.85499 1.00003 2.44212] max rel 1.43e-14; sum-1 +1.21e-12
+    node T=  997.025 K: kP/kR tab 0.963197 rel +6.66e-16; mP tab [0.47952 1.      1.36967] max rel 3.32e-14; sum-1 +1.03e-13
+    node T= 2002.795 K: kP/kR tab 1.000000 rel +0.00e+00; mP tab [1. 1. 1.] max rel 0.00e+00; sum-1 +0.00e+00
+O3 kappa_P bilinear lookup vs generator at cell centres, whole table: rel max 2.096e-01  p99 4.365e-04  median 6.521e-13
+O3 same, collapse run box (rho 1e-20..1e-8, T 5..2000 K): rel max 2.096e-01  p99 5.964e-04  median 1.362e-12
+    worst in box: rho 1.122e-20 g/cm^3, T 140.5 K, lookup/true - 1 = +2.096e-01
+    box, T in [5,140) K: rel max 2.570e-10  p99 3.032e-12  median 3.532e-13
+    box, T in [140,200) K: rel max 2.096e-01  p99 2.096e-01  median 4.170e-06
+    box, T in [200,900) K: rel max 4.197e-02  p99 5.815e-07  median 1.703e-07
+    box, T in [900,1300) K: rel max 4.075e-02  p99 1.781e-02  median 7.957e-06
+    box, T in [1300,2000) K: rel max 3.958e-02  p99 1.934e-12  median 1.803e-12
+    T cell 140-141 K (centre 140.5): worst |lookup/true - 1| 2.096e-01 over rho in box
+    mP lookup worst > 5 %: cell-centre T 140.5 K, max rel 7.701e-01
+O3 mP_g lookup (linear in log T) vs independent at cell-centre T in 5..2000 K: rel max 7.701e-01  p99 1.091e-03  median 2.530e-06
+O3 sum_g frac_g mP_g - 1 at cell-centre T in 5..2000 K (lookup): max 2.233e-04  p99 7.629e-06  median 2.328e-07

@@ -1,0 +1,24 @@
+# R2 Su-Olson (scripts/analyze_R2.py): errors of the +A/-A pair mean vs the semi-analytic reference, |z| <= 6;
+# L1 = sum|code-ref| / sum|ref|, max = max|code-ref| / max|ref|; lin = max|U(+A)-U(-A)|/2 / max|U| (linearisation)
+== base (nx 800, dtau 0.01, base keys)
+   tau  0.1000 vs ref(code48): U L1 1.34e-02 max 3.99e-02 | V L1 9.03e-02 max 9.45e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  0.1000 vs ref(S64   ): U L1 1.49e-02 max 4.12e-02 | V L1 9.03e-02 max 9.46e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  1.0100 vs ref(code48): U L1 1.09e-02 max 1.22e-02 | V L1 1.07e-02 max 1.73e-02 | U(0) code 0.65272 ref 0.65171 | lin 1.5e-05
+   tau  1.0100 vs ref(S64   ): U L1 2.80e-02 max 3.61e-02 | V L1 1.83e-02 max 3.31e-02 | U(0) code 0.65272 ref 0.64617 | lin 1.5e-05
+   tau  3.2100 vs ref(code48): U L1 3.90e-03 max 7.24e-03 | V L1 4.58e-03 max 8.37e-03 | U(0) code 1.19712 ref 1.19980 | lin 1.6e-04
+   tau  3.2100 vs ref(S64   ): U L1 3.33e-02 max 3.69e-02 | V L1 2.91e-02 max 3.58e-02 | U(0) code 1.19712 ref 1.20979 | lin 1.6e-04
+   tau 10.0000 vs ref(code48): U L1 1.68e-03 max 4.19e-03 | V L1 1.83e-03 max 4.42e-03 | U(0) code 2.18666 ref 2.19042 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 2.10e-02 max 2.43e-02 | V L1 2.24e-02 max 2.49e-02 | U(0) code 2.18666 ref 2.23462 | lin 3.6e-04
+== dz2 (nx 1600, dtau 0.01, base keys)
+   tau  0.1000 vs ref(code48): U L1 1.30e-02 max 4.48e-02 | V L1 8.74e-02 max 8.96e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  0.1000 vs ref(S64   ): U L1 1.11e-02 max 3.46e-02 | V L1 8.74e-02 max 8.95e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  1.0100 vs ref(code48): U L1 4.84e-03 max 7.40e-03 | V L1 4.98e-03 max 1.11e-02 | U(0) code 0.65181 ref 0.65225 | lin 1.5e-05
+   tau  1.0100 vs ref(S64   ): U L1 2.62e-02 max 3.71e-02 | V L1 1.78e-02 max 3.41e-02 | U(0) code 0.65181 ref 0.64661 | lin 1.5e-05
+   tau  3.2100 vs ref(code48): U L1 1.41e-03 max 4.12e-03 | V L1 1.98e-03 max 4.98e-03 | U(0) code 1.19979 ref 1.20069 | lin 1.6e-04
+   tau  3.2100 vs ref(S64   ): U L1 3.23e-02 max 3.59e-02 | V L1 2.80e-02 max 3.55e-02 | U(0) code 1.19979 ref 1.21052 | lin 1.6e-04
+   tau 10.0000 vs ref(code48): U L1 5.44e-04 max 2.33e-03 | V L1 6.14e-04 max 2.48e-03 | U(0) code 2.19037 ref 2.19150 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 2.04e-02 max 2.29e-02 | V L1 2.18e-02 max 2.35e-02 | U(0) code 2.19037 ref 2.23564 | lin 3.6e-04
+== dt2: MISSING dumps
+== tol10: MISSING dumps
+== step: MISSING dumps
+== ang816: MISSING dumps

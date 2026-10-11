@@ -1,0 +1,6 @@
+R7F3/a_dual | R0/SEAM_sou.in | parthenon/time/nlim=60 hydro/dual_energy=true | 8
+R7F3/b_ghostsync | R0/SEAM_sou.in | parthenon/time/nlim=60 hydro/ghost_sync_rounds=1 | 8
+R7F3/c_compghost | R0/SEAM_sou.in | parthenon/time/nlim=60 hydro/dual_energy=true hydro/dual_comp_ghost=true | 8
+R7F3/d_heatrkl2 | R0/SEAM_sou.in | parthenon/time/nlim=60 hydro/dual_energy=true hydro/dual_energy_heat_rkl2=true | 8
+R7F3/e_resync | R0/SEAM_sou.in | parthenon/time/nlim=60 hydro/dual_energy=true hydro/dual_energy_exact_resync=true hydro/dual_energy_sync_step_end=true | 8
+R7F3/f_base | R0/SEAM_sou.in | parthenon/time/nlim=60 | 8

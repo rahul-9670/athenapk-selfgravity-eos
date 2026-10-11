@@ -1,0 +1,11 @@
+GATE G10 -- scattering does not exchange energy with the gas
+  --- arm ks0 ---
+    t = 3  cycle = 182   T = 0.768032492   Er = 0.347951228   conservation drift 1.177e-08 (tol 1.82e-07)
+    PASS : conservation
+  --- arm ks2 ---
+    t = 3  cycle = 182   T = 0.768032491   Er = 0.347951227   conservation drift 1.274e-08 (tol 1.82e-07)
+    PASS : conservation
+  --- invariance ---
+    T(kappa_s=0) = 0.768032492   T(kappa_s=2) = 0.768032491   relative difference 5.698e-10 (tol 1e-06)
+    PASS : equilibrium is independent of kappa_s
+G10 PASS (0 failures)

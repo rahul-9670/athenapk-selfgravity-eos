@@ -25,6 +25,8 @@
 #include "utils/error_checking.hpp"
 
 #include "../main.hpp"
+#include "../radiation/radiation.hpp"
+#include "../radiation/radiation_sn.hpp"
 
 namespace Hydro {
 namespace BoundaryFunction {
@@ -61,10 +63,13 @@ void DiodeBC(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
             : (X1 ? IndexDomain::outer_x1
                   : (X2 ? IndexDomain::outer_x2 : IndexDomain::outer_x3));
 
-  // FUSED PATH (hydro/fused_bc): Parthenon's GenericBC zero-gradient copy of every FillGhost field
-  // and the diode clamp on `cons` in ONE kernel over ONE pack (the values written are identical to
-  // the two-pass path below). Only taken when every FillGhost field is cell-centred and none is
-  // Metadata::Fine; otherwise the original path runs unchanged.
+  // FUSED PATH (hydro/fused_bc): Parthenon's GenericBC zero-gradient copy of every FillGhost field,
+  // the diode clamp on `cons` and the Sn incoming-ordinate override in ONE kernel over ONE pack (the
+  // values written are identical to the passes below: every ghost first takes the reference interior
+  // cell, the normal-momentum component of `cons` is then zeroed if it points inward, and the
+  // incoming Sn ordinates are then overwritten). The Sn Krylov vector is exchanged every BiCGSTAB
+  // iteration, so this function runs very often. Only taken when every FillGhost field is
+  // cell-centred and none is Metadata::Fine; otherwise the original path runs unchanged.
   if (pmb->packages.Get("Hydro")->Param<bool>("fused_bc")) {
     std::vector<std::string> names;
     bool fusable = true;
@@ -91,8 +96,27 @@ void DiodeBC(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
           cnt = ip.second - ip.first + 1;
         }
       };
-      int ic, nc;
+      int ic, nc, iu, nu, iy, ny, icy, ncy;
       rng("cons", ic, nc);
+      rng(Radiation::Sn::USolName(), iu, nu);
+      rng(Radiation::Sn::KyName(), iy, ny);
+  rng(Radiation::Sn::KcyName(), icy, ncy);   // R-F14: the coupled-solve (sn_fc_scatter) Krylov vector, nfa-wide
+      // Sn incoming override: the same parameters SnApplyIncomingBC reads.
+      int mode = 0, nang = 1;
+      Kokkos::View<Real *> ubg;
+      Radiation::Sn::DeviceAngles ang;
+      auto &all = pmb->packages.AllPackages();
+      auto it = all.find("radiation");
+      if (it != all.end() && it->second->AllParams().hasKey("sn_bc_mode")) {
+        mode = it->second->Param<int>("sn_bc_mode");
+        if (mode != 0) {
+          nang = it->second->Param<Radiation::Sn::SnParams>("sn_params").nang;
+          ubg = it->second->Param<Kokkos::View<Real *>>("sn_bc_ubg");
+          ang = it->second->Param<Radiation::Sn::DeviceAngles>("sn_angles");
+        }
+      }
+      if (mode == 0) nu = ny = ncy = 0;
+      auto nxv = ang.nx, nyv = ang.ny, nzv = ang.nz;
       const int cmom = (ic >= 0) ? ic + DIR : -1; // IM1/IM2/IM3 == DIR within cons
       const auto nvr = IndexRange{0, nv - 1};
       pmb->par_for_bndry(
@@ -102,6 +126,20 @@ void DiodeBC(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
             if (l == cmom) {
               const bool inward = INNER ? (val > 0.0) : (val < 0.0);
               if (inward) val = 0.0;
+            }
+            if (nu > 0 && l >= iu && l < iu + nu) {
+              const int n = l - iu;
+              const int a = n % nang;
+              const Real nc_ = X1 ? nxv(a) : (X2 ? nyv(a) : nzv(a));
+              if (INNER ? (nc_ > 0.0) : (nc_ < 0.0)) val = (mode == 2) ? ubg(n / nang) : 0.0;
+            } else if (ny > 0 && l >= iy && l < iy + ny && (l - iy) < nang) {
+              const int a = l - iy;
+              const Real nc_ = X1 ? nxv(a) : (X2 ? nyv(a) : nzv(a));
+              if (INNER ? (nc_ > 0.0) : (nc_ < 0.0)) val = 0.0;
+            } else if (ncy > 0 && l >= icy && l < icy + ncy) {
+              const int a = (l - icy) % nang;
+              const Real nc_ = X1 ? nxv(a) : (X2 ? nyv(a) : nzv(a));
+              if (INNER ? (nc_ > 0.0) : (nc_ < 0.0)) val = 0.0;
             }
             q(l, k, j, i) = val;
           });
@@ -132,9 +170,22 @@ void DiodeBC(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
         cons(v, k, j, i) = (normal_mom && inward) ? 0.0 : val;
       });
 
+  // Sn incoming-ordinate condition (radiation/sn_bc_incoming != outflow). The generic copy
+  // above has already filled sn.u and sn.k_y zero-gradient; this overwrites the INCOMING
+  // ordinates in the same ghost region. The pointer is null on the historical path, so a run
+  // without it (or without Sn at all) executes exactly the code above and nothing else.
+  {
+    auto &all = pmb->packages.AllPackages();
+    auto it = all.find("radiation");
+    if (it != all.end() && it->second->AllParams().hasKey("sn_bc_fun")) {
+      using SnBcFun = void (*)(std::shared_ptr<MeshBlockData<Real>> &, bool, int, bool);
+      auto fn = it->second->Param<SnBcFun>("sn_bc_fun");
+      if (fn != nullptr) fn(mbd, coarse, X1 ? 1 : (X2 ? 2 : 3), INNER);
+    }
+  }
 }
 
-//! VALIDATION-ONLY closed wall ("reflecting_val", validation_tests/self_gravity L6c, 2026-10-04).
+//! VALIDATION-ONLY closed wall ("reflecting_val", validation/self_gravity L6c, 2026-10-04).
 //! Mirror every FillGhost field across the face (Parthenon GenericBC Reflect), then rewrite `cons`
 //! as the mirror image with the NORMAL momentum and the NORMAL magnetic field negated
 //! (conducting wall; psi even). Mass flux through the face is exactly zero, so a pressure-confined
@@ -174,7 +225,7 @@ void ReflectValBC(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
       });
 }
 
-//! Mesh-level fused diode BC (bvals/fused_bc_mesh.cpp), registered as
+//! Mesh-level fused diode + Sn BC (bvals/fused_bc_mesh.cpp), registered as
 //! parthenon::MeshDataBoundaryHook() when all six domain faces are `diode`.
 bool FusedDiodeBCMesh(std::shared_ptr<MeshData<Real>> &md, bool coarse);
 void RegisterFusedDiodeBCMesh(parthenon::ParameterInput *pin);

@@ -1,0 +1,7 @@
+# R7-O1 opacity-table provenance (written by scripts/r7_o1_provenance.py)
+# generator src/radiation/gen_opacity_table.py md5 7612cc4cea536c2592d06b540cd0d5a2
+# recipe --nr 101 --nT 233 --rho_min 1e-20 --rho_max 1 --T_min 0.4755370 --T_max 299920
+# arm | generator args | regenerated md5 | reference | reference md5 | bytes | first difference | verdict
+v9_pollack_fmt3 | --evap pollack --format 3 | a7f55ddd49b470e7b86ac57770143108 | opacity_table_v9_pollack_fmt3.bin | a7f55ddd49b470e7b86ac57770143108 | 576112 | - | BIT-IDENTICAL
+v7_bl94_fmt3 | --evap bl94 --format 3 | 9e2d1b0b96e1a2328f468136a36f58ca | opacity_table_v7_f23_fmt3.bin | 9e2d1b0b96e1a2328f468136a36f58ca | 576112 | - | BIT-IDENTICAL
+v7_bl94_fmt2 | --evap bl94 --format 2 | 00729d41c7b8834665d438c33d1a0ceb | opacity_table_v7_f23_fmt2.bin | 00729d41c7b8834665d438c33d1a0ceb | 576080 | - | BIT-IDENTICAL

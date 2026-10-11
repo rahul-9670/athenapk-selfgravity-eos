@@ -1,0 +1,6 @@
+# R2 reference convergence (scripts/r2_refcheck.py): max |U - U_base| / max|U_base| vs Lp=80, nk=4096, S64
+Lp    80 nk   8192: tau 1.01 U 1.18e-05 V 2.08e-05 | tau 10 U 2.44e-06 V 2.58e-06
+Lp   160 nk   8192: tau 1.01 U 1.20e-08 V 9.66e-09 | tau 10 U 1.22e-09 V 1.29e-09
+Lp   160 nk  16384: tau 1.01 U 1.18e-05 V 2.08e-05 | tau 10 U 2.44e-06 V 2.58e-06
+S32 vs S64 at tau 10: U 1.29e-03
+S96 vs S64 at tau 10: U 3.40e-04

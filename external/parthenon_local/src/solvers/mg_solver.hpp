@@ -46,6 +46,9 @@ struct MGParams {
   std::string postsmoother = "SRJ2";
   int max_coarsenings = std::numeric_limits<int>::max();
   std::string prolongation = "OldLinear";
+  // ATHENAPK PATCH (2026-10-09): quiet = true suppresses the rank-0 per-call header and per-V-cycle residual lines of
+  // the standalone solver (the Sn gray DSA calls it twice per Krylov iteration).
+  bool quiet = false;
 
   MGParams() = default;
   MGParams(ParameterInput *pin, const std::string &input_block) {
@@ -65,6 +68,7 @@ struct MGParams {
         pin->GetOrAddString(input_block, "postsmoother", smoother,
                             {"SRJ1", "SRJ2", "SRJ3"}, "Post-smoother used in multigrid.");
     prolongation = pin->GetOrAddString(input_block, "prolongation", prolongation);
+    quiet = pin->GetOrAddBoolean(input_block, "quiet", quiet);
     max_coarsenings = pin->GetOrAddInteger(
         input_block, "max_coarsenings", max_coarsenings,
         "Maximum number of levels to include in the multigrid hierarchy.");
@@ -164,13 +168,13 @@ class MGSolver : public SolverBase, MGSolverCounter {
     iter_counter = -1;
     auto update_iter = itl.AddTask(
         TaskQualifier::local_sync | TaskQualifier::once_per_region, none, "print",
-        [](int *iter_counter) {
+        [](int *iter_counter, bool quiet) {
           (*iter_counter)++;
-          if (*iter_counter > 1 || Globals::my_rank != 0) return TaskStatus::complete;
+          if (quiet || *iter_counter > 1 || Globals::my_rank != 0) return TaskStatus::complete;
           printf("# [0] v-cycle\n# [1] rms-residual\n# [2] rms-error\n");
           return TaskStatus::complete;
         },
-        &iter_counter);
+        &iter_counter, params_.quiet);
     auto mg_finest =
         AddLinearOperatorTasks(itl, update_iter, default_partition_idx, pmesh);
 
@@ -200,7 +204,7 @@ class MGSolver : public SolverBase, MGSolverCounter {
         TaskQualifier::completion, get_res, "Check residual",
         [default_partition_idx](MGSolver *solver, Mesh *pmesh) {
           Real rms_res = std::sqrt(solver->residual.val / pmesh->GetTotalCells());
-          if (Globals::my_rank == 0 && default_partition_idx == 0)
+          if (Globals::my_rank == 0 && default_partition_idx == 0 && !solver->params_.quiet)
             printf("%i %e\n", solver->iter_counter, rms_res);
           solver->final_residual = rms_res;
           solver->final_iteration = solver->iter_counter;

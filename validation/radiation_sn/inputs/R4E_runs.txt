@@ -1,0 +1,7 @@
+R4E/d7_on | R4_D7_ref_er.in | hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 hydro/dual_energy=false radiation/sn_dual_energy=false radiation/sn_conserve_residual=true | 1
+R4E/d7_off | R4_D7_ref_er.in | hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 hydro/dual_energy=false radiation/sn_dual_energy=false | 1
+R4E/d7_on_dual | R4_D7_ref_er.in | hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 radiation/sn_conserve_residual=true | 1
+R4E/d7_on_nx16 | R4_D7_ref_er.in | hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 hydro/dual_energy=false radiation/sn_dual_energy=false radiation/sn_conserve_residual=true parthenon/mesh/nx1=16 parthenon/mesh/nx2=16 parthenon/mesh/nx3=16 parthenon/meshblock/nx1=16 parthenon/meshblock/nx2=16 parthenon/meshblock/nx3=16 | 1
+R4E/r1_a05_on | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=0.5 radiation/sn_conserve_residual=true | 1
+R4E/r1_a10_on | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 radiation/sn_conserve_residual=true | 1
+R4E/r1_a10_off | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 | 1

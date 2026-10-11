@@ -1,0 +1,1 @@
+R5/b_o12x24L | R5/b_P3_T300.in | radiation/sn_nzeta=12 radiation/sn_npsi=24 radiation/sn_precond_stencil=sou | 27

@@ -1,0 +1,56 @@
+# R-F13 on table v12 (Semenov 2003 + Helling 2001): group partitions, R5 problem (scripts/analyze_R13.py)
+# envelope T_gas vs the reference F34 (0.0625 dex over [1e12, 1e14]); Q = envelope heat int(e - e0) / Q_ref; x20/x50 = where T falls to 20/50 K [AU]; wall = s/cycle (1 rank, 1-D); it = Sn iterations/cycle
+T_core 150 K, end (t = 1.200e-05 code), reference F34:
+  G1   ng  1: max |dT/T| 3.651e-01  median 1.323e-01  Q/Q_ref 0.8654  x20  6.447  x50  4.358  T(3 AU)   71.10 K  wall 0.049  it 28
+  P3   ng  3: max |dT/T| 3.251e-01  median 4.638e-02  Q/Q_ref 0.8477  x20  6.368  x50  4.542  T(3 AU)   73.67 K  wall 0.134  it 29
+  E4   ng  4: max |dT/T| 3.686e-01  median 3.686e-02  Q/Q_ref 0.8122  x20  6.210  x50  4.475  T(3 AU)   73.56 K  wall 0.223  it 30
+  E5   ng  5: max |dT/T| 2.405e-01  median 4.236e-02  Q/Q_ref 0.8955  x20  6.555  x50  4.715  T(3 AU)   73.77 K  wall 0.280  it 32
+  X5   ng  5: max |dT/T| 2.691e-01  median 1.605e-02  Q/Q_ref 0.8653  x20  6.306  x50  4.749  T(3 AU)   75.01 K  wall 0.299  it 33
+  E6   ng  6: max |dT/T| 2.026e-01  median 4.099e-02  Q/Q_ref 0.9347  x20  6.644  x50  4.840  T(3 AU)   74.81 K  wall 0.343  it 32
+  W6   ng  6: max |dT/T| 3.325e-01  median 1.518e-02  Q/Q_ref 0.8216  x20  6.184  x50  4.626  T(3 AU)   74.76 K  wall 0.320  it 32
+  X6   ng  6: max |dT/T| 2.188e-01  median 1.680e-02  Q/Q_ref 0.8894  x20  6.423  x50  4.814  T(3 AU)   74.73 K  wall 0.338  it 32
+  X6b  ng  6: max |dT/T| 3.055e-01  median 8.108e-02  Q/Q_ref 0.9069  x20  6.280  x50  4.740  T(3 AU)   74.44 K  wall 0.340  it 32
+  X7   ng  7: max |dT/T| 1.307e-01  median 1.868e-02  Q/Q_ref 0.9403  x20  6.681  x50  4.921  T(3 AU)   74.94 K  wall 0.415  it 33
+  E8   ng  8: max |dT/T| 2.021e-01  median 4.141e-02  Q/Q_ref 0.9353  x20  6.647  x50  4.840  T(3 AU)   74.81 K  wall 0.439  it 33
+  X8   ng  8: max |dT/T| 9.327e-02  median 1.015e-02  Q/Q_ref 0.9640  x20  6.723  x50  5.009  T(3 AU)   75.79 K  wall 0.481  it 34
+  F10  ng 10: max |dT/T| 9.572e-02  median 4.534e-03  Q/Q_ref 0.9592  x20  6.758  x50  4.991  T(3 AU)   75.69 K  wall 0.603  it 34
+  L18  ng 18: max |dT/T| 9.443e-02  median 6.175e-03  Q/Q_ref 0.9608  x20  6.765  x50  4.992  T(3 AU)   75.70 K  wall 0.998  it 33
+  F18  ng 18: max |dT/T| 2.073e-02  median 2.989e-03  Q/Q_ref 0.9885  x20  6.853  x50  5.093  T(3 AU)   76.16 K  wall 1.152  it 35
+  M34  ng 34: max |dT/T| 1.889e-02  median 1.323e-03  Q/Q_ref 0.9906  x20  6.862  x50  5.095  T(3 AU)   76.18 K  wall 2.003  it 34
+  F34  ng 34: max |dT/T| 0.000e+00  median 0.000e+00  Q/Q_ref 1.0000  x20  6.891  x50  5.121  T(3 AU)   76.28 K  wall 2.245  it 35
+T_core 300 K, end (t = 1.200e-05 code), reference F34:
+  G1   ng  1: max |dT/T| 4.949e-01  median 1.835e-01  Q/Q_ref 0.9092  x20 13.527  x50 10.219  T(3 AU)  165.74 K  wall 0.174  it 106
+  P3   ng  3: max |dT/T| 5.220e-01  median 5.005e-02  Q/Q_ref 0.9103  x20 11.977  x50 10.321  T(3 AU)  168.09 K  wall 0.480  it 110
+  E4   ng  4: max |dT/T| 5.770e-01  median 2.365e-02  Q/Q_ref 0.9057  x20 11.589  x50 10.235  T(3 AU)  167.99 K  wall 0.875  it 130
+  E5   ng  5: max |dT/T| 4.387e-01  median 2.424e-02  Q/Q_ref 0.9272  x20 12.094  x50 10.542  T(3 AU)  167.29 K  wall 1.015  it 117
+  X5   ng  5: max |dT/T| 4.341e-01  median 1.758e-02  Q/Q_ref 0.9466  x20 11.904  x50 10.630  T(3 AU)  167.75 K  wall 1.102  it 130
+  E6   ng  6: max |dT/T| 3.877e-01  median 4.053e-02  Q/Q_ref 0.9383  x20 12.435  x50 10.616  T(3 AU)  166.47 K  wall 1.765  it 173
+  W6   ng  6: max |dT/T| 5.532e-01  median 4.110e-02  Q/Q_ref 0.9119  x20 11.590  x50 10.336  T(3 AU)  167.71 K  wall 1.448  it 146
+  X6   ng  6: max |dT/T| 3.372e-01  median 1.562e-02  Q/Q_ref 0.9620  x20 12.123  x50 10.781  T(3 AU)  167.86 K  wall 1.226  it 121
+  X6b  ng  6: max |dT/T| 3.705e-01  median 6.138e-02  Q/Q_ref 0.9584  x20 12.525  x50 10.686  T(3 AU)  167.02 K  wall 1.221  it 119
+  X7   ng  7: max |dT/T| 1.931e-01  median 1.560e-02  Q/Q_ref 0.9778  x20 12.510  x50 10.942  T(3 AU)  167.58 K  wall 1.423  it 119
+  E8   ng  8: max |dT/T| 3.872e-01  median 4.097e-02  Q/Q_ref 0.9385  x20 12.439  x50 10.617  T(3 AU)  166.48 K  wall 2.468  it 191
+  X8   ng  8: max |dT/T| 1.424e-01  median 1.062e-02  Q/Q_ref 0.9863  x20 12.588  x50 11.012  T(3 AU)  167.66 K  wall 1.673  it 124
+  F10  ng 10: max |dT/T| 2.050e-01  median 6.140e-03  Q/Q_ref 0.9754  x20 12.554  x50 10.925  T(3 AU)  167.45 K  wall 2.263  it 134
+  L18  ng 18: max |dT/T| 2.028e-01  median 5.673e-03  Q/Q_ref 0.9760  x20 12.564  x50 10.927  T(3 AU)  167.47 K  wall 3.827  it 133
+  F18  ng 18: max |dT/T| 4.498e-02  median 4.852e-03  Q/Q_ref 0.9953  x20 12.696  x50 11.111  T(3 AU)  167.78 K  wall 4.560  it 150
+  M34  ng 34: max |dT/T| 4.267e-02  median 2.636e-03  Q/Q_ref 0.9958  x20 12.708  x50 11.113  T(3 AU)  167.80 K  wall 8.912  it 155
+  F34  ng 34: max |dT/T| 0.000e+00  median 0.000e+00  Q/Q_ref 1.0000  x20 12.758  x50 11.156  T(3 AU)  167.84 K  wall 7.663  it 125
+T_core 1000 K, end (t = 1.200e-05 code), reference F34:
+  G1   ng  1: max |dT/T| 1.219e-01  median 1.151e-01  Q/Q_ref 0.8817  x20    nan  x50    nan  T(3 AU)  785.15 K  wall 0.433  it 267
+  P3   ng  3: max |dT/T| 9.831e-02  median 9.001e-02  Q/Q_ref 1.0904  x20    nan  x50    nan  T(3 AU)  966.47 K  wall 4.034  it 801
+  E4   ng  4: max |dT/T| 9.943e-02  median 8.702e-02  Q/Q_ref 1.0921  x20    nan  x50    nan  T(3 AU)  960.57 K  wall 3.857  it 577
+  E5   ng  5: max |dT/T| 2.545e-01  median 2.456e-01  Q/Q_ref 1.2544  x20    nan  x50    nan  T(3 AU) 1105.15 K  wall 2.633  it 308
+  X5   ng  5: max |dT/T| 9.697e-02  median 8.739e-02  Q/Q_ref 1.0888  x20    nan  x50    nan  T(3 AU)  963.32 K  wall 2.872  it 339
+  E6   ng  6: max |dT/T| 4.121e-02  median 2.502e-02  Q/Q_ref 1.0310  x20    nan  x50    nan  T(3 AU)  901.71 K  wall 4.176  it 412
+  W6   ng  6: max |dT/T| 1.108e-01  median 1.036e-01  Q/Q_ref 0.8988  x20    nan  x50    nan  T(3 AU)  794.36 K  wall 3.509  it 347
+  X6  : FAILED -- NaN guard at cycle 17; NOT CONVERGED x1, recurrence disagreements x0; Sn iterations per step mean 405 max 724
+  X6b  ng  6: max |dT/T| 9.924e-02  median 9.067e-02  Q/Q_ref 1.0924  x20    nan  x50    nan  T(3 AU)  966.53 K  wall 3.677  it 361
+  X7   ng  7: max |dT/T| 2.451e-02  median 1.716e-02  Q/Q_ref 1.0165  x20    nan  x50    nan  T(3 AU)  902.46 K  wall 4.067  it 346
+  E8   ng  8: max |dT/T| 8.319e-02  median 7.460e-02  Q/Q_ref 1.0812  x20    nan  x50    nan  T(3 AU)  952.74 K  wall 4.691  it 349
+  X8   ng  8: max |dT/T| 1.217e-01  median 1.173e-01  Q/Q_ref 0.8801  x20    nan  x50    nan  T(3 AU)  785.51 K  wall 4.833  it 357
+  F10  ng 10: max |dT/T| 4.058e-02  median 2.562e-02  Q/Q_ref 0.9740  x20    nan  x50    nan  T(3 AU)  856.89 K  wall 7.239  it 434
+  L18  ng 18: max |dT/T| 7.595e-02  median 6.762e-02  Q/Q_ref 1.0081  x20    nan  x50    nan  T(3 AU)  958.56 K  wall 14.927  it 497
+  F18  ng 18: max |dT/T| 3.394e-01  median 1.899e-01  Q/Q_ref 1.1891  x20    nan  x50    nan  T(3 AU)  932.16 K  wall 15.794  it 520
+  M34  ng 34: max |dT/T| 3.503e-01  median 2.882e-01  Q/Q_ref 1.2889  x20    nan  x50    nan  T(3 AU) 1095.91 K  wall 25.304  it 428
+  F34  ng 34: max |dT/T| 0.000e+00  median 0.000e+00  Q/Q_ref 1.0000  x20    nan  x50    nan  T(3 AU)  892.71 K  wall 27.337  it 461

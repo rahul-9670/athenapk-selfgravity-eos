@@ -1,0 +1,20 @@
+# R-F3: coupled Fleck & Cummings (sn_fc_scatter) vs legacy same-group split, 0-D R1 problems (analyze_RF3.py)
+# impl = code vs its discrete model (FC: imc_step; legacy: code_step); errors vs exact ODE at t = 1..4 x 1.1e-5
+== g100r30_c2
+  k=0 FC     impl 3.1e-08 | live groups 6.18e-03 1.76e-05 1.97e-08 2.84e-09 | group 0 6.18e-03 1.76e-05 1.97e-08 2.84e-09
+  k=0 legacy impl 1.3e-08 | live groups 3.54e-01 1.55e-01 6.75e-02 2.95e-02 | group 0 3.54e-01 1.55e-01 6.75e-02 2.95e-02
+== g100r30_tab
+  k=0 FC     impl 3.6e-10 | live groups 4.25e-03 2.00e-06 7.46e-10 2.71e-10 | group 0 4.25e-03 2.00e-06 7.46e-10 1.35e-10
+  k=0 legacy impl 2.1e-07 | live groups 2.55e-01 8.00e-02 2.51e-02 7.89e-03 | group 0 2.55e-01 8.00e-02 2.51e-02 7.89e-03
+== g30r100_c2
+  k=0 FC     impl 1.1e-09 | live groups 1.18e-02 3.45e-06 2.09e-09 1.66e-10 | group 0 1.18e-02 3.45e-06 2.09e-09 6.01e-11
+  k=0 legacy impl 1.1e-08 | live groups 1.98e-03 4.54e-06 1.96e-08 1.12e-08 | group 0 1.98e-03 4.54e-06 1.96e-08 1.12e-08
+== g30r100_tab
+  k=0 FC     impl 4.2e-09 | live groups 1.32e-02 8.70e-06 1.22e-09 1.90e-10 | group 0 1.32e-02 8.70e-06 1.22e-09 9.34e-11
+  k=0 legacy impl 6.8e-09 | live groups 6.11e-03 2.43e-06 7.43e-09 5.25e-09 | group 0 1.29e-03 2.43e-06 7.43e-09 3.85e-09
+== g15r10_tab
+  k=0 FC     impl 4.7e-10 | live groups 5.40e-04 4.32e-07 4.48e-10 1.74e-11 | group 0 5.40e-04 4.32e-07 4.48e-10 1.30e-11
+  k=0 legacy impl 9.2e-11 | live groups 5.66e-04 4.82e-07 3.18e-10 6.42e-12 | group 0 5.66e-04 4.82e-07 3.18e-10 6.42e-12
+== g100r30_c0
+  k=0 FC     impl 7.9e-10 | live groups 3.90e-03 2.04e-07 7.94e-10 6.50e-10 | group 0 3.90e-03 2.04e-07 7.94e-10 2.16e-10
+  k=0 legacy impl 1.8e-06 | live groups 2.89e-03 1.79e-05 1.72e-07 1.69e-07 | group 0 2.89e-03 1.79e-05 1.72e-07 1.69e-07

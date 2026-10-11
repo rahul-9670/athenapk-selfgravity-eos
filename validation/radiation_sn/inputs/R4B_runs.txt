@@ -1,0 +1,5 @@
+R4B/d7_ref | R4_D7_ref.in | hydro/dual_energy=false radiation/sn_dual_energy=false hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 | 1
+R4B/d7_norad | R4_D7_ref.in | hydro/dual_energy=false radiation/sn_dual_energy=false hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 physics/radiation=false | 1
+R4B/d7_nocouple | R4_D7_ref.in | hydro/dual_energy=false radiation/sn_dual_energy=false hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 radiation/sn_matter_coupling=false | 1
+R4B/d7_tol12 | R4_D7_ref.in | hydro/dual_energy=false radiation/sn_dual_energy=false hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 radiation/sn_rel_tol=1.0e-12 | 1
+R4B/d7_dual | R4_D7_ref.in | hydro/max_dt=4.0e-4 parthenon/time/tlim=0.4 parthenon/output0/dt=0.02 | 1

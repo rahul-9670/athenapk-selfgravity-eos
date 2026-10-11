@@ -1,0 +1,44 @@
+# R-F3: coupled Fleck & Cummings (sn_fc_scatter) vs legacy same-group split, 0-D R1 problems (analyze_RF3.py)
+# impl = code vs its discrete model (FC: imc_step; legacy: code_step); errors vs exact ODE at t = 1..4 x 1.1e-5
+== g100r30_c2
+  k=0 FC     impl 3.1e-08 | live groups 6.18e-03 1.76e-05 1.97e-08 2.84e-09 | group 0 6.18e-03 1.76e-05 1.97e-08 2.84e-09
+  k=0 legacy impl 1.3e-08 | live groups 3.54e-01 1.55e-01 6.75e-02 2.95e-02 | group 0 3.54e-01 1.55e-01 6.75e-02 2.95e-02
+  k=1 FC     impl 1.2e-07 | live groups 1.42e-07 6.75e-08 5.25e-08 2.11e-08 | group 0 1.42e-07 6.75e-08 5.25e-08 2.11e-08
+  k=1 legacy impl 3.2e-07 | live groups 3.02e-02 1.12e-03 4.19e-05 1.88e-06 | group 0 3.02e-02 1.12e-03 4.19e-05 1.88e-06
+  k=2 FC     impl 1.5e-08 | live groups 1.51e-08 1.26e-09 9.43e-10 9.43e-10 | group 0 1.51e-08 1.26e-09 2.87e-10 2.91e-10
+  k=2 legacy impl 3.2e-08 | live groups 1.01e-06 3.17e-08 1.02e-08 1.02e-08 | group 0 1.01e-06 3.17e-08 4.71e-09 3.13e-09
+== g100r30_tab
+  k=0 FC     impl 3.6e-10 | live groups 4.25e-03 2.00e-06 7.46e-10 2.71e-10 | group 0 4.25e-03 2.00e-06 7.46e-10 1.35e-10
+  k=0 legacy impl 2.1e-07 | live groups 2.55e-01 8.00e-02 2.51e-02 7.89e-03 | group 0 2.55e-01 8.00e-02 2.51e-02 7.89e-03
+  k=1 FC     impl 1.2e-09 | live groups 2.40e-10 1.18e-09 4.23e-10 6.60e-10 | group 0 5.09e-11 1.18e-09 4.23e-10 6.60e-10
+  k=1 legacy impl 1.8e-06 | live groups 7.95e-03 7.81e-05 2.20e-06 1.78e-06 | group 0 7.95e-03 7.81e-05 2.20e-06 1.78e-06
+  k=2 FC     impl 6.7e-09 | live groups 6.75e-09 6.75e-09 6.75e-09 6.75e-09 | group 0 1.19e-09 2.06e-09 2.02e-09 2.00e-09
+  k=2 legacy impl 2.3e-07 | live groups 2.31e-07 1.86e-08 2.46e-09 2.46e-09 | group 0 2.31e-07 1.86e-08 2.45e-09 9.25e-10
+== g30r100_c2
+  k=0 FC     impl 1.1e-09 | live groups 1.18e-02 3.45e-06 2.09e-09 1.66e-10 | group 0 1.18e-02 3.45e-06 2.09e-09 6.01e-11
+  k=0 legacy impl 1.1e-08 | live groups 1.98e-03 4.54e-06 1.96e-08 1.12e-08 | group 0 1.98e-03 4.54e-06 1.96e-08 1.12e-08
+  k=1 FC     impl 6.3e-10 | live groups 6.53e-10 5.20e-11 5.21e-11 5.22e-11 | group 0 6.53e-10 1.92e-11 2.07e-11 2.10e-11
+  k=1 legacy impl 3.1e-09 | live groups 3.24e-09 7.61e-11 7.57e-11 7.52e-11 | group 0 3.24e-09 2.83e-11 2.85e-11 2.82e-11
+  k=2 FC     impl 8.9e-11 | live groups 8.82e-11 8.85e-11 8.87e-11 8.89e-11 | group 0 3.52e-11 3.53e-11 3.52e-11 3.54e-11
+  k=2 legacy impl 4.0e-10 | live groups 4.02e-10 4.02e-10 4.02e-10 4.02e-10 | group 0 1.58e-10 1.58e-10 1.58e-10 1.58e-10
+== g30r100_tab
+  k=0 FC     impl 4.2e-09 | live groups 1.32e-02 8.70e-06 1.22e-09 1.90e-10 | group 0 1.32e-02 8.70e-06 1.22e-09 9.34e-11
+  k=0 legacy impl 6.8e-09 | live groups 6.11e-03 2.43e-06 7.43e-09 5.25e-09 | group 0 1.29e-03 2.43e-06 7.43e-09 3.85e-09
+  k=1 FC     impl 3.8e-09 | live groups 4.12e-09 5.01e-11 5.01e-11 5.01e-11 | group 0 4.12e-09 2.02e-11 2.02e-11 2.03e-11
+  k=1 legacy impl 5.1e-10 | live groups 1.05e-09 5.20e-11 5.20e-11 5.20e-11 | group 0 1.05e-09 2.10e-11 2.10e-11 2.10e-11
+  k=2 FC     impl 7.5e-11 | live groups 7.48e-11 7.46e-11 7.46e-11 7.46e-11 | group 0 2.87e-11 2.87e-11 2.87e-11 2.87e-11
+  k=2 legacy impl 3.4e-12 | live groups 3.25e-12 3.40e-12 3.35e-12 3.37e-12 | group 0 1.90e-12 1.90e-12 1.90e-12 1.90e-12
+== g15r10_tab
+  k=0 FC     impl 4.7e-10 | live groups 5.40e-04 4.32e-07 4.48e-10 1.71e-11 | group 0 5.40e-04 4.32e-07 4.48e-10 1.28e-11
+  k=0 legacy impl 9.2e-11 | live groups 5.66e-04 4.82e-07 3.18e-10 6.42e-12 | group 0 5.66e-04 4.82e-07 3.18e-10 6.42e-12
+  k=1 FC     impl 8.7e-11 | live groups 1.56e-10 9.96e-12 9.83e-12 9.71e-12 | group 0 1.56e-10 4.63e-12 4.58e-12 4.52e-12
+  k=1 legacy impl 3.5e-12 | live groups 6.96e-11 9.60e-13 9.60e-13 9.59e-13 | group 0 6.96e-11 4.48e-13 4.48e-13 4.47e-13
+  k=2 FC     impl 8.1e-13 | live groups 8.15e-13 7.00e-13 5.78e-13 4.57e-13 | group 0 3.80e-13 3.27e-13 2.70e-13 2.13e-13
+  k=2 legacy impl 3.5e-13 | live groups 3.45e-13 3.45e-13 3.44e-13 3.44e-13 | group 0 1.59e-13 1.59e-13 1.59e-13 1.59e-13
+== g100r30_c0
+  k=0 FC     impl 7.9e-10 | live groups 3.90e-03 2.04e-07 7.94e-10 6.50e-10 | group 0 3.90e-03 2.04e-07 7.94e-10 2.16e-10
+  k=0 legacy impl 1.8e-06 | live groups 2.89e-03 1.79e-05 1.72e-07 1.69e-07 | group 0 2.89e-03 1.79e-05 1.72e-07 1.69e-07
+  k=1 FC     impl 7.4e-09 | live groups 7.42e-09 7.43e-09 7.43e-09 7.43e-09 | group 0 2.97e-09 2.08e-09 2.07e-09 2.04e-09
+  k=1 legacy impl 5.0e-08 | live groups 5.10e-08 2.73e-08 2.73e-08 2.73e-08 | group 0 5.10e-08 8.04e-09 8.09e-09 8.09e-09
+  k=2 FC     impl 9.0e-10 | live groups 4.44e-10 8.99e-10 2.47e-10 6.57e-11 | group 0 4.44e-10 8.99e-10 2.47e-10 6.26e-11
+  k=2 legacy impl 2.7e-08 | live groups 2.74e-08 2.74e-08 2.74e-08 2.74e-08 | group 0 8.12e-09 8.12e-09 8.12e-09 8.12e-09

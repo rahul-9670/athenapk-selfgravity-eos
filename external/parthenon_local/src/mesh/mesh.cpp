@@ -96,6 +96,12 @@ Mesh::Mesh(ParameterInput *pin, ApplicationInput *app_in, Packages_t &packages,
       do_coalesced_comms{pin->GetOrAddBoolean(
           "parthenon/mesh", "do_coalesced_comms", false,
           "Use coalesced MPI messages for inter-block communication")},
+      flat_bnd_kernels{pin->GetOrAddBoolean(
+          "parthenon/mesh", "flat_bnd_kernels", false,
+          "Boundary pack/unpack kernels with one thread per buffer element")},
+      coalesced_batch_pack{pin->GetOrAddBoolean(
+          "parthenon/mesh", "coalesced_batch_pack", false,
+          "Coalesced comms: pack for all neighbour ranks, fence once, then send")},
       nbuf_add_{pin->GetOrAddInteger(
           "parthenon/mesh", "comm_buffer_chunk_size", -1,
           "Number of comm buffers to allocate when more are required. Default is a "

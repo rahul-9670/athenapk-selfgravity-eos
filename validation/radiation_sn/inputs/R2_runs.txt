@@ -1,0 +1,12 @@
+R2/base_p | R2/su_base_p.in | | 1
+R2/base_m | R2/su_base_m.in | | 1
+R2/dz2_p | R2/su_dz2_p.in | | 1
+R2/dz2_m | R2/su_dz2_m.in | | 1
+R2/dt2_p | R2/su_dt2_p.in | | 1
+R2/dt2_m | R2/su_dt2_m.in | | 1
+R2/tol10_p | R2/su_tol10_p.in | | 1
+R2/tol10_m | R2/su_tol10_m.in | | 1
+R2/step_p | R2/su_step_p.in | | 1
+R2/step_m | R2/su_step_m.in | | 1
+R2/ang816_p | R2/su_ang816_p.in | | 1
+R2/ang816_m | R2/su_ang816_m.in | | 1

@@ -113,6 +113,39 @@ TaskStatus SendBoundBufsWithRestrictOption(std::shared_ptr<MeshData<Real>> &md,
   auto &sending_nonzero_flags = cache.sending_non_zero_flags;
   auto &sending_nonzero_flags_h = cache.sending_non_zero_flags_h;
 
+  if (pmesh->flat_bnd_kernels) {   // parthenon/mesh/flat_bnd_kernels: one thread per buffer element
+    Kokkos::parallel_for(
+        "SendBoundBufsFlat", Kokkos::TeamPolicy<>(parthenon::DevExecSpace(), nbound, Kokkos::AUTO),
+        KOKKOS_LAMBDA(parthenon::team_mbr_t team_member) {
+          const int b = team_member.league_rank();
+          if (!bnd_info(b).allocated || bnd_info(b).same_to_same) {
+            Kokkos::single(Kokkos::PerTeam(team_member), [&]() { sending_nonzero_flags(b) = false; });
+            return;
+          }
+          const Real threshold = bnd_info(b).var.allocation_threshold;
+          bool non_zero[3]{false, false, false};
+          int idx_offset = 0;
+          for (int it = 0; it < bnd_info(b).ntopological_elements; ++it) {
+            auto &idxer = bnd_info(b).idxer[it];
+            const int iel = static_cast<int>(bnd_info(b).topo_idx[it]) % 3;
+            const int off = idx_offset;
+            Kokkos::parallel_reduce(
+                Kokkos::TeamThreadRange<>(team_member, static_cast<int>(idxer.size())),
+                [&](const int idx, bool &lnon_zero) {
+                  const auto [t, u, v, k, j, i] = idxer(idx);
+                  const Real val = bnd_info(b).var(iel, t, u, v, k, j, i);
+                  bnd_info(b).buf(idx + off) = val;
+                  lnon_zero = lnon_zero || (std::abs(val) >= threshold) ||
+                              (bound_type == BoundaryType::flxcor_send);
+                },
+                Kokkos::LOr<bool, parthenon::DevMemSpace>(non_zero[iel]));
+            idx_offset += idxer.size();
+          }
+          Kokkos::single(Kokkos::PerTeam(team_member), [&]() {
+            sending_nonzero_flags(b) = non_zero[0] || non_zero[1] || non_zero[2];
+          });
+        });
+  } else
   Kokkos::parallel_for(
       PARTHENON_AUTO_LABEL,
       Kokkos::TeamPolicy<>(parthenon::DevExecSpace(), nbound, Kokkos::AUTO),
@@ -305,6 +338,7 @@ TaskStatus SetBounds(std::shared_ptr<MeshData<Real>> &md) {
   }
   // const Real threshold = Globals::sparse_config.allocation_threshold;
   auto &bnd_info = cache.bnd_info;
+  const bool flat = pmesh->flat_bnd_kernels;   // parthenon/mesh/flat_bnd_kernels: one thread per buffer element
   Kokkos::parallel_for(
       PARTHENON_AUTO_LABEL,
       Kokkos::TeamPolicy<>(parthenon::DevExecSpace(), nbound, Kokkos::AUTO),
@@ -321,7 +355,16 @@ TaskStatus SetBounds(std::shared_ptr<MeshData<Real>> &md) {
           Real fac = ftemp; // Can't capture structured bindings
           const int iel = static_cast<int>(tel) % 3;
           const int Ni = idxer.template EndIdx<5>() - idxer.template StartIdx<5>() + 1;
-          if (bnd_info(b).buf_allocated && bnd_info(b).allocated) {
+          if (flat && bnd_info(b).buf_allocated && bnd_info(b).allocated) {
+            const int off = idx_offset;
+            Kokkos::parallel_for(
+                Kokkos::TeamThreadRange<>(team_member, static_cast<int>(idxer.size())), [&](const int idx) {
+                  const auto [t, u, v, k, j, i] = idxer(idx);
+                  const int tt = t, uu = u, vv = v;
+                  const auto [il, jl, kl] = lcoord_trans.InverseTransform({i, j, k});
+                  if (idxer.IsActive(kl, jl, il)) var(iel, tt, uu, vv, kl, jl, il) = fac * bnd_info(b).buf(idx + off);
+                });
+          } else if (bnd_info(b).buf_allocated && bnd_info(b).allocated) {
             Kokkos::parallel_for(
                 Kokkos::TeamThreadRange<>(team_member, idxer.size() / Ni),
                 [&](const int idx) {

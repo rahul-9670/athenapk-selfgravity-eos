@@ -1,0 +1,6 @@
+R13/F34_T150 | R13/F34_T150.in | radiation/sn_precond_stencil=sou | 1
+R13/M34_T150 | R13/M34_T150.in | radiation/sn_precond_stencil=sou | 1
+R13/F34_T300 | R13/F34_T300.in | radiation/sn_precond_stencil=sou | 1
+R13/M34_T300 | R13/M34_T300.in | radiation/sn_precond_stencil=sou | 1
+R13/F34_T1000 | R13/F34_T1000.in | radiation/sn_precond_stencil=sou | 1
+R13/M34_T1000 | R13/M34_T1000.in | radiation/sn_precond_stencil=sou | 1

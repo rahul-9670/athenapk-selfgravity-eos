@@ -1,0 +1,3 @@
+R7F2/prod_nodual | R0/SEAM_prod.in | hydro/dual_energy=false radiation/sn_dual_energy=false | 8
+R7F2/prod_noghost | R0/SEAM_prod.in | hydro/dual_comp_ghost=false hydro/ghost_sync_rounds=0 | 8
+R7F2/sou_dual | R0/SEAM_sou.in | hydro/dual_energy=true hydro/dual_energy_eta1=5e-2 hydro/dual_energy_sync_step_end=true hydro/dual_energy_unsigned_prim=true hydro/dual_energy_exact_resync=true hydro/dual_energy_eta2=0.1 hydro/dual_energy_kappa=3.0 hydro/dual_energy_shock_comp=0.02 hydro/dual_energy_shared_select=true hydro/dual_comp_ghost=true hydro/dual_energy_heat_rkl2=true hydro/boundary_clamp_dual=true hydro/ghost_sync_rounds=1 radiation/sn_dual_energy=true | 8

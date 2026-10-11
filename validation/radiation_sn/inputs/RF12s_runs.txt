@@ -1,0 +1,2 @@
+RF12s/G1 | R13/G1_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_sou_limiter=none parthenon/time/nlim=1 parthenon/output9/file_type=hdf5 parthenon/output9/dn=1 parthenon/output9/variables=sn.u,sn.un,sn.chia,sn.chis,sn.fleck,sn.src | 1
+RF12s/P3noex | R13/P3_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_sou_limiter=none parthenon/time/nlim=1 radiation/sn_rosseland_excess=false parthenon/output9/file_type=hdf5 parthenon/output9/dn=1 parthenon/output9/variables=sn.u,sn.un,sn.chia,sn.chis,sn.fleck,sn.src | 1

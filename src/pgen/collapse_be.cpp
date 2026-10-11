@@ -32,6 +32,7 @@
 
 #include "../main.hpp"
 #include "../eos/adiabatic_glmmhd.hpp" // AUDIT F-45: EOS-table IC thermal state
+#include "../radiation/radiation_groups.hpp" // multigroup LTE seeding (GroupFieldNames)
 #include "../units.hpp" // canonical Heaviside-Lorentz magnetic-unit definition (audit #3)
 #include "../units/be_normalization.hpp" // Phase 1: shared BE base-scale derivation
 #include "../units/physical_units.hpp"   // Phase 1: authoritative units (consistency guard)
@@ -48,7 +49,7 @@ constexpr Real rc_code        = 6.45;        // BE radius in code units
 constexpr Real rcsq_code      = 26.0 / 3.0;  // BE profile scale^2
 constexpr Real bemass_code    = 197.561;     // total mass of critical BE sphere
 
-// VALIDATION (2026-10-03, validation_tests/self_gravity L6/L7): optional EXACT isothermal
+// VALIDATION (2026-10-03, validation/self_gravity L6/L7): optional EXACT isothermal
 // Bonnor-Ebert profile, rho = exp(-psi(r)) from the isothermal Lane-Emden equation (in code
 // units xi = r), truncated at r = xi_max. Default `be_profile = tomida` with xi_max = 6.45 is the
 // historical (production) profile and radius -- identical arithmetic. Host-side only (the IC is
@@ -376,7 +377,8 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
         // Pressure: isothermal c_s = 1 (T=10K), so the BE-equilibrium pressure is
         // p = rho * c_s^2 = rho.
         //
-        // ApplyBarotropicCooling overwrites e_th every step, so this sets only the t = 0 state.
+        // Without radiation ApplyBarotropicCooling overwrites e_th every step, so this sets only the
+        // t = 0 state. With radiation the barotropic overwrite is skipped and this IC energy is kept.
         const Real p = rho;
 
         u(IDN, k, j, i) = rho;
@@ -727,6 +729,75 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
     }
   }
   u_dev.DeepCopy(u);
+
+  // ============================================================================
+  // Seed the radiation field in LTE with the initial gas (only when the
+  // radiation package is active). Er = arad * T^4, isotropic (Fr = 0). Without
+  // this, Er defaults to 0 and the matter-coupling solve would drain a ~arad*T^4
+  // chunk of gas thermal energy on the first step (a spurious t=0 cooling
+  // transient). Mirrors the ir = T^4 seed used in the Athena++ collapse_rad pgen.
+  // ============================================================================
+  if (pmb->packages.AllPackages().count("radiation") > 0) {
+    auto rad_pkg = pmb->packages.Get("radiation");
+    const Real arad = rad_pkg->Param<Real>("arad");
+    // Multigroup: seed EACH group in LTE, Er_g = arad*T^4 * PlanckFraction(g,T), Fr_g = 0.
+    // For n_group=1 PlanckFraction(0)=1 => Er_0 = arad*T^4 (bit-identical to the gray seed).
+    // Parthenon does not zero-init Independent fields, so the group>0 fields MUST be seeded
+    // here or the first multigroup step reads garbage.
+    const int n_group = rad_pkg->Param<int>("n_group");
+    const Real T_unit = rad_pkg->Param<Real>("T_unit");
+    const auto &eos_ic_seed =
+        pmb->packages.Get("Hydro")->Param<AdiabaticGLMMHDEOS>("eos").GetEosTable();
+    const Radiation::RadGroups groups = rad_pkg->Param<Radiation::RadGroups>("groups");
+    std::vector<decltype(data->Get("rad.Er").data.GetHostMirrorAndCopy())> gEr, gFx, gFy, gFz;
+    for (int g = 0; g < n_group; ++g) {
+      const auto nm = Radiation::GroupFieldNames(g);
+      gEr.push_back(data->Get(nm[0]).data.GetHostMirrorAndCopy());
+      gFx.push_back(data->Get(nm[1]).data.GetHostMirrorAndCopy());
+      gFy.push_back(data->Get(nm[2]).data.GetHostMirrorAndCopy());
+      gFz.push_back(data->Get(nm[3]).data.GetHostMirrorAndCopy());
+    }
+    for (int k = kb.s; k <= kb.e; ++k) {
+      for (int j = jb.s; j <= jb.e; ++j) {
+        for (int i = ib.s; i <= ib.e; ++i) {
+          const Real rho = u(IDN, k, j, i);
+          const Real ke  = 0.5 / rho * (u(IM1, k, j, i) * u(IM1, k, j, i)
+                                      + u(IM2, k, j, i) * u(IM2, k, j, i)
+                                      + u(IM3, k, j, i) * u(IM3, k, j, i));
+          const Real me  = mhd ? 0.5 * (u(IB1, k, j, i) * u(IB1, k, j, i)
+                                      + u(IB2, k, j, i) * u(IB2, k, j, i)
+                                      + u(IB3, k, j, i) * u(IB3, k, j, i))
+                               : 0.0;
+          const Real p   = gm1 * (u(IEN, k, j, i) - ke - me);
+          // T_code (= 1 at the 10 K IC). For the tabulated EOS the ideal relation p/rho
+          // does not hold; the BE-sphere IC is isothermal at 10 K everywhere => T_code=1.
+          // AUDIT F-45: was a hardcoded 1.0 under the tabulated EOS ("the BE-sphere IC is
+          // isothermal at 10 K everywhere => T_code=1"). True in intent, false in fact: the
+          // IC's own energy put it at T_code = 1.0179 (10.194 K), so Er was seeded 7.3 % low.
+          // Now that e_int_over_p is inverted from the table at T_code = 1 the two agree by
+          // construction, and reading the table here keeps them agreeing if either changes.
+          const Real T   = use_h2diss
+                               ? eos_ic_seed.TemperatureKHost(rho, u(IEN, k, j, i) - ke - me) /
+                                     T_unit
+                               : p / rho;
+          const Real Beq = arad * T * T * T * T;
+          for (int g = 0; g < n_group; ++g) {
+            gEr[g](0, k, j, i) = Beq * groups.PlanckFraction(g, T * T_unit);
+            gFx[g](0, k, j, i) = 0.0;
+            gFy[g](0, k, j, i) = 0.0;
+            gFz[g](0, k, j, i) = 0.0;
+          }
+        }
+      }
+    }
+    for (int g = 0; g < n_group; ++g) {
+      const auto nm = Radiation::GroupFieldNames(g);
+      data->Get(nm[0]).data.DeepCopy(gEr[g]);
+      data->Get(nm[1]).data.DeepCopy(gFx[g]);
+      data->Get(nm[2]).data.DeepCopy(gFy[g]);
+      data->Get(nm[3]).data.DeepCopy(gFz[g]);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -760,6 +831,10 @@ TaskStatus ApplyBarotropicCooling(MeshData<Real> *md, const parthenon::SimTime &
   const Real igm1 = 1.0 / gm1;
   const Real rcsq = rc * rc;
   const bool use_table = hydro_pkg->Param<bool>("collapse_be_table");
+  // When the radiation package is active it OWNS the gas thermal energy: skip the
+  // barotropic e_th overwrite (Radiation::MatterCoupling sets T from absorption/emission
+  // instead). The outside-sphere momentum BC below still applies in both cases.
+  const bool rad_owns_energy = pm->packages.AllPackages().count("radiation") > 0;
 
   const auto &cons_pack = md->PackVariables(std::vector<std::string>{"cons"});
 
@@ -768,7 +843,7 @@ TaskStatus ApplyBarotropicCooling(MeshData<Real> *md, const parthenon::SimTime &
   parthenon::IndexRange kb = md->GetBoundsK(parthenon::IndexDomain::interior);
   const int nblocks = md->NumBlocks();
 
-  if (use_table) {
+  if (use_table && !rad_owns_energy) {
     const Real T0K = hydro_pkg->Param<Real>("collapse_be_T0K");
     const auto tab = hydro_pkg->Param<AdiabaticGLMMHDEOS>("eos").GetEosTable();
     parthenon::par_for(
@@ -812,13 +887,26 @@ TaskStatus ApplyBarotropicCooling(MeshData<Real> *md, const parthenon::SimTime &
 
         // Outside sphere: zero velocity (fixed BC on momentum)
         if (r2 > rcsq) {
+          // When radiation owns the gas energy the barotropic overwrite below is skipped,
+          // so the kinetic energy of the killed momentum must be removed from IEN too --
+          // otherwise it is silently converted to heat (a spurious secular heating of the
+          // ambient gas every step). In the non-RT branch IEN is fully overwritten below,
+          // so this subtraction is a no-op there by construction.
+          if (rad_owns_energy) {
+            const Real rho_bc = cons(IDN, k, j, i);
+            cons(IEN, k, j, i) -=
+                0.5 / rho_bc *
+                (cons(IM1, k, j, i) * cons(IM1, k, j, i) +
+                 cons(IM2, k, j, i) * cons(IM2, k, j, i) +
+                 cons(IM3, k, j, i) * cons(IM3, k, j, i));
+          }
           cons(IM1, k, j, i) = 0.0;
           cons(IM2, k, j, i) = 0.0;
           cons(IM3, k, j, i) = 0.0;
         }
 
-        // Barotropic EOS enforcement (everywhere); IEN is fully overwritten.
-        {
+        // Barotropic EOS enforcement (everywhere) -- SKIPPED when radiation owns energy.
+        if (!rad_owns_energy) {
           const Real rho = cons(IDN, k, j, i);
           const Real ke = 0.5 / rho * (cons(IM1, k, j, i) * cons(IM1, k, j, i)
                                      + cons(IM2, k, j, i) * cons(IM2, k, j, i)

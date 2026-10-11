@@ -1,0 +1,3 @@
+R6/gpu/R8c_noloc | R8/point.in | radiation/sn_precond_stencil=sou radiation/sn_local_tol=0.0 | 1
+R6/gpu/R5_noloc | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_local_tol=0.0 | 1
+R6/gpu/R5_prodkeys | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_norm=rhs radiation/sn_local_tol=0.0 | 1

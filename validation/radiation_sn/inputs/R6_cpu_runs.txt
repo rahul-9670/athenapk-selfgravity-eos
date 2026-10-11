@@ -1,0 +1,8 @@
+R6/cpu/G9 | R0/G9_prod.in | radiation/creduc=1.0 | 1
+R6/cpu/K4 | R0/K4_prod.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true | 1
+R6/cpu/R1 | R1/base_g100r30_tab.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 | 1
+R6/cpu/S1 | R3/S1_sou.in | radiation/sn_sou_limiter=positive | 1
+R6/cpu/S3 | R3/S3_sou.in | radiation/sn_sou_limiter=positive | 1
+R6/cpu/R5 | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou | 1
+R6/cpu/R8a | R8/plane.in | parthenon/time/dt_force=0.002 | 1
+R6/cpu/R8c | R8/point.in | radiation/sn_precond_stencil=sou | 1

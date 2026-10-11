@@ -31,7 +31,17 @@ namespace poisson_test {
 void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
 } // namespace poisson_test
 
-// Self-gravity validation suite (validation_tests/self_gravity, 2026-10-03).
+// Radiation (Sn) validation problems (validation/radiation_sn): a static or uniformly moving medium with an
+// optional Gaussian / top-hat radiation or temperature profile (rad_pulse), and the Lowrie & Edwards radiative
+// shock initial state (rad_shock).
+namespace rad_pulse {
+void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
+} // namespace rad_pulse
+namespace rad_shock {
+void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
+} // namespace rad_shock
+
+// Self-gravity validation suite (validation/self_gravity, 2026-10-03).
 namespace grav_analytic {
 void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
 } // namespace grav_analytic

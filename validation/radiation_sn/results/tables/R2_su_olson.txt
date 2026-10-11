@@ -1,0 +1,56 @@
+# R2 Su-Olson (scripts/analyze_R2.py): errors of the +A/-A pair mean vs the semi-analytic reference, |z| <= 6;
+# L1 = sum|code-ref| / sum|ref|, max = max|code-ref| / max|ref|; lin = max|U(+A)-U(-A)|/2 / max|U| (linearisation)
+== base (nx 800, dtau 0.01, base keys)
+   tau  0.1000 vs ref(code48): U L1 1.34e-02 max 3.99e-02 | V L1 9.03e-02 max 9.45e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  0.1000 vs ref(S64   ): U L1 1.49e-02 max 4.12e-02 | V L1 9.03e-02 max 9.46e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  1.0100 vs ref(code48): U L1 1.09e-02 max 1.22e-02 | V L1 1.07e-02 max 1.73e-02 | U(0) code 0.65272 ref 0.65171 | lin 1.5e-05
+   tau  1.0100 vs ref(S64   ): U L1 2.80e-02 max 3.61e-02 | V L1 1.83e-02 max 3.31e-02 | U(0) code 0.65272 ref 0.64617 | lin 1.5e-05
+   tau  3.2100 vs ref(code48): U L1 3.90e-03 max 7.24e-03 | V L1 4.58e-03 max 8.37e-03 | U(0) code 1.19712 ref 1.19980 | lin 1.6e-04
+   tau  3.2100 vs ref(S64   ): U L1 3.33e-02 max 3.69e-02 | V L1 2.91e-02 max 3.58e-02 | U(0) code 1.19712 ref 1.20979 | lin 1.6e-04
+   tau 10.0000 vs ref(code48): U L1 1.68e-03 max 4.19e-03 | V L1 1.83e-03 max 4.42e-03 | U(0) code 2.18666 ref 2.19042 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 2.10e-02 max 2.43e-02 | V L1 2.24e-02 max 2.49e-02 | U(0) code 2.18666 ref 2.23462 | lin 3.6e-04
+== dz2 (nx 1600, dtau 0.01, base keys)
+   tau  0.1000 vs ref(code48): U L1 1.30e-02 max 4.48e-02 | V L1 8.74e-02 max 8.96e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  0.1000 vs ref(S64   ): U L1 1.11e-02 max 3.46e-02 | V L1 8.74e-02 max 8.95e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  1.0100 vs ref(code48): U L1 4.84e-03 max 7.40e-03 | V L1 4.98e-03 max 1.11e-02 | U(0) code 0.65181 ref 0.65225 | lin 1.5e-05
+   tau  1.0100 vs ref(S64   ): U L1 2.62e-02 max 3.71e-02 | V L1 1.78e-02 max 3.41e-02 | U(0) code 0.65181 ref 0.64661 | lin 1.5e-05
+   tau  3.2100 vs ref(code48): U L1 1.41e-03 max 4.12e-03 | V L1 1.98e-03 max 4.98e-03 | U(0) code 1.19979 ref 1.20069 | lin 1.6e-04
+   tau  3.2100 vs ref(S64   ): U L1 3.23e-02 max 3.59e-02 | V L1 2.80e-02 max 3.55e-02 | U(0) code 1.19979 ref 1.21052 | lin 1.6e-04
+   tau 10.0000 vs ref(code48): U L1 5.44e-04 max 2.33e-03 | V L1 6.14e-04 max 2.48e-03 | U(0) code 2.19037 ref 2.19150 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 2.04e-02 max 2.29e-02 | V L1 2.18e-02 max 2.35e-02 | U(0) code 2.19037 ref 2.23564 | lin 3.6e-04
+== dt2 (nx 800, dtau 0.005, base keys)
+   tau  0.1000 vs ref(code48): U L1 1.12e-02 max 3.32e-02 | V L1 4.75e-02 max 5.28e-02 | U(0) code 0.09511 ref 0.09532 | lin 4.2e-09
+   tau  0.1000 vs ref(S64   ): U L1 1.27e-02 max 3.45e-02 | V L1 4.76e-02 max 5.28e-02 | U(0) code 0.09511 ref 0.09532 | lin 4.2e-09
+   tau  1.0050 vs ref(code48): U L1 1.08e-02 max 1.32e-02 | V L1 1.01e-02 max 1.70e-02 | U(0) code 0.65164 ref 0.64969 | lin 1.5e-05
+   tau  1.0050 vs ref(S64   ): U L1 2.83e-02 max 3.64e-02 | V L1 1.80e-02 max 3.22e-02 | U(0) code 0.65164 ref 0.64440 | lin 1.5e-05
+   tau  3.2000 vs ref(code48): U L1 3.86e-03 max 7.15e-03 | V L1 4.28e-03 max 8.22e-03 | U(0) code 1.19536 ref 1.19785 | lin 1.6e-04
+   tau  3.2000 vs ref(S64   ): U L1 3.34e-02 max 3.70e-02 | V L1 2.90e-02 max 3.59e-02 | U(0) code 1.19536 ref 1.20770 | lin 1.6e-04
+   tau 10.0000 vs ref(code48): U L1 1.66e-03 max 4.13e-03 | V L1 1.79e-03 max 4.34e-03 | U(0) code 2.18681 ref 2.19042 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 2.10e-02 max 2.42e-02 | V L1 2.25e-02 max 2.48e-02 | U(0) code 2.18681 ref 2.23462 | lin 3.6e-04
+== tol10 (nx 800, dtau 0.01, {'sn_rel_tol': '1.0e-10'})
+   tau  0.1000 vs ref(code48): U L1 1.34e-02 max 3.99e-02 | V L1 9.03e-02 max 9.46e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  0.1000 vs ref(S64   ): U L1 1.49e-02 max 4.12e-02 | V L1 9.03e-02 max 9.46e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  1.0100 vs ref(code48): U L1 1.09e-02 max 1.22e-02 | V L1 1.07e-02 max 1.73e-02 | U(0) code 0.65272 ref 0.65171 | lin 1.5e-05
+   tau  1.0100 vs ref(S64   ): U L1 2.80e-02 max 3.61e-02 | V L1 1.83e-02 max 3.31e-02 | U(0) code 0.65272 ref 0.64617 | lin 1.5e-05
+   tau  3.2100 vs ref(code48): U L1 3.90e-03 max 7.24e-03 | V L1 4.58e-03 max 8.37e-03 | U(0) code 1.19712 ref 1.19980 | lin 1.6e-04
+   tau  3.2100 vs ref(S64   ): U L1 3.33e-02 max 3.69e-02 | V L1 2.91e-02 max 3.58e-02 | U(0) code 1.19712 ref 1.20979 | lin 1.6e-04
+   tau 10.0000 vs ref(code48): U L1 1.68e-03 max 4.19e-03 | V L1 1.83e-03 max 4.42e-03 | U(0) code 2.18666 ref 2.19042 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 2.10e-02 max 2.43e-02 | V L1 2.24e-02 max 2.49e-02 | U(0) code 2.18666 ref 2.23462 | lin 3.6e-04
+== step (nx 800, dtau 0.01, {'sn_spatial': 'step'})
+   tau  0.1000 vs ref(code48): U L1 2.68e-02 max 4.75e-02 | V L1 8.79e-02 max 9.40e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  0.1000 vs ref(S64   ): U L1 2.58e-02 max 4.37e-02 | V L1 8.71e-02 max 9.01e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  1.0100 vs ref(code48): U L1 3.18e-02 max 4.35e-02 | V L1 3.28e-02 max 4.87e-02 | U(0) code 0.64089 ref 0.65171 | lin 1.5e-05
+   tau  1.0100 vs ref(S64   ): U L1 2.00e-02 max 1.80e-02 | V L1 2.08e-02 max 2.14e-02 | U(0) code 0.64089 ref 0.64617 | lin 1.5e-05
+   tau  3.2100 vs ref(code48): U L1 1.93e-02 max 2.88e-02 | V L1 2.13e-02 max 3.21e-02 | U(0) code 1.19118 ref 1.19980 | lin 1.6e-04
+   tau  3.2100 vs ref(S64   ): U L1 2.36e-02 max 2.05e-02 | V L1 2.09e-02 max 1.89e-02 | U(0) code 1.19118 ref 1.20979 | lin 1.6e-04
+   tau 10.0000 vs ref(code48): U L1 1.35e-02 max 1.99e-02 | V L1 1.37e-02 max 2.05e-02 | U(0) code 2.17653 ref 2.19042 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 1.97e-02 max 2.60e-02 | V L1 2.05e-02 max 2.60e-02 | U(0) code 2.17653 ref 2.23462 | lin 3.6e-04
+== ang816 (nx 800, dtau 0.01, {'sn_nzeta': '8', 'sn_npsi': '16'})
+   tau  0.1000 vs ref(code816): U L1 1.36e-02 max 4.19e-02 | V L1 9.01e-02 max 9.46e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  0.1000 vs ref(S64   ): U L1 1.37e-02 max 4.17e-02 | V L1 9.01e-02 max 9.47e-02 | U(0) code 0.09491 ref 0.09532 | lin 5.0e-09
+   tau  1.0100 vs ref(code816): U L1 8.69e-03 max 1.34e-02 | V L1 8.56e-03 max 1.60e-02 | U(0) code 0.64359 ref 0.64719 | lin 1.5e-05
+   tau  1.0100 vs ref(S64   ): U L1 6.93e-03 max 1.39e-02 | V L1 6.09e-03 max 1.32e-02 | U(0) code 0.64359 ref 0.64617 | lin 1.5e-05
+   tau  3.2100 vs ref(code816): U L1 3.71e-03 max 7.77e-03 | V L1 4.57e-03 max 9.10e-03 | U(0) code 1.21339 ref 1.21525 | lin 1.6e-04
+   tau  3.2100 vs ref(S64   ): U L1 7.16e-03 max 1.43e-02 | V L1 7.06e-03 max 1.49e-02 | U(0) code 1.21339 ref 1.20979 | lin 1.6e-04
+   tau 10.0000 vs ref(code816): U L1 1.72e-03 max 4.46e-03 | V L1 1.87e-03 max 4.70e-03 | U(0) code 2.23257 ref 2.23575 | lin 3.6e-04
+   tau 10.0000 vs ref(S64   ): U L1 3.25e-03 max 8.00e-03 | V L1 3.54e-03 max 8.43e-03 | U(0) code 2.23257 ref 2.23462 | lin 3.6e-04

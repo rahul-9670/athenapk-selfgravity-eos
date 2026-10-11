@@ -1,0 +1,54 @@
+# R5 group-count / edge (R5a, 1-D) and ordinate (R5b, 3-D) convergence (scripts/analyze_R5.py)
+# envelope T_gas vs the reference; Q = envelope heat int(e - e0) relative to the reference; x20/x50 = where T falls to 20/50 K [AU]; wall = s/cycle (1 rank 1-D; 27 ranks 3-D), it = Sn iterations/cycle
+R5a T_core 300 K, mid-run (t = 6.200e-06 code), reference L18:
+  G1   ng  1: max |dT/T| 5.495e-01  median 3.758e-01  Q/Q_ref 0.8101  x20 14.167  x50  9.142  T(3 AU)  197.79 K  wall 0.289  it 173
+  P3   ng  3: max |dT/T| 5.130e-01  median 2.260e-01  Q/Q_ref 0.8345  x20 12.692  x50  9.370  T(3 AU)  199.62 K  wall 0.761  it 172
+  L3   ng  3: max |dT/T| 5.492e-01  median 3.754e-01  Q/Q_ref 0.8104  x20 14.161  x50  9.144  T(3 AU)  197.80 K  wall 0.766  it 173
+  E3   ng  3: max |dT/T| 5.129e-01  median 2.260e-01  Q/Q_ref 0.8346  x20 12.693  x50  9.371  T(3 AU)  199.62 K  wall 0.928  it 182
+  L4   ng  4: max |dT/T| 4.157e-01  median 1.904e-01  Q/Q_ref 0.9082  x20 12.521  x50  9.770  T(3 AU)  200.75 K  wall 1.112  it 181
+  E4   ng  4: max |dT/T| 3.990e-01  median 1.253e-01  Q/Q_ref 0.9149  x20 12.176  x50  9.830  T(3 AU)  201.43 K  wall 1.256  it 182
+  L6   ng  6: max |dT/T| 3.992e-01  median 1.253e-01  Q/Q_ref 0.9148  x20 12.174  x50  9.828  T(3 AU)  201.42 K  wall 1.803  it 185
+  E8   ng  8: max |dT/T| 2.157e-01  median 3.112e-02  Q/Q_ref 0.9625  x20 11.787  x50 10.185  T(3 AU)  202.69 K  wall 2.600  it 197
+  L10  ng 10: max |dT/T| 2.156e-01  median 3.110e-02  Q/Q_ref 0.9624  x20 11.786  x50 10.184  T(3 AU)  202.69 K  wall 3.238  it 200
+  L18  ng 18: max |dT/T| 0.000e+00  median 0.000e+00  Q/Q_ref 1.0000  x20 11.951  x50 10.428  T(3 AU)  203.03 K  wall 5.438  it 184
+  F10 : FAILED -- not run
+  F18 : FAILED -- not run
+R5a T_core 300 K, end (t = 1.200e-05 code), reference L18:
+  G1   ng  1: max |dT/T| 5.651e-01  median 2.269e-01  Q/Q_ref 0.7746  x20 15.665  x50 11.261  T(3 AU)  184.87 K  wall 0.289  it 173
+  P3   ng  3: max |dT/T| 5.641e-01  median 1.454e-01  Q/Q_ref 0.7963  x20 14.501  x50 11.453  T(3 AU)  186.54 K  wall 0.761  it 172
+  L3   ng  3: max |dT/T| 5.650e-01  median 2.265e-01  Q/Q_ref 0.7748  x20 15.659  x50 11.263  T(3 AU)  184.88 K  wall 0.766  it 173
+  E3   ng  3: max |dT/T| 5.641e-01  median 1.454e-01  Q/Q_ref 0.7963  x20 14.502  x50 11.454  T(3 AU)  186.55 K  wall 0.928  it 182
+  L4   ng  4: max |dT/T| 4.516e-01  median 1.069e-01  Q/Q_ref 0.8878  x20 14.934  x50 12.148  T(3 AU)  189.34 K  wall 1.112  it 181
+  E4   ng  4: max |dT/T| 4.383e-01  median 7.139e-02  Q/Q_ref 0.8975  x20 14.695  x50 12.231  T(3 AU)  189.89 K  wall 1.256  it 182
+  L6   ng  6: max |dT/T| 4.385e-01  median 7.140e-02  Q/Q_ref 0.8975  x20 14.694  x50 12.229  T(3 AU)  189.89 K  wall 1.803  it 185
+  E8   ng  8: max |dT/T| 2.575e-01  median 3.409e-02  Q/Q_ref 0.9550  x20 14.681  x50 12.771  T(3 AU)  191.37 K  wall 2.600  it 197
+  L10  ng 10: max |dT/T| 2.574e-01  median 3.412e-02  Q/Q_ref 0.9550  x20 14.680  x50 12.770  T(3 AU)  191.37 K  wall 3.238  it 200
+  L18  ng 18: max |dT/T| 0.000e+00  median 0.000e+00  Q/Q_ref 1.0000  x20 15.001  x50 13.186  T(3 AU)  191.93 K  wall 5.438  it 184
+  F10 : FAILED -- not run
+  F18 : FAILED -- not run
+R5a T_core 1000 K, mid-run (t = 6.200e-06 code), reference L10:
+  G1  : FAILED -- NaN guard at cycle 36; NOT CONVERGED x2, recurrence disagreements x0; Sn iterations per step mean 1869 max 3254
+  P3  : FAILED -- trust audit (recurrence vs true residual) at cycle 31; NOT CONVERGED x0, recurrence disagreements x1; Sn iterations per step mean 1735 max 2926
+  L3  : FAILED -- trust audit (recurrence vs true residual) at cycle 59; NOT CONVERGED x2, recurrence disagreements x1; Sn iterations per step mean 1950 max 3768
+  E3   ng  3: max |dT/T| 6.842e-01  median 1.352e-01  Q/Q_ref 1.0805  x20    nan  x50    nan  T(3 AU)  711.19 K  wall 8.863  it 1768
+  L4  : FAILED -- trust audit (recurrence vs true residual) at cycle 4; NOT CONVERGED x0, recurrence disagreements x1; Sn iterations per step mean 1972 max 3188
+  E4   ng  4: max |dT/T| 1.720e+00  median 1.151e-01  Q/Q_ref 1.1035  x20    nan  x50    nan  T(3 AU)  785.96 K  wall 11.556  it 1686
+  L6   ng  6: max |dT/T| 1.719e+00  median 1.116e-01  Q/Q_ref 1.1000  x20    nan  x50    nan  T(3 AU)  770.73 K  wall 18.127  it 1808
+  E8   ng  8: max |dT/T| 1.302e-02  median 4.571e-03  Q/Q_ref 1.0004  x20    nan  x50    nan  T(3 AU) 2240.84 K  wall 25.487  it 1790
+  L10  ng 10: max |dT/T| 0.000e+00  median 0.000e+00  Q/Q_ref 1.0000  x20    nan  x50    nan  T(3 AU) 2242.33 K  wall 29.349  it 1477
+  L18 : FAILED -- abort at cycle 41; NOT CONVERGED x0, recurrence disagreements x0; Sn iterations per step mean 1988 max 2696
+  F10 : FAILED -- not run
+  F18 : FAILED -- not run
+R5a T_core 1000 K, end (t = 1.200e-05 code), reference L10:
+  G1  : FAILED -- NaN guard at cycle 36; NOT CONVERGED x2, recurrence disagreements x0; Sn iterations per step mean 1869 max 3254
+  P3  : FAILED -- trust audit (recurrence vs true residual) at cycle 31; NOT CONVERGED x0, recurrence disagreements x1; Sn iterations per step mean 1735 max 2926
+  L3  : FAILED -- trust audit (recurrence vs true residual) at cycle 59; NOT CONVERGED x2, recurrence disagreements x1; Sn iterations per step mean 1950 max 3768
+  E3   ng  3: max |dT/T| 5.768e-02  median 5.379e-02  Q/Q_ref 1.0566  x20    nan  x50    nan  T(3 AU)  739.14 K  wall 8.863  it 1768
+  L4  : FAILED -- trust audit (recurrence vs true residual) at cycle 4; NOT CONVERGED x0, recurrence disagreements x1; Sn iterations per step mean 1972 max 3188
+  E4   ng  4: max |dT/T| 5.464e-02  median 5.172e-02  Q/Q_ref 1.0477  x20    nan  x50    nan  T(3 AU)  737.05 K  wall 11.556  it 1686
+  L6   ng  6: max |dT/T| 5.421e-02  median 5.000e-02  Q/Q_ref 1.0464  x20    nan  x50    nan  T(3 AU)  736.46 K  wall 18.127  it 1808
+  E8   ng  8: max |dT/T| 2.300e-03  median 2.169e-03  Q/Q_ref 1.0000  x20    nan  x50    nan  T(3 AU)  703.18 K  wall 25.487  it 1790
+  L10  ng 10: max |dT/T| 0.000e+00  median 0.000e+00  Q/Q_ref 1.0000  x20    nan  x50    nan  T(3 AU)  704.60 K  wall 29.349  it 1477
+  L18 : FAILED -- abort at cycle 41; NOT CONVERGED x0, recurrence disagreements x0; Sn iterations per step mean 1988 max 2696
+  F10 : FAILED -- not run
+  F18 : FAILED -- not run

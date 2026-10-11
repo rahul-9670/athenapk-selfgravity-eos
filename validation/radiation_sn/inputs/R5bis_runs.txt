@@ -1,0 +1,18 @@
+R5/bis_G1_T1000_prod | R5/a_G1_T1000.in | radiation/sn_norm=rhs radiation/sn_local_tol=0.0 radiation/sn_conserve_residual=false radiation/sn_fc_scatter=false radiation/sn_sou_limiter=none radiation/opacity_interp=linear | 1
+R5/bis_G1_T1000_nolim | R5/a_G1_T1000.in | radiation/sn_sou_limiter=none | 1
+R5/bis_G1_T1000_noloc | R5/a_G1_T1000.in | radiation/sn_local_tol=0.0 | 1
+R5/bis_G1_T1000_nonorm | R5/a_G1_T1000.in | radiation/sn_norm=rhs | 1
+R5/bis_G1_T1000_nocons | R5/a_G1_T1000.in | radiation/sn_conserve_residual=false | 1
+R5/bis_G1_T1000_nofc | R5/a_G1_T1000.in | radiation/sn_fc_scatter=false | 1
+R5/bis_G1_T1000_step | R5/a_G1_T1000.in | radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1
+R5/bis_G1_T1000_dt2 | R5/a_G1_T1000.in | parthenon/time/dt_force=1.0e-07 | 1
+R5/bis_G1_T1000_prodstep | R5/a_G1_T1000.in | radiation/sn_norm=rhs radiation/sn_local_tol=0.0 radiation/sn_conserve_residual=false radiation/sn_fc_scatter=false radiation/sn_sou_limiter=none radiation/opacity_interp=linear radiation/sn_spatial=step | 1
+R5/bis_P3_T1000_prod | R5/a_P3_T1000.in | radiation/sn_norm=rhs radiation/sn_local_tol=0.0 radiation/sn_conserve_residual=false radiation/sn_fc_scatter=false radiation/sn_sou_limiter=none radiation/opacity_interp=linear | 1
+R5/bis_P3_T1000_nolim | R5/a_P3_T1000.in | radiation/sn_sou_limiter=none | 1
+R5/bis_P3_T1000_noloc | R5/a_P3_T1000.in | radiation/sn_local_tol=0.0 | 1
+R5/bis_P3_T1000_nonorm | R5/a_P3_T1000.in | radiation/sn_norm=rhs | 1
+R5/bis_P3_T1000_nocons | R5/a_P3_T1000.in | radiation/sn_conserve_residual=false | 1
+R5/bis_P3_T1000_nofc | R5/a_P3_T1000.in | radiation/sn_fc_scatter=false | 1
+R5/bis_P3_T1000_step | R5/a_P3_T1000.in | radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1
+R5/bis_P3_T1000_dt2 | R5/a_P3_T1000.in | parthenon/time/dt_force=1.0e-07 | 1
+R5/bis_P3_T1000_prodstep | R5/a_P3_T1000.in | radiation/sn_norm=rhs radiation/sn_local_tol=0.0 radiation/sn_conserve_residual=false radiation/sn_fc_scatter=false radiation/sn_sou_limiter=none radiation/opacity_interp=linear radiation/sn_spatial=step | 1

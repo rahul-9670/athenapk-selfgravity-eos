@@ -29,6 +29,18 @@ add_executable(
         utils/few_modes_ft.hpp
         self_gravity/self_gravity.cpp
         self_gravity/self_gravity_driver.cpp
+        radiation/radiation.cpp
+        radiation/radiation_sn.cpp
+        radiation/radiation_sn_conserve.cpp
+        radiation/radiation_sn_testsrc.cpp
+        radiation/radiation_sn_criterion.cpp
+        radiation/radiation_sn_fc.cpp
+        radiation/radiation_sn_soulim.cpp
+        radiation/radiation_sn_precond.cpp
+        radiation/radiation_sn_wavefront.cpp
+        radiation/radiation_sn_fastops.cpp
+        radiation/radiation_sn_graydsa.cpp
+        radiation/radiation_tasks.cpp
 )
 
 add_subdirectory(pgen)

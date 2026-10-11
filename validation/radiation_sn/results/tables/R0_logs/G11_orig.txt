@@ -1,0 +1,12 @@
+GATE G11 -- Fleck linearisation vs the explicit coupling
+  --- arm alpha1 (expect STABLE) ---
+    T history: 1  0.768208  0.768033  0.768032  0.768032  0.768032  0.768032  0.768032
+    finite&positive=True  monotone=True  T_end err vs equilibrium 8.792e-08  conservation 1.491e-07
+    checkerboard (odd-even pressure split): 3.444e-12
+    PASS : stable, monotone, on the equilibrium
+  --- arm alpha0 (expect UNSTABLE) ---
+    T history: 1  0.681407  0.792611  0.759386  0.770907  0.767057  0.767803  0.768109
+    finite&positive=True  monotone=False  T_end err vs equilibrium 1.286e-01  conservation 5.475e-08
+    checkerboard (odd-even pressure split): 7.765e-01
+    PASS : explicit arm misbehaves as required (this is the discrimination)
+G11 PASS (0 failures)

@@ -133,6 +133,18 @@ ParArray1DRaw<BndId> &CoalescedBuffer::GetBndIdsOnDevice(const std::set<Uid_t> &
 
 //----------------------------------------------------------------------------------------
 void CoalescedBuffer::PackAndSend(const std::set<Uid_t> &vars) {
+  const int comb_size = Pack(vars);
+#ifdef MPI_PARALLEL
+  Kokkos::fence();
+#endif
+  Send(vars, comb_size);
+}
+
+//----------------------------------------------------------------------------------------
+// Pack / Send split (parthenon/mesh/coalesced_batch_pack, AthenaPK patch 2026-10-10): PackAndSend = Pack + fence +
+// Send, unchanged; CoalescedComms::PackAndSend can instead launch every destination's Pack, fence ONCE, then Send all
+// (same data in the same buffers: bit-identical), instead of one launch + fence + send round trip per neighbour rank.
+int CoalescedBuffer::Pack(const std::set<Uid_t> &vars) {
   PARTHENON_REQUIRE(coalesced_comm_buffer.IsAvailableForWrite(),
                     "Trying to write to a buffer that is in use.");
   int comb_size;
@@ -150,9 +162,11 @@ void CoalescedBuffer::PackAndSend(const std::set<Uid_t> &vars) {
                                [&](const int idx) { com_buf[idx] = buf[idx]; });
         }
       });
-#ifdef MPI_PARALLEL
-  Kokkos::fence();
-#endif
+  return comb_size;
+}
+
+void CoalescedBuffer::Send(const std::set<Uid_t> &vars, const int comb_size) {
+  auto &bids = GetBndIdsOnDevice(vars);
   coalesced_comm_buffer.Send(false, comb_size);
 
   // Send the sparse null info as well
@@ -387,6 +401,15 @@ void CoalescedBuffersRank::PackAndSend(MeshData<Real> *pmd) {
 }
 
 //----------------------------------------------------------------------------------------
+CoalescedBuffer *CoalescedBuffersRank::GetBuffer(MeshData<Real> *pmd) {
+  PARTHENON_REQUIRE(buffers_built,
+                    "Trying to send combined buffers before they have been built");
+  const int partition_id = CoalescedPartitionId(pmd);
+  if (coalesced_bufs.count(partition_id) == 0) return nullptr;   // nothing non-local for this partition
+  return &coalesced_bufs.at(partition_id);
+}
+
+//----------------------------------------------------------------------------------------
 bool CoalescedBuffersRank::IsAvailableForWrite(MeshData<Real> *pmd) {
   PARTHENON_REQUIRE(sender, "Shouldn't be checking this on non-sender.");
   const int partition_id = CoalescedPartitionId(pmd);
@@ -512,11 +535,26 @@ bool CoalescedComms::IsAvailableForWrite(MeshData<Real> *pmd, BoundaryType b_typ
 
 //----------------------------------------------------------------------------------------
 void CoalescedComms::PackAndSend(MeshData<Real> *pmd, BoundaryType b_type) {
+  if (!pmesh->coalesced_batch_pack) {
+    for (int rank = 0; rank < Globals::nranks; ++rank) {
+      if (coalesced_send_buffers.count({rank, b_type})) {
+        coalesced_send_buffers.at({rank, b_type}).PackAndSend(pmd);
+      }
+    }
+    return;
+  }
+  // parthenon/mesh/coalesced_batch_pack: all packs, one fence, all sends
+  std::vector<std::pair<CoalescedBuffer *, int>> todo;
   for (int rank = 0; rank < Globals::nranks; ++rank) {
     if (coalesced_send_buffers.count({rank, b_type})) {
-      coalesced_send_buffers.at({rank, b_type}).PackAndSend(pmd);
+      auto *cb = coalesced_send_buffers.at({rank, b_type}).GetBuffer(pmd);
+      if (cb != nullptr) todo.emplace_back(cb, cb->Pack(pmd->GetUids()));
     }
   }
+#ifdef MPI_PARALLEL
+  if (!todo.empty()) Kokkos::fence();
+#endif
+  for (auto &[cb, sz] : todo) cb->Send(pmd->GetUids(), sz);
 }
 
 //----------------------------------------------------------------------------------------

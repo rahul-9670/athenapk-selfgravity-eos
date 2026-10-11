@@ -1,0 +1,1 @@
+RF12y/P3_T1000_v1q | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 parthenon/mesh/ix1_bc=diode parthenon/mesh/ox1_bc=diode radiation/sn_gray_dsa=true radiation/sn_gray_dsa_solver/type=MG radiation/sn_gray_dsa_solver/max_iterations=1 parthenon/mesh/multigrid=true | 1

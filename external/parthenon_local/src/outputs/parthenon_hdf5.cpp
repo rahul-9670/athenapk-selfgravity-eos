@@ -383,6 +383,12 @@ void PHDF5Output::WriteOutputFileImpl(Mesh *pm, ParameterInput *pin, SimTime *tm
         std::fill(&(chunk_size[0]), &(chunk_size[0]) + ndim - 3, 1);
       }
       PARTHENON_HDF5_CHECK(H5Pset_chunk(pl_dcreate, ndim, chunk_size.data()));
+      // ATHENAPK PATCH (2026-10-09, radiation validation): pl_dcreate is ONE property list for every
+      // variable of this output, so each H5Pset_deflate APPENDED another deflate filter: variable k was compressed
+      // k times, and past H5Z_MAX_NFILTERS (32) the write aborted ("too many filters in pipeline") -- a 34-group
+      // deck died at its first output, and any restart with > 32 compressed datasets would. Clear the pipeline
+      // first. Values on read-back are unchanged (deflate is lossless); only the file encoding differs.
+      PARTHENON_HDF5_CHECK(H5Premove_filter(pl_dcreate, H5Z_FILTER_ALL));
       PARTHENON_HDF5_CHECK(
           H5Pset_deflate(pl_dcreate, std::min(9, output_params.hdf5_compression_level)));
     }

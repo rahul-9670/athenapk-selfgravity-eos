@@ -1,0 +1,63 @@
+arm_ref    arm_ref/parthenon.out0.final.phdf
+arm_kry0   arm_kry0/parthenon.out0.final.phdf
+arm_kry1   arm_kry1/parthenon.out0.final.phdf
+arm_tight  arm_tight/parthenon.out0.final.phdf
+
+--- PREMISE: do the arms solve the same problem? (gas state must match) ---
+  prim arm_kry0   vs arm_ref: max/cell = 0.000e+00   OK
+  prim arm_kry1   vs arm_ref: max/cell = 0.000e+00   OK
+  prim arm_tight  vs arm_ref: max/cell = 0.000e+00   OK
+
+--- CONTENT: source structure ---
+  Er spread (max-min)/mean = 0.4560   OK
+  variation along k(z): 1.8279e-01   OK
+  variation along j(y): 1.8279e-01   OK
+  variation along i(x): 1.8279e-01   OK
+
+--- UNUSED INPUT KEYS (a mistyped key is silently the default) ---
+  none
+
+--- OPERATOR: SnApplyA == SnResidual ---
+  96 PASS, 0 FAIL
+
+--- ANSWER vs arm_tight (sn_rel_tol=1e-13), both moments ---
+  rad.Er:  CONTROL arm_ref vs tight: L1=5.231e-11 max/cell=3.094e-10
+      arm_kry0 : L1=1.032e-10 (  1.97x)  max/cell=1.783e-10 (  0.58x)   PASS
+      arm_kry1 : L1=5.418e-11 (  1.04x)  max/cell=2.171e-10 (  0.70x)   PASS
+  rad.Fr1:  CONTROL arm_ref vs tight: L1=1.828e-10 max/cell=3.730e-09
+      arm_kry0 : L1=3.758e-10 (  2.06x)  max/cell=1.343e-09 (  0.36x)   PASS
+      arm_kry1 : L1=1.690e-10 (  0.92x)  max/cell=3.757e-09 (  1.01x)   PASS
+  rad.Fr2:  CONTROL arm_ref vs tight: L1=1.828e-10 max/cell=3.730e-09
+      arm_kry0 : L1=3.758e-10 (  2.06x)  max/cell=1.343e-09 (  0.36x)   PASS
+      arm_kry1 : L1=1.690e-10 (  0.92x)  max/cell=3.757e-09 (  1.01x)   PASS
+  rad.Fr3:  CONTROL arm_ref vs tight: L1=2.399e-10 max/cell=1.229e-08
+      arm_kry0 : L1=3.060e-10 (  1.28x)  max/cell=1.442e-09 (  0.12x)   PASS
+      arm_kry1 : L1=1.433e-10 (  0.60x)  max/cell=4.189e-09 (  0.34x)   PASS
+
+--- CONVERGENCE ---
+    [SN/bicgstab] group 0 converged in 79 iters, rel = 6.48e-11 (from 5.40e-02)
+    [SN/bicgstab] group 0 converged in 79 iters, rel = 3.28e-11 (from 4.58e-02)
+    [SN/bicgstab] group 0 converged in 79 iters, rel = 6.74e-11 (from 3.95e-02)
+    [SN/bicgstab] group 0 converged in 73 iters, rel = 9.83e-11 (from 3.42e-02)
+    [SN/bicgstab] group 0 converged in 73 iters, rel = 7.92e-11 (from 2.99e-02)
+    [SN/bicgstab] group 0 converged in 72 iters, rel = 6.54e-11 (from 2.63e-02)
+    [SN] converged in 8 iterations (rel 9.02e-15)
+    [SN] converged in 8 iterations (rel 1.88e-15)
+    [SN] converged in 8 iterations (rel 1.81e-15)
+    [SN] converged in 8 iterations (rel 1.58e-15)
+    [SN] converged in 7 iterations (rel 8.67e-14)
+    [SN] converged in 7 iterations (rel 6.90e-14)
+    [SN] converged in 6 iterations (rel 6.57e-11)
+    [SN] converged in 6 iterations (rel 1.49e-11)
+    [SN] converged in 6 iterations (rel 1.37e-11)
+    [SN] converged in 6 iterations (rel 1.16e-11)
+    [SN] converged in 6 iterations (rel 9.32e-12)
+    [SN] converged in 6 iterations (rel 7.82e-12)
+    [SN/bicgstab] group 0 converged in 13 iters, rel = 3.12e-11 (from 5.40e-02)
+    [SN/bicgstab] group 0 converged in 13 iters, rel = 3.98e-11 (from 4.58e-02)
+    [SN/bicgstab] group 0 converged in 14 iters, rel = 8.05e-12 (from 3.95e-02)
+    [SN/bicgstab] group 0 converged in 14 iters, rel = 3.07e-12 (from 3.42e-02)
+    [SN/bicgstab] group 0 converged in 14 iters, rel = 3.40e-12 (from 2.99e-02)
+    [SN/bicgstab] group 0 converged in 13 iters, rel = 5.14e-11 (from 2.63e-02)
+
+GATE K1: PASS

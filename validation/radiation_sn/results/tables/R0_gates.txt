@@ -1,0 +1,254 @@
+# R0 consolidated Sn gates (scripts/analyze_R0.py). Binary athenaPK_cpu_c69ee834 unless stated; families:
+#   orig/step/sou = archived deck (+ the scheme keys its submit script passed), prod = + PROD_RAD + dual keys.
+# Full checker outputs: results/tables/R0_logs/<gate>_<family>.txt
+== G8/orig (exit 0)
+       Er   relative error vs a_R T^4 = 1         : 0.000e+00   (tol 1e-06)
+       PASS : Er == a_R T^4, uniform, zero flux
+       Er   relative error vs a_R T^4 = 1         : 1.000e+00   (tol 1e-06)
+       PASS : stayed away from equilibrium as required (Er_mean=1.000e-30)
+       Er   relative error vs a_R T^4 = 48        : 1.480e-16   (tol 1e-06)
+       PASS : Er == a_R T^4, uniform, zero flux
+   G8 PASS (0 arm failures)
+== G8/prod (exit 0)
+       Er   relative error vs a_R T^4 = 1         : 0.000e+00   (tol 1e-06)
+       PASS : Er == a_R T^4, uniform, zero flux
+       Er   relative error vs a_R T^4 = 1         : 1.000e+00   (tol 1e-06)
+       PASS : stayed away from equilibrium as required (Er_mean=1.000e-30)
+       Er   relative error vs a_R T^4 = 48        : 1.480e-16   (tol 1e-06)
+       PASS : Er == a_R T^4, uniform, zero flux
+   G8 PASS (0 arm failures)
+== G9/orig (exit 0)
+       total e_gas + (c/chat)Er :  1.49999992500000e+00 -> 1.49999990733846e+00   drift 1.177e-08  (tol 2e-07)
+       T  : 1.000000 -> 0.768032   equilibrium 0.768032   err 6.942e-09  (tol 1e-04)
+       PASS : conserved, and relaxed to the coupled equilibrium
+       total e_gas + (c/chat)Er :  1.49999992500000e+00 -> 1.49999991375446e+00   drift 7.497e-09  (tol 2e-07)
+       T  : 1.000000 -> 0.616011   equilibrium 0.616010   err 1.222e-06  (tol 1e-04)
+       PASS : conserved, and relaxed to the coupled equilibrium
+   G9 PASS (0 arm failures)
+== G9/prod (exit 0)
+       total e_gas + (c/chat)Er :  1.49999992500000e+00 -> 1.49999992546252e+00   drift 3.083e-10  (tol 2e-07)
+       T  : 1.000000 -> 0.768032   equilibrium 0.768032   err 1.818e-10  (tol 1e-04)
+       PASS : conserved, and relaxed to the coupled equilibrium
+       total e_gas + (c/chat)Er :  1.49999992500000e+00 -> 1.49999992512115e+00   drift 8.076e-11  (tol 2e-07)
+       T  : 1.000000 -> 0.616011   equilibrium 0.616010   err 1.225e-06  (tol 1e-04)
+       PASS : conserved, and relaxed to the coupled equilibrium
+   G9 PASS (0 arm failures)
+== G10/orig (exit 0)
+       PASS : conservation
+       PASS : conservation
+       T(kappa_s=0) = 0.768032492   T(kappa_s=2) = 0.768032491   relative difference 5.698e-10 (tol 1e-06)
+       PASS : equilibrium is independent of kappa_s
+   G10 PASS (0 failures)
+== G10/prod (exit 0)
+       PASS : conservation
+       PASS : conservation
+       T(kappa_s=0) = 0.768032497   T(kappa_s=2) = 0.768032497   relative difference 1.103e-10 (tol 1e-06)
+       PASS : equilibrium is independent of kappa_s
+   G10 PASS (0 failures)
+== G11/orig (exit 0)
+       finite&positive=True  monotone=True  T_end err vs equilibrium 8.792e-08  conservation 1.491e-07
+       PASS : stable, monotone, on the equilibrium
+       finite&positive=True  monotone=False  T_end err vs equilibrium 1.286e-01  conservation 5.475e-08
+       PASS : explicit arm misbehaves as required (this is the discrimination)
+   G11 PASS (0 failures)
+== G11/prod (exit 1)
+       finite&positive=True  monotone=False  T_end err vs equilibrium 2.742e-09  conservation 4.650e-09
+       FAIL : alpha=1 FAILED to be stable -- the Fleck factor is not working
+       finite&positive=True  monotone=False  T_end err vs equilibrium 1.308e-01  conservation 2.856e-04
+       PASS : explicit arm misbehaves as required (this is the discrimination)
+   G11 FAIL (1 failure)
+   NOTE: alpha1 non-monotone only after equilibrium: |dT|/T <= 6e-12 from cycle 7 (solver noise at sn_rel_tol 1e-8; criterion 1e-12); T_end err 2.7e-9, checkerboard 0. Not an instability.
+== K1/step (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=1.563e-10 (  2.17x)  max/cell=3.169e-10 (  1.57x)   PASS
+         arm_kry1 : L1=5.488e-12 (  0.08x)  max/cell=3.126e-11 (  0.15x)   PASS
+         arm_kry0 : L1=2.971e-10 (  2.61x)  max/cell=2.076e-09 (  0.87x)   PASS
+         arm_kry1 : L1=4.865e-11 (  0.43x)  max/cell=1.229e-09 (  0.52x)   PASS
+         arm_kry0 : L1=2.971e-10 (  2.61x)  max/cell=2.076e-09 (  0.87x)   PASS
+         arm_kry1 : L1=4.865e-11 (  0.43x)  max/cell=1.229e-09 (  0.52x)   PASS
+         arm_kry0 : L1=2.545e-10 (  2.43x)  max/cell=1.848e-09 (  0.40x)   PASS
+         arm_kry1 : L1=3.472e-11 (  0.33x)  max/cell=7.566e-10 (  0.16x)   PASS
+   GATE K1: PASS
+== K1/sou (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=1.113e-10 (  2.13x)  max/cell=2.174e-10 (  0.70x)   PASS
+         arm_kry1 : L1=5.418e-11 (  1.04x)  max/cell=2.171e-10 (  0.70x)   PASS
+         arm_kry0 : L1=4.051e-10 (  2.22x)  max/cell=1.351e-09 (  0.36x)   PASS
+         arm_kry1 : L1=1.690e-10 (  0.92x)  max/cell=3.757e-09 (  1.01x)   PASS
+         arm_kry0 : L1=4.051e-10 (  2.22x)  max/cell=1.351e-09 (  0.36x)   PASS
+         arm_kry1 : L1=1.690e-10 (  0.92x)  max/cell=3.757e-09 (  1.01x)   PASS
+         arm_kry0 : L1=3.507e-10 (  1.46x)  max/cell=1.830e-09 (  0.15x)   PASS
+         arm_kry1 : L1=1.433e-10 (  0.60x)  max/cell=4.189e-09 (  0.34x)   PASS
+   GATE K1: PASS
+== K1/prod (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=1.032e-10 (  1.97x)  max/cell=1.783e-10 (  0.58x)   PASS
+         arm_kry1 : L1=5.418e-11 (  1.04x)  max/cell=2.171e-10 (  0.70x)   PASS
+         arm_kry0 : L1=3.758e-10 (  2.06x)  max/cell=1.343e-09 (  0.36x)   PASS
+         arm_kry1 : L1=1.690e-10 (  0.92x)  max/cell=3.757e-09 (  1.01x)   PASS
+         arm_kry0 : L1=3.758e-10 (  2.06x)  max/cell=1.343e-09 (  0.36x)   PASS
+         arm_kry1 : L1=1.690e-10 (  0.92x)  max/cell=3.757e-09 (  1.01x)   PASS
+         arm_kry0 : L1=3.060e-10 (  1.28x)  max/cell=1.442e-09 (  0.12x)   PASS
+         arm_kry1 : L1=1.433e-10 (  0.60x)  max/cell=4.189e-09 (  0.34x)   PASS
+   GATE K1: PASS
+== K3/step (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=4.604e-11 (  0.13x)  max/cell=2.077e-09 (  0.12x)   PASS
+         arm_kry1 : L1=6.637e-12 (  0.02x)  max/cell=2.406e-10 (  0.01x)   PASS
+         arm_kry0 : L1=3.273e-10 (  0.22x)  max/cell=2.408e-07 (  0.21x)   PASS
+         arm_kry1 : L1=2.853e-11 (  0.02x)  max/cell=1.544e-08 (  0.01x)   PASS
+         arm_kry0 : L1=3.273e-10 (  0.22x)  max/cell=2.408e-07 (  0.21x)   PASS
+         arm_kry1 : L1=2.853e-11 (  0.02x)  max/cell=1.544e-08 (  0.01x)   PASS
+         arm_kry0 : L1=2.811e-10 (  0.22x)  max/cell=3.137e-07 (  0.61x)   PASS
+         arm_kry1 : L1=2.226e-11 (  0.02x)  max/cell=1.484e-08 (  0.03x)   PASS
+   GATE K3 (AMR): PASS
+== K3/sou (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=8.758e-11 (  0.23x)  max/cell=1.919e-09 (  0.18x)   PASS
+         arm_kry1 : L1=5.642e-11 (  0.15x)  max/cell=1.714e-09 (  0.16x)   PASS
+         arm_kry0 : L1=2.527e-10 (  0.25x)  max/cell=3.542e-08 (  0.13x)   PASS
+         arm_kry1 : L1=1.947e-10 (  0.19x)  max/cell=3.965e-08 (  0.15x)   PASS
+         arm_kry0 : L1=2.527e-10 (  0.25x)  max/cell=3.542e-08 (  0.13x)   PASS
+         arm_kry1 : L1=1.947e-10 (  0.19x)  max/cell=3.965e-08 (  0.15x)   PASS
+         arm_kry0 : L1=2.220e-10 (  0.24x)  max/cell=2.173e-08 (  0.09x)   PASS
+         arm_kry1 : L1=1.784e-10 (  0.20x)  max/cell=2.687e-08 (  0.11x)   PASS
+   GATE K3 (AMR): PASS
+== K3/prod (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=5.866e-11 (  0.15x)  max/cell=1.272e-09 (  0.12x)   PASS
+         arm_kry1 : L1=5.642e-11 (  0.15x)  max/cell=1.714e-09 (  0.16x)   PASS
+         arm_kry0 : L1=1.580e-10 (  0.15x)  max/cell=2.702e-08 (  0.10x)   PASS
+         arm_kry1 : L1=1.947e-10 (  0.19x)  max/cell=3.965e-08 (  0.15x)   PASS
+         arm_kry0 : L1=1.580e-10 (  0.15x)  max/cell=2.702e-08 (  0.10x)   PASS
+         arm_kry1 : L1=1.947e-10 (  0.19x)  max/cell=3.965e-08 (  0.15x)   PASS
+         arm_kry0 : L1=1.414e-10 (  0.16x)  max/cell=2.106e-08 (  0.09x)   PASS
+         arm_kry1 : L1=1.784e-10 (  0.20x)  max/cell=2.687e-08 (  0.11x)   PASS
+   GATE K3 (AMR): PASS
+== K5/step (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=6.070e-10 (  0.62x)  max/cell=1.317e-09 (  0.06x)   PASS
+         arm_kry1 : L1=3.609e-10 (  0.37x)  max/cell=1.685e-08 (  0.75x)   PASS
+         arm_kry0 : L1=2.294e-10 (  0.08x)  max/cell=2.430e-09 (  0.02x)   PASS
+         arm_kry1 : L1=9.785e-10 (  0.33x)  max/cell=1.973e-07 (  1.27x)   PASS
+         arm_kry0 : L1=2.294e-10 (  0.08x)  max/cell=2.430e-09 (  0.02x)   PASS
+         arm_kry1 : L1=9.785e-10 (  0.33x)  max/cell=1.973e-07 (  1.27x)   PASS
+         arm_kry0 : L1=1.811e-10 (  0.06x)  max/cell=1.910e-09 (  0.01x)   PASS
+         arm_kry1 : L1=9.758e-10 (  0.33x)  max/cell=1.929e-07 (  1.24x)   PASS
+   GATE K5 (scattering): PASS
+== K5/sou (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=3.500e-10 (  0.28x)  max/cell=1.038e-09 (  0.03x)   PASS
+         arm_kry1 : L1=1.509e-10 (  0.12x)  max/cell=4.609e-09 (  0.13x)   PASS
+         arm_kry0 : L1=1.259e-10 (  0.04x)  max/cell=4.318e-10 (  0.00x)   PASS
+         arm_kry1 : L1=4.514e-10 (  0.14x)  max/cell=2.897e-08 (  0.14x)   PASS
+         arm_kry0 : L1=1.259e-10 (  0.04x)  max/cell=4.318e-10 (  0.00x)   PASS
+         arm_kry1 : L1=4.514e-10 (  0.14x)  max/cell=2.897e-08 (  0.14x)   PASS
+         arm_kry0 : L1=1.052e-10 (  0.03x)  max/cell=4.220e-10 (  0.00x)   PASS
+         arm_kry1 : L1=4.513e-10 (  0.14x)  max/cell=2.923e-08 (  0.14x)   PASS
+   GATE K5 (scattering): PASS
+== K5/prod (exit 0)
+     96 PASS, 0 FAIL
+         arm_kry0 : L1=2.723e-10 (  0.22x)  max/cell=8.324e-10 (  0.02x)   PASS
+         arm_kry1 : L1=1.509e-10 (  0.12x)  max/cell=4.609e-09 (  0.13x)   PASS
+         arm_kry0 : L1=1.038e-10 (  0.03x)  max/cell=6.050e-10 (  0.00x)   PASS
+         arm_kry1 : L1=4.514e-10 (  0.14x)  max/cell=2.897e-08 (  0.14x)   PASS
+         arm_kry0 : L1=1.038e-10 (  0.03x)  max/cell=6.050e-10 (  0.00x)   PASS
+         arm_kry1 : L1=4.514e-10 (  0.14x)  max/cell=2.897e-08 (  0.14x)   PASS
+         arm_kry0 : L1=1.038e-10 (  0.03x)  max/cell=3.514e-10 (  0.00x)   PASS
+         arm_kry1 : L1=4.513e-10 (  0.14x)  max/cell=2.923e-08 (  0.14x)   PASS
+   GATE K5 (scattering): PASS
+== SEAM/step (exit 0)
+   binaries (cmd.txt): 4135083d c69ee834
+       t = 2  cycle = 315  levels [0, 1]
+       t = 2  cycle = 158  levels [0]
+       t = 2  cycle = 315  levels [0]
+     uniform coarse  error      : 8.282e-03   <- pure resolution error
+     static AMR      error      : 1.601e-02
+     ratio AMR/coarse           : 1.93
+     => THE SEAM COSTS 1.93x THE RESOLUTION ERROR, AND REFINING MAKES THE GLOBAL
+        Seam-attributable error = 7.732e-03, on top of a 8.282e-03 resolution error.
+== SEAM/sou (exit 0)
+   binaries (cmd.txt): 4135083d c69ee834
+       t = 2  cycle = 315  levels [0, 1]
+       t = 2  cycle = 158  levels [0]
+       t = 2  cycle = 315  levels [0]
+     uniform coarse  error      : 3.336e-04   <- pure resolution error
+     static AMR      error      : 2.595e-03
+     ratio AMR/coarse           : 7.78
+     => THE SEAM DOMINATES (7.78x the coarse error). Refining makes the steady state
+== SEAM/prod (exit 0)
+   binaries (cmd.txt): 4135083d c69ee834
+       t = 2  cycle = 315  levels [0, 1]
+       t = 2  cycle = 158  levels [0]
+       t = 2  cycle = 315  levels [0]
+     uniform coarse  error      : 3.336e-04   <- pure resolution error
+     static AMR      error      : 2.595e-03
+     ratio AMR/coarse           : 7.78
+     => THE SEAM DOMINATES (7.78x the coarse error). Refining makes the steady state
+== FLECK/orig (exit 0)
+   alpha=1.0: fitted order over N>=64 (dt <= 0.000244): p = 1.043
+   alpha=0.5: fitted order over N>=64 (dt <= 0.000244): p = 1.007
+   alpha=0.0: fitted order over N>=64 (dt <= 0.000244): p = 1.030
+   alpha=1.0: |errT| at dt=1.53e-5 (N=1024, closest to production dt 1.1e-5): 6.012e-06
+   alpha=0.5: |errT| at dt=1.53e-5 (N=1024, closest to production dt 1.1e-5): 2.516e-06
+== FLECK/prod (exit 0)
+   alpha=1.0: fitted order over N>=64 (dt <= 0.000244): p = 1.043
+   alpha=0.5: fitted order over N>=64 (dt <= 0.000244): p = 1.007
+   alpha=0.0: fitted order over N>=64 (dt <= 0.000244): p = 1.030
+   alpha=1.0: |errT| at dt=1.53e-5 (N=1024, closest to production dt 1.1e-5): 6.012e-06
+   alpha=0.5: |errT| at dt=1.53e-5 (N=1024, closest to production dt 1.1e-5): 2.516e-06
+== K4/orig (exit 0)
+   f_step_tau0p2         0.20   1.3021e+00      1.5014e+00   1.1531   2.63e-09                 1.1156
+   f_step_tau0p5         0.50   5.2083e-01      7.2076e-01   1.3839   1.76e-08                 1.3198
+   f_step_tau1           1.00   2.6042e-01      4.6057e-01   1.7686   2.28e-08                 1.6410
+   f_sou1_tau0p2         0.20   1.3021e+00      1.3015e+00   0.9995   8.33e-09                 0.9744
+   f_sou1_tau0p5         0.50   5.2083e-01      5.2049e-01   0.9993   3.27e-08                 0.9735
+   f_sou1_tau1           1.00   2.6042e-01      2.6026e-01   0.9994   5.13e-08                 0.9737
+   Er conservation requirement is 1e-6; violations: none
+== K4/prod (exit 0)
+   f_step_tau0p2         0.20   only 0 dumps
+   f_step_tau0p5         0.50   only 0 dumps
+   f_step_tau1           1.00   only 0 dumps
+   f_sou1_tau0p2         0.20   1.3021e+00      1.3015e+00   0.9995   8.63e-09                 0.9744
+   f_sou1_tau0p5         0.50   5.2083e-01      5.2049e-01   0.9993   4.47e-08                 0.9735
+   f_sou1_tau1           1.00   2.6042e-01      2.6026e-01   0.9994   7.91e-08                 0.9737
+   Er conservation requirement is 1e-6; violations: none
+== RAY/orig (exit 0)
+     z4p8     32    | 8.660e-01 1.753e-01 4.106e-01 1.448e-01 | 1.541e+00 3.694e-01 1.026e+00 3.188e-01 | 1.888e+00 4.443e-01 1.322e+00 4.083e-01 | global(r>0.1) rms 2.999e-01 max 1.322e+00
+     z8p16    128   | 1.109e+00 3.974e-02 1.188e-01 2.460e-01 | 1.154e+00 6.954e-02 2.287e-01 2.146e-01 | 6.723e-01 9.844e-02 3.563e-01 1.772e-01 | global(r>0.1) rms 7.536e-02 max 3.963e-01
+     z24p48   1152  | 1.183e+00 0.000e+00 0.000e+00 2.721e-01 | 1.320e+00 0.000e+00 0.000e+00 2.487e-01 | 9.685e-01 0.000e+00 0.000e+00 1.655e-01 | global(r>0.1) rms 0.000e+00 max 0.000e+00
+     z4p8sou  32    | 1.466e+00 5.243e-01 1.138e+00 3.339e-01 | 3.921e+00 1.223e+00 4.135e+00 1.087e+00 | 5.867e+00 1.340e+00 5.230e+00 1.271e+00 | global(r>0.1) rms 8.361e-01 max 5.230e+00
+== host tests and restart exactness
+   HOST test_opacity             ALL GATES PASS (0 failures)
+   HOST test_rad_groups          ALL GATES PASS (0 failures)
+   HOST test_sn_angles           PASS  (0 failures)
+   HOST test_sn_sweep            PASS  (0 failures)
+   HOST test_sn_units            PASS  (0 failures)
+   HOST ---
+   RESTART bin c69ee834 variant dual        cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin c69ee834 variant dual        cont vs legB @12: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant dual        cont vs legB @20: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant orig        cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin c69ee834 variant orig        cont vs legB @12: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant orig        cont vs legB @20: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant prod        cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin c69ee834 variant prod        cont vs legB @12: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant prod        cont vs legB @20: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant prodnodual  cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin c69ee834 variant prodnodual  cont vs legB @12: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant prodnodual  cont vs legB @20: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant prodstep    cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin c69ee834 variant prodstep    cont vs legB @12: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant prodstep    cont vs legB @20: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant solv        cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin c69ee834 variant solv        cont vs legB @12: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant solv        cont vs legB @20: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant sou         cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin c69ee834 variant sou         cont vs legB @12: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin c69ee834 variant sou         cont vs legB @20: RESULT: NOT identical (6 dataset(s) differ)
+   RESTART bin 4135083d variant orig        cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin 4135083d variant orig        cont vs legB @12: RESULT: BIT-IDENTICAL
+   RESTART bin 4135083d variant orig        cont vs legB @20: RESULT: BIT-IDENTICAL
+   RESTART bin 4135083d variant prod        cont vs cont2 @20: RESULT: BIT-IDENTICAL
+   RESTART bin 4135083d variant prod        cont vs legB @12: RESULT: BIT-IDENTICAL
+   RESTART bin 4135083d variant prod        cont vs legB @20: RESULT: BIT-IDENTICAL

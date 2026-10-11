@@ -1,0 +1,29 @@
+arm       tau_cell   kappa_s   D_analytic   D_measured    ratio     dEr/Er   ratio(2nd-mom, BIASED)
+dd_tau0p2      0.20      25.6   only 0 dumps
+dd_tau0p5      0.50      64.0   only 0 dumps
+dd_tau1       1.00     128.0   only 0 dumps
+dd_tau3       3.00     384.0   only 0 dumps
+
+NO CALIBRATION ARM -- the ladder is unanchored and means nothing.
+
+==============================================================================
+SOU LADDER (this job)
+arm               tau_cell   D_analytic D_meas(Fourier)    ratio     dEr/Er  ratio(2nd-mom,BIASED)
+f_step_tau0p2         0.20   1.3021e+00      1.5014e+00   1.1531   2.63e-09                 1.1156
+f_step_tau0p5         0.50   5.2083e-01      7.2076e-01   1.3839   1.76e-08                 1.3198
+f_step_tau1           1.00   2.6042e-01      4.6057e-01   1.7686   2.28e-08                 1.6410
+f_step_tau3           3.00   only 0 dumps
+f_sou1_tau0p2         0.20   1.3021e+00      1.3015e+00   0.9995   8.33e-09                 0.9744
+f_sou1_tau0p5         0.50   5.2083e-01      5.2049e-01   0.9993   3.27e-08                 0.9735
+f_sou1_tau1           1.00   2.6042e-01      2.6026e-01   0.9994   5.13e-08                 0.9737
+f_sou1_tau3           3.00   only 0 dumps
+f_sou1_tau1_nb32      1.00   only 0 dumps
+sou094_tau0p2         0.20   only 0 dumps
+sou094_tau1           1.00   only 0 dumps
+sou000_tau1           1.00   only 0 dumps
+ang_sou_n6p8          1.00   only 0 dumps
+ang_sou_n8p12         1.00   only 0 dumps
+ang_sou_n10p16        1.00   only 0 dumps
+ang_step_n10p16       1.00   only 0 dumps
+
+Er conservation requirement is 1e-6; violations: none

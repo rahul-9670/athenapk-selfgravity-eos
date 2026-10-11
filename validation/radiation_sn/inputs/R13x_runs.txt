@@ -1,0 +1,15 @@
+R13/X5_T150 | R13/X5_T150.in | radiation/sn_precond_stencil=sou | 1
+R13/X6_T150 | R13/X6_T150.in | radiation/sn_precond_stencil=sou | 1
+R13/X6b_T150 | R13/X6b_T150.in | radiation/sn_precond_stencil=sou | 1
+R13/X7_T150 | R13/X7_T150.in | radiation/sn_precond_stencil=sou | 1
+R13/X8_T150 | R13/X8_T150.in | radiation/sn_precond_stencil=sou | 1
+R13/X5_T300 | R13/X5_T300.in | radiation/sn_precond_stencil=sou | 1
+R13/X6_T300 | R13/X6_T300.in | radiation/sn_precond_stencil=sou | 1
+R13/X6b_T300 | R13/X6b_T300.in | radiation/sn_precond_stencil=sou | 1
+R13/X7_T300 | R13/X7_T300.in | radiation/sn_precond_stencil=sou | 1
+R13/X8_T300 | R13/X8_T300.in | radiation/sn_precond_stencil=sou | 1
+R13/X5_T1000 | R13/X5_T1000.in | radiation/sn_precond_stencil=sou | 1
+R13/X6_T1000 | R13/X6_T1000.in | radiation/sn_precond_stencil=sou | 1
+R13/X6b_T1000 | R13/X6b_T1000.in | radiation/sn_precond_stencil=sou | 1
+R13/X7_T1000 | R13/X7_T1000.in | radiation/sn_precond_stencil=sou | 1
+R13/X8_T1000 | R13/X8_T1000.in | radiation/sn_precond_stencil=sou | 1

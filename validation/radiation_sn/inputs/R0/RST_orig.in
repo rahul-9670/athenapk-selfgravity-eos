@@ -1,0 +1,115 @@
+# R0: copied verbatim from athenapk/runs/sn_restart_fix/deck.in (restart bisection base)
+<comment>
+problem = TWO-LEG Sn RESTART CONSERVATION TEST (docs/FIX_SN_RESTART_2026-09-15.md)
+#
+# WHAT THIS GRADES. Whether restarting an Sn run from its OWN restart preserves the ordinate
+# field (and therefore total energy), or silently refits it to its own first two angular
+# moments. The defect being tested is not a solver error and is invisible to every diagnostic
+# except conservation: the P1 refit I = (chat/4pi)(Er + 3 n.Fr/chat) is CLAMPED at zero, and
+# the clamp is an energy-ADDING operation wherever |Fr| > chat*Er/3.
+#
+# THE IC IS DELIBERATELY FREE-STREAMING (reduced_flux = 1, |Fr| = chat*Er exactly). That is
+# the regime where the clamp bites: a P1 refit of a forward beam is negative over the backward
+# hemisphere, the clamp deletes the negative lobe, and the surviving J is LARGER than the Er
+# it was built from. A diffusive IC would hide the defect, which is exactly why the FIRST
+# re-seed in the production chain (from an M1 restart) looked benign.
+#
+# MATTER COUPLING IS ON so the manufactured radiation has somewhere to go, reproducing the
+# production signature (gas internal energy rising at a leg boundary).
+
+<job>
+problem_id = rad_pulse
+
+<problem/rad_pulse>
+rho0 = 1.0
+p0   = 1.0
+# Free-streaming Gaussian beam in +x1. E0 is a small floor, not a background.
+E0   = 1.0e-8
+Eamp = 100.0
+x0   = -0.15
+width = 0.08
+reduced_flux = 1.0
+beam_dir1 = 1.0
+beam_dir2 = 0.0
+beam_dir3 = 0.0
+thermal_wave = false
+
+<parthenon/mesh>
+refinement = none
+nghost = 2
+nx1 = 32
+x1min = -0.5
+x1max =  0.5
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 32
+x2min = -0.5
+x2max =  0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 32
+x3min = -0.5
+x3max =  0.5
+ix3_bc = periodic
+ox3_bc = periodic
+task_collection_timeout_in_seconds = 3600
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 16
+nx3 = 16
+
+<parthenon/time>
+integrator = vl2
+cfl        = 0.3
+tlim       = 1.0e30
+nlim       = 4
+ncycle_out = 1
+
+<hydro>
+fluid          = glmmhd
+eos            = adiabatic
+gamma          = 1.6666667
+riemann        = hlld
+reconstruction = plm
+dfloor         = 1.0e-10
+pfloor         = 1.0e-12
+
+<physics>
+self_gravity = false
+radiation = true
+
+<radiation>
+transport = sn
+closure = M1
+sn_nzeta = 4
+sn_npsi = 8
+sn_source = planck
+sn_writeback = true
+sn_matter_coupling = true
+sn_smoother = ordered
+sn_solver = bicgstab
+sn_precond_sweeps = 1
+sn_rel_tol = 1.0e-10
+sn_max_iterations = 4000
+n_group = 1
+c_code = 10.0
+arad_code = 1.0
+creduc = 1.0
+opacity_model = constant
+kappa_a_code = 1.0
+kappa_s_code = 0.0
+coupling_tmax_K = 1.0e8
+tfloor_code = 1.0e-12
+efloor = 1.0e-40
+matter_coupling = true
+cfl = 0.3
+
+<parthenon/output0>
+file_type = hdf5
+dn = 1000000
+variables = prim, rad.Er, rad.Fr1, rad.Fr2, rad.Fr3
+
+<parthenon/output1>
+file_type = rst
+dn = 1

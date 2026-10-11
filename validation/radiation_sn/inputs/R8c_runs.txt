@@ -1,0 +1,3 @@
+R8/point_o4x8 | R8/point.in | radiation/sn_precond_stencil=sou | 64
+R8/point_o8x16 | R8/point.in | radiation/sn_nzeta=8 radiation/sn_npsi=16 radiation/sn_precond_stencil=sou | 64
+R8/point_o4x8_step | R8/point.in | radiation/sn_spatial=step radiation/sn_sou_limiter=none | 64

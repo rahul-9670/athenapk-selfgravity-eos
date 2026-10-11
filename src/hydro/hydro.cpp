@@ -44,6 +44,9 @@
 #include "prolongation/custom_ops.hpp"
 #include "rsolvers/rsolvers.hpp"
 #include "utils/error_checking.hpp"
+#include "../radiation/radiation.hpp"
+#include "../radiation/radiation_groups.hpp"
+#include "../radiation/radiation_opacity.hpp"
 #include "../self_gravity/self_gravity.hpp"
 #include "../utils/row_tile.hpp"
 
@@ -67,9 +70,12 @@ parthenon::Packages_t ProcessPackages(std::unique_ptr<ParameterInput> &pin) {
   if (pin->GetOrAddBoolean("physics", "self_gravity", false)) {
     packages.Add(SelfGravity::Initialize(pin.get()));
   }
-  // This tree carries hydro/MHD + self-gravity + the tabulated EOS only. Refuse switches for
-  // packages that are not part of it rather than silently running without them.
-  for (const char *phys : {"radiation", "chemistry", "dust"}) {
+  if (pin->GetOrAddBoolean("physics", "radiation", false)) {
+    packages.Add(Radiation::Initialize(pin.get()));
+  }
+  // This tree carries hydro/MHD + self-gravity + the tabulated EOS + radiation (Sn) only. Refuse
+  // switches for packages that are not part of it rather than silently running without them.
+  for (const char *phys : {"chemistry", "dust"}) {
     PARTHENON_REQUIRE_THROWS(!pin->GetOrAddBoolean("physics", phys, false),
                              "<physics> " + std::string(phys) + " is not part of this build.");
   }
@@ -136,6 +142,17 @@ void PreStepMeshUserWorkInLoop(Mesh *pmesh, ParameterInput *pin, SimTime &tm) {
     const auto &etab = hydro_pkg->Param<AdiabaticGLMMHDEOS>("eos").GetEosTable();
     unsigned long long c[EOSTable::EosTable::kNClampCtr] = {0};
     bool have_eos_ctr = etab.ReadAndResetClampCounts(c);
+    // radiation.cpp loads its OWN EosTable (own clamp counter); drain and sum both banks
+    // so the report covers the whole run (MatterCoupling/probe lookups live on radiation's copy).
+    if (pmesh->packages.AllPackages().count("radiation") > 0) {
+      const auto &retab =
+          pmesh->packages.Get("radiation")->Param<EOSTable::EosTable>("eos_tab");
+      unsigned long long cr[EOSTable::EosTable::kNClampCtr] = {0};
+      if (retab.ReadAndResetClampCounts(cr)) {
+        for (int q = 0; q < EOSTable::EosTable::kNClampCtr; ++q) c[q] += cr[q];
+        have_eos_ctr = true;
+      }
+    }
     if (have_eos_ctr) {
 #ifdef MPI_PARALLEL
       PARTHENON_MPI_CHECK(MPI_Allreduce(MPI_IN_PLACE, c, EOSTable::EosTable::kNClampCtr,
@@ -169,6 +186,54 @@ void PreStepMeshUserWorkInLoop(Mesh *pmesh, ParameterInput *pin, SimTime &tm) {
                      " mean the table does not cover the run -- regenerate it"
                      " (src/eos/gen_eos_table.py). PROBE clamps are root-finder trial values"
                      " pulled back by bisection and are benign unless they explode."
+                  << std::endl;
+      }
+    }
+  }
+
+  // ---- OPACITY-TABLE OUT-OF-RANGE CLAMP REPORT (2026-08-17) --------------------------------
+  // The other half of the same job: both opacity tables clamp exactly like the EOS one, and a
+  // silently clamped opacity gives a wrong answer while every run reports success.
+  // Same reduction pattern as above, and drained in the same cycle so a run that walks off both
+  // tables says so once, not twice.
+  if (pmesh->packages.AllPackages().count("radiation") > 0) {
+    auto rad_pkg = pmesh->packages.Get("radiation");
+    unsigned long long cg[Radiation::OpacityTable::kNClampCtr] = {0};
+    unsigned long long cm[Radiation::GroupOpacityTable::kNClampCtr] = {0};
+    const auto &op = rad_pkg->Param<Radiation::OpacityParams>("opacity");
+    const auto &gt = rad_pkg->Param<Radiation::GroupOpacityTable>("optable");
+    const bool have_g = op.table.ReadAndResetClampCounts(cg);
+    const bool have_m = gt.ReadAndResetClampCounts(cm);
+    if (have_g || have_m) {
+      // 2026-08-21: [0..3] gray STATE, [4..7] gray PROBE, [8..9] group-mult STATE,
+      // [10..11] group-mult PROBE. See the EOS block above for why the split exists.
+      unsigned long long buf[12] = {cg[0], cg[1], cg[2], cg[3], cg[4], cg[5],
+                                    cg[6], cg[7], cm[0], cm[1], cm[2], cm[3]};
+#ifdef MPI_PARALLEL
+      PARTHENON_MPI_CHECK(MPI_Allreduce(MPI_IN_PLACE, buf, 12, MPI_UNSIGNED_LONG_LONG, MPI_SUM,
+                                        MPI_COMM_WORLD));
+#endif
+      unsigned long long tot = 0, tot_probe = 0;
+      for (int q = 0; q < 4; ++q) tot += buf[q];
+      for (int q = 8; q < 10; ++q) tot += buf[q];
+      for (int q = 4; q < 8; ++q) tot_probe += buf[q];
+      for (int q = 10; q < 12; ++q) tot_probe += buf[q];
+      if ((tot > 0 || tot_probe > 0) && parthenon::Globals::my_rank == 0) {
+        Real lrl = 0, lrh = 0, lTl = 0, lTh = 0;
+        if (have_g) op.table.AxisRanges(lrl, lrh, lTl, lTh);
+        std::cout << (tot > 0 ? "### WARNING opacity table: " : "### NOTE opacity table: ") << tot
+                  << " CELL-STATE (+ " << tot_probe << " solver-probe)"
+                  << " out-of-range lookups were EDGE-CLAMPED in the previous cycle"
+                     " (nearest-neighbour extrapolation, NOT interpolation). gray:"
+                     "  rho<" << lrl << ": " << buf[0] << "  rho>" << lrh << ": " << buf[1]
+                  << "  T<" << lTl << ": " << buf[2] << "  T>" << lTh << ": " << buf[3]
+                  << " | group multipliers:  T below: " << buf[8]
+                  << "  T above: " << buf[9]
+                  << " | PROBE gray  rho<: " << buf[4] << "  rho>: " << buf[5]
+                  << "  T<: " << buf[6] << "  T>: " << buf[7]
+                  << " | PROBE mult  T below: " << buf[10] << "  T above: " << buf[11]
+                  << "   (axes are log10; rho in CGS, T in K). Regenerate the table over the"
+                     " range the run actually visits (src/radiation/gen_opacity_table.py)."
                   << std::endl;
       }
     }
@@ -438,7 +503,7 @@ TaskStatus ClampBoundaryFluxes(MeshData<Real> *md) {
   const Real ylo = pm->mesh_size.xmin(X2DIR), yhi = pm->mesh_size.xmax(X2DIR);
   const Real zlo = pm->mesh_size.xmin(X3DIR), zhi = pm->mesh_size.xmax(X3DIR);
   const int ndim = pm->ndim;
-  // validation_tests/dual_energy DE-F2 (2026-10-07): clamp only PHYSICAL boundaries. A periodic mesh face is an
+  // validation/dual_energy DE-F2 (2026-10-07): clamp only PHYSICAL boundaries. A periodic mesh face is an
   // interior face of the domain; clamping its inflow drained periodic test boxes to vacuum. Production: outflow
   // on all faces -> unchanged.
   using parthenon::BoundaryFace;
@@ -828,7 +893,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     // predictor (`dc`, the historical behaviour, kept for bit-reproducing older runs) leaves an
     // O(dt) error at converging stagnation points -- measured as a FIRST-order-in-dt error of the
     // collapse's central density, 35 % of the n_J = 8 collapse-time error
-    // (validation_tests/self_gravity, L7).
+    // (validation/self_gravity, L7).
     const auto vl2_pred = pin->GetOrAddString("hydro", "vl2_predictor_recon", "same");
     PARTHENON_REQUIRE(vl2_pred == "dc" || vl2_pred == "same",
                       "hydro/vl2_predictor_recon must be 'same' (default) or 'dc'");
@@ -852,7 +917,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   auto first_order_flux_correct =
       pin->GetOrAddBoolean("hydro", "first_order_flux_correct", false);
   pkg->AddParam<>("first_order_flux_correct", first_order_flux_correct);
-  // hydro/double_flux (validation_tests/eos_tabulated E7 / E-F10, 2026-10-05; default false): pressure-exact
+  // hydro/double_flux (validation/eos_tabulated E7 / E-F10, 2026-10-05; default false): pressure-exact
   // contacts for the tabulated EOS via the double-flux energy update (src/hydro/double_flux.hpp). Opt-in;
   // refused outside its validated scope.
   {
@@ -878,7 +943,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
                         "hydro/double_flux needs reconstruction = plm or dc");
       PARTHENON_REQUIRE(integrator == Integrator::vl2, "hydro/double_flux needs integrator = vl2");
       // mesh refinement allowed since 2026-10-06: coarse cells along fine/coarse faces are standard cells
-      // (double_flux.cpp); validated by validation_tests/eos_tabulated E7r.
+      // (double_flux.cpp); validated by validation/eos_tabulated E7r.
       PARTHENON_REQUIRE(!first_order_flux_correct,
                         "hydro/double_flux: first_order_flux_correct not supported (it replaces the fluxes the "
                         "double-flux increments were built for)");
@@ -1041,7 +1106,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     Real Tfloor = pin->GetOrAddReal("hydro", "Tfloor", -1.0);
     Real efloor = Tfloor;
     if (efloor > 0.0) {
-      // validation_tests/eos_tabulated E-F5 (2026-10-05): the tabulated EOS takes the floor energy from the table
+      // validation/eos_tabulated E-F5 (2026-10-05): the tabulated EOS takes the floor energy from the table
       // (below) and needs neither a units block nor hydro/He_mass_fraction -- the requirement applies to the
       // ideal-gas branch only. Tfloor is in CODE temperature units (x temperature_unit = K; 10.015 K for FHC).
       if (!use_h2diss && !pkg->AllParams().hasKey("mbar_over_kb")) {
@@ -1172,11 +1237,15 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   // Advected components after `nhydro`: the passive scalars plus, with dual energy on, the
   // internal-energy density in the LAST slot (so no scalar index shifts).
   // GUARD. collapse_be's barotropic step overwrites the thermal energy every stage and does not update the
-  // advected internal energy, so the two energies would drift apart; dual energy is refused there.
+  // advected internal energy, so the two energies would drift apart; dual energy is refused there. With
+  // radiation on the barotropic overwrite is skipped (radiation owns the energy, collapse_be.cpp) and the
+  // radiation thermal exchange updates the internal energy, so that combination is allowed.
   if (dual_energy) {
     PARTHENON_REQUIRE_THROWS(!(pin->DoesParameterExist("job", "problem_id") &&
-                               pin->GetString("job", "problem_id") == "collapse_be"),
-                             "hydro/dual_energy is not wired into collapse_be's barotropic step.");
+                               pin->GetString("job", "problem_id") == "collapse_be") ||
+                                 pin->GetOrAddBoolean("physics", "radiation", false),
+                             "hydro/dual_energy is not wired into collapse_be's barotropic step "
+                             "(it is allowed with <physics> radiation = true).");
   }
   const int nadvected = nscalars + (dual_energy ? 1 : 0);
   pkg->AddParam("dual_energy", dual_energy);
@@ -1185,7 +1254,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   pkg->AddParam("dual_energy_sync_step_end",
                 pin->GetOrAddBoolean("hydro", "dual_energy_sync_step_end", false));
   pkg->AddParam("dual_idx", dual_energy ? nhydro + nscalars : -1);
-  // hydro/dual_energy_flux (validation_tests/dual_energy DE-F3, default "specific" = legacy, task graph unchanged):
+  // hydro/dual_energy_flux (validation/dual_energy DE-F3, default "specific" = legacy, task graph unchanged):
   // "density" rebuilds the dual flux from the reconstructed rho*e (hydro/dual_flux_density.cpp) so switched cells
   // keep pressure equilibrium at contacts. PLM only; needs the unsigned prim (the legacy signed flag would flip q).
   {
@@ -1246,13 +1315,20 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
                                                     Metadata::OneCopy});
     pkg->AddField("dual_comp", m_comp);
   }
+  // hydro/dual_energy_shared_select (audit P-01, default false = legacy): the Sn seed and matter coupling pick
+  // the gas internal energy with ConsToPrim's own two-sided rule (AdiabaticGLMMHDEOS::DualSelectEint) instead
+  // of the one-sided eta1 rule. See SnDualSel in radiation/radiation_sn.cpp; no effect without radiation.
+  const bool dual_shared_select =
+      dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_shared_select", false);
+  pkg->AddParam("dual_energy_shared_select", dual_shared_select);
   // hydro/boundary_clamp_dual (audit P-10, default false = legacy): ClampBoundaryFluxes also zeroes
   // the dual-energy flux of a clamped inflow face (it zeroed only the passive scalars before).
   pkg->AddParam("boundary_clamp_dual",
                 dual_energy && pin->GetOrAddBoolean("hydro", "boundary_clamp_dual", false));
   if (parthenon::Globals::my_rank == 0 && dual_energy &&
-      (dual_comp_ghost || pkg->Param<bool>("boundary_clamp_dual"))) {
+      (dual_comp_ghost || dual_shared_select || pkg->Param<bool>("boundary_clamp_dual"))) {
     std::cout << "## Dual energy keys: comp_ghost=" << dual_comp_ghost
+              << " shared_select=" << dual_shared_select
               << " clamp_dual=" << pkg->Param<bool>("boundary_clamp_dual") << std::endl;
   }
   const bool dual_unsigned_prim =
@@ -1263,6 +1339,18 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   pkg->AddParam("ghost_sync_rounds", pin->GetOrAddInteger("hydro", "ghost_sync_rounds", 0));
   // See RegisterVarNames in hydro_driver.cpp. Default false = full register copies.
   pkg->AddParam("lean_registers", pin->GetOrAddBoolean("hydro", "lean_registers", false));
+  // Speed work (2026-10-08): hydro halo exchanges without the Sn fields (hydro_driver.cpp HydroExchangeData).
+  pkg->AddParam("lean_exchange", pin->GetOrAddBoolean("hydro", "lean_exchange", false));
+  {
+    const bool lr = pin->GetOrAddBoolean("hydro", "lean_exchange_rad", false);
+    PARTHENON_REQUIRE(!lr || pin->GetOrAddBoolean("hydro", "lean_exchange", false),
+                      "hydro/lean_exchange_rad needs hydro/lean_exchange = true");
+    // read-only (radiation.cpp owns the key and its default "sn"; a GetOrAdd here could register a second default)
+    PARTHENON_REQUIRE(!lr || !pin->DoesParameterExist("radiation", "transport") ||
+                          pin->GetString("radiation", "transport") == "sn",
+                      "hydro/lean_exchange_rad is valid only with radiation/transport = sn (M1/FLD read rad.* ghosts)");
+    pkg->AddParam("lean_exchange_rad", lr);
+  }
   if (dual_unsigned_prim) {
     // Written over IndexDomain::entire by every ConsToPrim; never exchanged or restarted
     // (it is a pure function of cons at the last ConsToPrim, and only cons-ndual reads it).
@@ -1311,7 +1399,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
       std::vector<int>({nhydro + nadvected}), cons_labels);
   // hydro/cons_prolong_pc (VALIDATION ONLY, default false = the production minmod operator): piecewise-constant
   // prolongation of cons, to isolate the fine/coarse source of the residual double-flux contact error
-  // (validation_tests/eos_tabulated E7v, 2026-10-06).
+  // (validation/eos_tabulated E7v, 2026-10-06).
   if (pin->GetOrAddBoolean("hydro", "cons_prolong_pc", false)) {
     m.RegisterRefinementOps<parthenon::refinement_ops::ProlongatePiecewiseConstant,
                             parthenon::refinement_ops::RestrictAverage>();

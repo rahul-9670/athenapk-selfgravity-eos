@@ -1,0 +1,54 @@
+# R8a Ganapol plane source (scripts/analyze_R8.py): phi = c E; SN_ref = exact discrete ordinates on the code set; Ganapol = closed form (ganapol_ref.py, verified by Monte Carlo) convolved with the initial Gaussian; L1 = int|phi-ref|/int ref; int = int phi dx (exact 1)
+t = 0.5:
+   4x 8 SN_ref (exact discrete ordinates): W1 to Ganapol 3.074e-02  variance 0.07105 (continuum 0.07105)
+    code dt 2e-03 sou : vs SN_ref L1 6.819e-01 max rel |x|<0.9t 8.336e+00 | vs Ganapol W1 2.564e-02 variance 0.07139 | int 1.0000000483  min +1.00e-30
+    code dt 2e-03 step: vs SN_ref L1 8.494e-01 max rel |x|<0.9t 5.540e+00 | vs Ganapol W1 2.251e-02 variance 0.07189 | int 1.0000000000  min +1.00e-12
+    code dt 5e-04 sou : vs SN_ref L1 5.737e-01 max rel |x|<0.9t 1.387e+01 | vs Ganapol W1 2.795e-02 variance 0.07181 | int 1.0000002268  min +1.00e-30
+    code dt 5e-04 step: vs SN_ref L1 8.190e-01 max rel |x|<0.9t 6.580e+00 | vs Ganapol W1 2.300e-02 variance 0.07174 | int 1.0000000000  min +1.00e-12
+   8x16 SN_ref (exact discrete ordinates): W1 to Ganapol 1.015e-02  variance 0.07105 (continuum 0.07105)
+    code dt 2e-03 sou : vs SN_ref L1 4.502e-01 max rel |x|<0.9t 6.379e+00 | vs Ganapol W1 8.000e-03 variance 0.07137 | int 1.0000000016  min +1.00e-30
+    code dt 2e-03 step: vs SN_ref L1 5.258e-01 max rel |x|<0.9t 5.685e+00 | vs Ganapol W1 6.921e-03 variance 0.07188 | int 1.0000000000  min +1.00e-12
+    code dt 5e-04 sou : vs SN_ref L1 3.933e-01 max rel |x|<0.9t 7.210e+00 | vs Ganapol W1 8.715e-03 variance 0.07176 | int 1.0000000563  min +1.00e-30
+    code dt 5e-04 step: vs SN_ref L1 5.130e-01 max rel |x|<0.9t 5.980e+00 | vs Ganapol W1 6.908e-03 variance 0.07173 | int 1.0000000000  min +1.00e-12
+  16x32 SN_ref (exact discrete ordinates): W1 to Ganapol 3.239e-03  variance 0.07105 (continuum 0.07105)
+    code dt 2e-03 sou : vs SN_ref L1 2.134e-01 max rel |x|<0.9t 2.820e+00 | vs Ganapol W1 2.622e-03 variance 0.07136 | int 1.0000000002  min +1.00e-30
+    code dt 2e-03 step: vs SN_ref L1 2.635e-01 max rel |x|<0.9t 2.693e+00 | vs Ganapol W1 3.085e-03 variance 0.07187 | int 1.0000000000  min +1.00e-12
+    code dt 5e-04 sou : vs SN_ref L1 1.980e-01 max rel |x|<0.9t 2.681e+00 | vs Ganapol W1 2.787e-03 variance 0.07176 | int 1.0000000104  min +1.00e-30
+    code dt 5e-04 step: vs SN_ref L1 2.533e-01 max rel |x|<0.9t 2.760e+00 | vs Ganapol W1 2.412e-03 variance 0.07172 | int 1.0000000000  min +1.00e-12
+t = 1.0:
+   4x 8 SN_ref (exact discrete ordinates): W1 to Ganapol 4.393e-02  variance 0.24528 (continuum 0.24528)
+    code dt 2e-03 sou : vs SN_ref L1 5.202e-01 max rel |x|<0.9t 4.250e+06 | vs Ganapol W1 3.879e-02 variance 0.24576 | int 1.0000000006  min +1.00e-30
+    code dt 2e-03 step: vs SN_ref L1 6.322e-01 max rel |x|<0.9t 3.306e+06 | vs Ganapol W1 3.453e-02 variance 0.24681 | int 1.0000000000  min +1.00e-12
+    code dt 5e-04 sou : vs SN_ref L1 4.592e-01 max rel |x|<0.9t 5.488e+06 | vs Ganapol W1 4.114e-02 variance 0.24678 | int 1.0000000783  min +1.00e-30
+    code dt 5e-04 step: vs SN_ref L1 6.136e-01 max rel |x|<0.9t 3.715e+06 | vs Ganapol W1 3.584e-02 variance 0.24663 | int 1.0000000000  min +1.00e-12
+   8x16 SN_ref (exact discrete ordinates): W1 to Ganapol 1.382e-02  variance 0.24528 (continuum 0.24528)
+    code dt 2e-03 sou : vs SN_ref L1 3.985e-01 max rel |x|<0.9t 3.727e+00 | vs Ganapol W1 1.144e-02 variance 0.24573 | int 1.0000000000  min +1.00e-30
+    code dt 2e-03 step: vs SN_ref L1 4.550e-01 max rel |x|<0.9t 3.162e+00 | vs Ganapol W1 1.004e-02 variance 0.24678 | int 1.0000000000  min +1.18e-12
+    code dt 5e-04 sou : vs SN_ref L1 3.530e-01 max rel |x|<0.9t 4.943e+00 | vs Ganapol W1 1.230e-02 variance 0.24663 | int 1.0000000173  min +1.00e-30
+    code dt 5e-04 step: vs SN_ref L1 4.460e-01 max rel |x|<0.9t 3.347e+00 | vs Ganapol W1 1.030e-02 variance 0.24660 | int 1.0000000000  min +1.00e-12
+  16x32 SN_ref (exact discrete ordinates): W1 to Ganapol 4.568e-03  variance 0.24528 (continuum 0.24528)
+    code dt 2e-03 sou : vs SN_ref L1 2.322e-01 max rel |x|<0.9t 2.174e+00 | vs Ganapol W1 3.464e-03 variance 0.24571 | int 1.0000000000  min +1.00e-30
+    code dt 2e-03 step: vs SN_ref L1 2.605e-01 max rel |x|<0.9t 1.966e+00 | vs Ganapol W1 3.168e-03 variance 0.24678 | int 1.0000000000  min +2.15e-12
+    code dt 5e-04 sou : vs SN_ref L1 2.167e-01 max rel |x|<0.9t 2.182e+00 | vs Ganapol W1 3.936e-03 variance 0.24660 | int 1.0000000045  min +1.00e-30
+    code dt 5e-04 step: vs SN_ref L1 2.560e-01 max rel |x|<0.9t 2.072e+00 | vs Ganapol W1 3.029e-03 variance 0.24659 | int 1.0000000000  min +1.00e-12
+R8b radiative shock (Lowrie & Edwards 2008 model; reference = radshock_ref.py non-equilibrium diffusion, 'static' = the code's physics without O(u/c) terms, 'full' = with them): T/T0, theta = T_rad/T0
+  shock_M2       t 0.0100: x_s 0.00868 (u_s 0.8678) Tmax 2.1740 theta(x_s) 1.8263 T(xi=-2e-4) 1.2468 T1 2.06859 rho1 2.29535 | static ref: Tmax 2.1706 theta(0) 1.8283 T(-2e-4) 1.2862 T1 2.07812 rho1 2.28571 L1(theta - 1)/<theta - 1> 3.295e-02 | full ref: Tmax 2.1702 theta(0) 1.8274 T(-2e-4) 1.2851 T1 2.07757 rho1 2.28607 L1(theta - 1)/<theta - 1> 3.258e-02
+  shock_M2       t 0.0150: x_s 0.01306 (u_s 0.8706) Tmax 2.1715 theta(x_s) 1.8190 T(xi=-2e-4) 1.2445 T1 2.07727 rho1 2.28591 | static ref: Tmax 2.1706 theta(0) 1.8283 T(-2e-4) 1.2862 T1 2.07812 rho1 2.28571 L1(theta - 1)/<theta - 1> 3.339e-02 | full ref: Tmax 2.1702 theta(0) 1.8274 T(-2e-4) 1.2851 T1 2.07757 rho1 2.28607 L1(theta - 1)/<theta - 1> 3.296e-02
+  shock_M2       t 0.0200: x_s 0.01742 (u_s 0.8710) Tmax 2.1633 theta(x_s) 1.8282 T(xi=-2e-4) 1.2472 T1 2.07721 rho1 2.28612 | static ref: Tmax 2.1706 theta(0) 1.8283 T(-2e-4) 1.2862 T1 2.07812 rho1 2.28571 L1(theta - 1)/<theta - 1> 3.273e-02 | full ref: Tmax 2.1702 theta(0) 1.8274 T(-2e-4) 1.2851 T1 2.07757 rho1 2.28607 L1(theta - 1)/<theta - 1> 3.234e-02
+  shock_M2_step  t 0.0100: x_s 0.00868 (u_s 0.8679) Tmax 2.1739 theta(x_s) 1.8268 T(xi=-2e-4) 1.2475 T1 2.06833 rho1 2.29564 | static ref: Tmax 2.1706 theta(0) 1.8283 T(-2e-4) 1.2862 T1 2.07812 rho1 2.28571 L1(theta - 1)/<theta - 1> 3.343e-02 | full ref: Tmax 2.1702 theta(0) 1.8274 T(-2e-4) 1.2851 T1 2.07757 rho1 2.28607 L1(theta - 1)/<theta - 1> 3.307e-02
+  shock_M2_step  t 0.0150: x_s 0.01306 (u_s 0.8706) Tmax 2.1717 theta(x_s) 1.8174 T(xi=-2e-4) 1.2453 T1 2.07725 rho1 2.28592 | static ref: Tmax 2.1706 theta(0) 1.8283 T(-2e-4) 1.2862 T1 2.07812 rho1 2.28571 L1(theta - 1)/<theta - 1> 3.380e-02 | full ref: Tmax 2.1702 theta(0) 1.8274 T(-2e-4) 1.2851 T1 2.07757 rho1 2.28607 L1(theta - 1)/<theta - 1> 3.339e-02
+  shock_M2_step  t 0.0200: x_s 0.01742 (u_s 0.8710) Tmax 2.1635 theta(x_s) 1.8300 T(xi=-2e-4) 1.2480 T1 2.07721 rho1 2.28611 | static ref: Tmax 2.1706 theta(0) 1.8283 T(-2e-4) 1.2862 T1 2.07812 rho1 2.28571 L1(theta - 1)/<theta - 1> 3.319e-02 | full ref: Tmax 2.1702 theta(0) 1.8274 T(-2e-4) 1.2851 T1 2.07757 rho1 2.28607 L1(theta - 1)/<theta - 1> 3.280e-02
+  M0 3.0 full reference: integration did not finish in 4e5 rhs calls (stiff/singular manifold)
+  shock_M3       t 0.0100: x_s 0.00972 (u_s 0.9719) Tmax 4.2342 theta(x_s) 3.4777 T(xi=-2e-4) 2.8889 T1 3.60250 rho1 3.05123 | static ref: Tmax 4.2642 theta(0) 3.4551 T(-2e-4) 3.0841 T1 3.66667 rho1 3.00000 L1(theta - 1)/<theta - 1> 4.624e-02
+  shock_M3       t 0.0150: x_s 0.01472 (u_s 0.9813) Tmax 4.2260 theta(x_s) 3.4601 T(xi=-2e-4) 2.8745 T1 3.64909 rho1 3.01290 | static ref: Tmax 4.2642 theta(0) 3.4551 T(-2e-4) 3.0841 T1 3.66667 rho1 3.00000 L1(theta - 1)/<theta - 1> 4.421e-02
+  shock_M3       t 0.0200: x_s 0.01970 (u_s 0.9850) Tmax 4.2392 theta(x_s) 3.4721 T(xi=-2e-4) 2.8876 T1 3.65773 rho1 3.00576 | static ref: Tmax 4.2642 theta(0) 3.4551 T(-2e-4) 3.0841 T1 3.66667 rho1 3.00000 L1(theta - 1)/<theta - 1> 4.314e-02
+  shock_M3_step  t 0.0100: x_s 0.00972 (u_s 0.9720) Tmax 4.2371 theta(x_s) 3.4842 T(xi=-2e-4) 2.8889 T1 3.60124 rho1 3.05227 | static ref: Tmax 4.2642 theta(0) 3.4551 T(-2e-4) 3.0841 T1 3.66667 rho1 3.00000 L1(theta - 1)/<theta - 1> 4.702e-02
+  shock_M3_step  t 0.0150: x_s 0.01472 (u_s 0.9813) Tmax 4.2312 theta(x_s) 3.4590 T(xi=-2e-4) 2.8751 T1 3.64853 rho1 3.01337 | static ref: Tmax 4.2642 theta(0) 3.4551 T(-2e-4) 3.0841 T1 3.66667 rho1 3.00000 L1(theta - 1)/<theta - 1> 4.487e-02
+  shock_M3_step  t 0.0200: x_s 0.01970 (u_s 0.9850) Tmax 4.2375 theta(x_s) 3.4754 T(xi=-2e-4) 2.8886 T1 3.65756 rho1 3.00591 | static ref: Tmax 4.2642 theta(0) 3.4551 T(-2e-4) 3.0841 T1 3.66667 rho1 3.00000 L1(theta - 1)/<theta - 1> 4.376e-02
+R8c Ganapol 3-D point source (pure scattering == steady gray radiative equilibrium): phi = c E
+  point_o4x8       t 0.5: int phi 1.00007233 (ref in box 1.00000013) | radial W1 3.566e-02 | shell-mean |err| median 2.807e-01 max 7.673e-01 | ray spread rms 7.247e-01 max 2.743e+00 (r < 0.9 t)
+  point_o4x8       t 1.0: int phi 0.99889616 (ref in box 0.99999995) | radial W1 3.967e-02 | shell-mean |err| median 9.182e-02 max 1.059e+00 | ray spread rms 9.214e-01 max 8.540e+00 (r < 0.9 t)
+  point_o8x16      t 0.5: int phi 1.00003269 (ref in box 1.00000013) | radial W1 3.554e-02 | shell-mean |err| median 2.235e-01 max 7.539e-01 | ray spread rms 4.950e-01 max 1.028e+00 (r < 0.9 t)
+  point_o8x16      t 1.0: int phi 0.99769701 (ref in box 0.99999995) | radial W1 4.062e-02 | shell-mean |err| median 6.027e-02 max 3.570e-01 | ray spread rms 3.744e-01 max 2.524e+00 (r < 0.9 t)
+  point_o4x8_step  t 0.5: int phi 0.99999776 (ref in box 1.00000013) | radial W1 5.508e-02 | shell-mean |err| median 4.459e-01 max 8.784e-01 | ray spread rms 6.767e-01 max 1.689e+00 (r < 0.9 t)
+  point_o4x8_step  t 1.0: int phi 0.98550689 (ref in box 0.99999995) | radial W1 6.801e-02 | shell-mean |err| median 1.364e-01 max 3.134e-01 | ray spread rms 5.565e-01 max 3.110e+00 (r < 0.9 t)

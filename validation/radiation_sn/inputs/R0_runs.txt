@@ -1,0 +1,140 @@
+R0/G8/orig/arm_planck | R0/G8_orig.in |  | 8
+R0/G8/orig/arm_t2 | R0/G8_orig.in | problem/rad_pulse/p0=2.0 radiation/arad_code=3.0 | 8
+R0/G8/orig/arm_noabs | R0/G8_orig.in | radiation/kappa_a_code=0.0 | 8
+R0/G8/prod/arm_planck | R0/G8_prod.in |  | 8
+R0/G8/prod/arm_t2 | R0/G8_prod.in | problem/rad_pulse/p0=2.0 radiation/arad_code=3.0 | 8
+R0/G8/prod/arm_noabs | R0/G8_prod.in | radiation/kappa_a_code=0.0 | 8
+R0/G9/orig/arm_creduc1 | R0/G9_orig.in | radiation/creduc=1.0 | 8
+R0/G9/orig/arm_creduc4 | R0/G9_orig.in | radiation/creduc=4.0 | 8
+R0/G9/orig/arm_creduc1_tol12 | R0/G9_orig.in | radiation/creduc=1.0 radiation/sn_rel_tol=1.0e-12 | 8
+R0/G9/prod/arm_creduc1 | R0/G9_prod.in | radiation/creduc=1.0 | 8
+R0/G9/prod/arm_creduc4 | R0/G9_prod.in | radiation/creduc=4.0 | 8
+R0/G9/prod/arm_creduc1_tol12 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_rel_tol=1.0e-12 | 8
+R0/G10/orig/arm_ks0 | R0/G10_orig.in | radiation/kappa_s_code=0.0 | 8
+R0/G10/orig/arm_ks2 | R0/G10_orig.in | radiation/kappa_s_code=2.0 | 8
+R0/G10/prod/arm_ks0 | R0/G10_prod.in | radiation/kappa_s_code=0.0 | 8
+R0/G10/prod/arm_ks2 | R0/G10_prod.in | radiation/kappa_s_code=2.0 | 8
+R0/G11/orig/arm_alpha1 | R0/G11_orig.in | radiation/sn_fleck_alpha=1.0 | 8
+R0/G11/orig/arm_alpha0 | R0/G11_orig.in | radiation/sn_fleck_alpha=0.0 | 8
+R0/G11/prod/arm_alpha1 | R0/G11_prod.in | radiation/sn_fleck_alpha=1.0 | 8
+R0/G11/prod/arm_alpha0 | R0/G11_prod.in | radiation/sn_fleck_alpha=0.0 | 8
+R0/K1/step/arm_ref | R0/K1_step.in | radiation/sn_solver=richardson | 8
+R0/K1/step/arm_kry0 | R0/K1_step.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K1/step/arm_kry1 | R0/K1_step.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K1/step/arm_tight | R0/K1_step.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K1/sou/arm_ref | R0/K1_sou.in | radiation/sn_solver=richardson | 8
+R0/K1/sou/arm_kry0 | R0/K1_sou.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K1/sou/arm_kry1 | R0/K1_sou.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K1/sou/arm_tight | R0/K1_sou.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K1/prod/arm_ref | R0/K1_prod.in | radiation/sn_solver=richardson | 8
+R0/K1/prod/arm_kry0 | R0/K1_prod.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K1/prod/arm_kry1 | R0/K1_prod.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K1/prod/arm_tight | R0/K1_prod.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K3/step/arm_ref | R0/K3_step.in | radiation/sn_solver=richardson | 8
+R0/K3/step/arm_kry0 | R0/K3_step.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K3/step/arm_kry1 | R0/K3_step.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K3/step/arm_tight | R0/K3_step.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K3/sou/arm_ref | R0/K3_sou.in | radiation/sn_solver=richardson | 8
+R0/K3/sou/arm_kry0 | R0/K3_sou.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K3/sou/arm_kry1 | R0/K3_sou.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K3/sou/arm_tight | R0/K3_sou.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K3/prod/arm_ref | R0/K3_prod.in | radiation/sn_solver=richardson | 8
+R0/K3/prod/arm_kry0 | R0/K3_prod.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K3/prod/arm_kry1 | R0/K3_prod.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K3/prod/arm_tight | R0/K3_prod.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K5/step/arm_ref | R0/K5_step.in | radiation/sn_solver=richardson | 8
+R0/K5/step/arm_kry0 | R0/K5_step.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K5/step/arm_kry1 | R0/K5_step.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K5/step/arm_tight | R0/K5_step.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K5/sou/arm_ref | R0/K5_sou.in | radiation/sn_solver=richardson | 8
+R0/K5/sou/arm_kry0 | R0/K5_sou.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K5/sou/arm_kry1 | R0/K5_sou.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K5/sou/arm_tight | R0/K5_sou.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/K5/prod/arm_ref | R0/K5_prod.in | radiation/sn_solver=richardson | 8
+R0/K5/prod/arm_kry0 | R0/K5_prod.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=0 | 8
+R0/K5/prod/arm_kry1 | R0/K5_prod.in | radiation/sn_solver=bicgstab radiation/sn_precond_sweeps=1 | 8
+R0/K5/prod/arm_tight | R0/K5_prod.in | radiation/sn_solver=richardson radiation/sn_rel_tol=1.0e-13 | 8
+R0/SEAM/step/arm_amr | R0/SEAM_step.in |  | 8
+R0/SEAM/step/arm_coarse | R0/SEAM_step.in | parthenon/mesh/refinement=none | 8
+R0/SEAM/step/arm_fine | R0/SEAM_step.in | parthenon/mesh/refinement=none parthenon/mesh/nx1=32 parthenon/mesh/nx2=32 parthenon/mesh/nx3=32 parthenon/meshblock/nx1=8 parthenon/meshblock/nx2=8 parthenon/meshblock/nx3=8 | 8
+R0/SEAM/sou/arm_amr | R0/SEAM_sou.in |  | 8
+R0/SEAM/sou/arm_coarse | R0/SEAM_sou.in | parthenon/mesh/refinement=none | 8
+R0/SEAM/sou/arm_fine | R0/SEAM_sou.in | parthenon/mesh/refinement=none parthenon/mesh/nx1=32 parthenon/mesh/nx2=32 parthenon/mesh/nx3=32 parthenon/meshblock/nx1=8 parthenon/meshblock/nx2=8 parthenon/meshblock/nx3=8 | 8
+R0/SEAM/prod/arm_amr | R0/SEAM_prod.in |  | 8
+R0/SEAM/prod/arm_coarse | R0/SEAM_prod.in | parthenon/mesh/refinement=none | 8
+R0/SEAM/prod/arm_fine | R0/SEAM_prod.in | parthenon/mesh/refinement=none parthenon/mesh/nx1=32 parthenon/mesh/nx2=32 parthenon/mesh/nx3=32 parthenon/meshblock/nx1=8 parthenon/meshblock/nx2=8 parthenon/meshblock/nx3=8 | 8
+R0/FLECK/orig/arm_a1.0_N1 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.015625 | 1
+R0/FLECK/orig/arm_a1.0_N2 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.0078125 | 1
+R0/FLECK/orig/arm_a1.0_N4 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.00390625 | 1
+R0/FLECK/orig/arm_a1.0_N8 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.001953125 | 1
+R0/FLECK/orig/arm_a1.0_N16 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.0009765625 | 1
+R0/FLECK/orig/arm_a1.0_N32 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.00048828125 | 1
+R0/FLECK/orig/arm_a1.0_N64 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.000244140625 | 1
+R0/FLECK/orig/arm_a1.0_N128 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.0001220703125 | 1
+R0/FLECK/orig/arm_a1.0_N256 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=6.103515625e-05 | 1
+R0/FLECK/orig/arm_a1.0_N512 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=3.0517578125e-05 | 1
+R0/FLECK/orig/arm_a1.0_N1024 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=1.52587890625e-05 | 1
+R0/FLECK/orig/arm_a0.5_N1 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.015625 | 1
+R0/FLECK/orig/arm_a0.5_N2 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.0078125 | 1
+R0/FLECK/orig/arm_a0.5_N4 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.00390625 | 1
+R0/FLECK/orig/arm_a0.5_N8 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.001953125 | 1
+R0/FLECK/orig/arm_a0.5_N16 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.0009765625 | 1
+R0/FLECK/orig/arm_a0.5_N32 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.00048828125 | 1
+R0/FLECK/orig/arm_a0.5_N64 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.000244140625 | 1
+R0/FLECK/orig/arm_a0.5_N128 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.0001220703125 | 1
+R0/FLECK/orig/arm_a0.5_N256 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=6.103515625e-05 | 1
+R0/FLECK/orig/arm_a0.5_N512 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=3.0517578125e-05 | 1
+R0/FLECK/orig/arm_a0.5_N1024 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=1.52587890625e-05 | 1
+R0/FLECK/orig/arm_a0.0_N4 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.00390625 | 1
+R0/FLECK/orig/arm_a0.0_N8 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.001953125 | 1
+R0/FLECK/orig/arm_a0.0_N16 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.0009765625 | 1
+R0/FLECK/orig/arm_a0.0_N32 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.00048828125 | 1
+R0/FLECK/orig/arm_a0.0_N64 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.000244140625 | 1
+R0/FLECK/orig/arm_a0.0_N128 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.0001220703125 | 1
+R0/FLECK/orig/arm_a0.0_N256 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=6.103515625e-05 | 1
+R0/FLECK/orig/arm_a0.0_N512 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=3.0517578125e-05 | 1
+R0/FLECK/orig/arm_a0.0_N1024 | R0/FLECK_orig.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=1.52587890625e-05 | 1
+R0/FLECK/prod/arm_a1.0_N1 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.015625 | 1
+R0/FLECK/prod/arm_a1.0_N2 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.0078125 | 1
+R0/FLECK/prod/arm_a1.0_N4 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.00390625 | 1
+R0/FLECK/prod/arm_a1.0_N8 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.001953125 | 1
+R0/FLECK/prod/arm_a1.0_N16 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.0009765625 | 1
+R0/FLECK/prod/arm_a1.0_N32 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.00048828125 | 1
+R0/FLECK/prod/arm_a1.0_N64 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.000244140625 | 1
+R0/FLECK/prod/arm_a1.0_N128 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=0.0001220703125 | 1
+R0/FLECK/prod/arm_a1.0_N256 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=6.103515625e-05 | 1
+R0/FLECK/prod/arm_a1.0_N512 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=3.0517578125e-05 | 1
+R0/FLECK/prod/arm_a1.0_N1024 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=1.0 parthenon/time/dt_force=1.52587890625e-05 | 1
+R0/FLECK/prod/arm_a0.5_N1 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.015625 | 1
+R0/FLECK/prod/arm_a0.5_N2 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.0078125 | 1
+R0/FLECK/prod/arm_a0.5_N4 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.00390625 | 1
+R0/FLECK/prod/arm_a0.5_N8 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.001953125 | 1
+R0/FLECK/prod/arm_a0.5_N16 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.0009765625 | 1
+R0/FLECK/prod/arm_a0.5_N32 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.00048828125 | 1
+R0/FLECK/prod/arm_a0.5_N64 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.000244140625 | 1
+R0/FLECK/prod/arm_a0.5_N128 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=0.0001220703125 | 1
+R0/FLECK/prod/arm_a0.5_N256 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=6.103515625e-05 | 1
+R0/FLECK/prod/arm_a0.5_N512 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=3.0517578125e-05 | 1
+R0/FLECK/prod/arm_a0.5_N1024 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.5 parthenon/time/dt_force=1.52587890625e-05 | 1
+R0/FLECK/prod/arm_a0.0_N4 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.00390625 | 1
+R0/FLECK/prod/arm_a0.0_N8 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.001953125 | 1
+R0/FLECK/prod/arm_a0.0_N16 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.0009765625 | 1
+R0/FLECK/prod/arm_a0.0_N32 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.00048828125 | 1
+R0/FLECK/prod/arm_a0.0_N64 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.000244140625 | 1
+R0/FLECK/prod/arm_a0.0_N128 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=0.0001220703125 | 1
+R0/FLECK/prod/arm_a0.0_N256 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=6.103515625e-05 | 1
+R0/FLECK/prod/arm_a0.0_N512 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=3.0517578125e-05 | 1
+R0/FLECK/prod/arm_a0.0_N1024 | R0/FLECK_prod.in | radiation/sn_fleck_alpha=0.0 parthenon/time/dt_force=1.52587890625e-05 | 1
+R0/K4/orig/f_sou1_tau0p2 | R0/K4_orig.in | radiation/kappa_s_code=25.6 parthenon/time/tlim=0.030720 parthenon/time/cfl=0.0846 parthenon/output0/dt=0.003072 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_spatial=sou radiation/sn_sou_kappa=1.0 | 4
+R0/K4/orig/f_step_tau0p2 | R0/K4_orig.in | radiation/kappa_s_code=25.6 parthenon/time/tlim=0.030720 parthenon/time/cfl=0.0846 parthenon/output0/dt=0.003072 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_spatial=step | 4
+R0/K4/prod/f_sou1_tau0p2 | R0/K4_prod.in | radiation/kappa_s_code=25.6 parthenon/time/tlim=0.030720 parthenon/time/cfl=0.0846 parthenon/output0/dt=0.003072 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true | 4
+R0/K4/orig/f_sou1_tau0p5 | R0/K4_orig.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_spatial=sou radiation/sn_sou_kappa=1.0 | 4
+R0/K4/orig/f_step_tau0p5 | R0/K4_orig.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_spatial=step | 4
+R0/K4/prod/f_sou1_tau0p5 | R0/K4_prod.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true | 4
+R0/K4/orig/f_sou1_tau1 | R0/K4_orig.in | radiation/kappa_s_code=128.0 parthenon/time/tlim=0.153600 parthenon/time/cfl=0.4000 parthenon/output0/dt=0.015360 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_spatial=sou radiation/sn_sou_kappa=1.0 | 4
+R0/K4/orig/f_step_tau1 | R0/K4_orig.in | radiation/kappa_s_code=128.0 parthenon/time/tlim=0.153600 parthenon/time/cfl=0.4000 parthenon/output0/dt=0.015360 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_spatial=step | 4
+R0/K4/prod/f_sou1_tau1 | R0/K4_prod.in | radiation/kappa_s_code=128.0 parthenon/time/tlim=0.153600 parthenon/time/cfl=0.4000 parthenon/output0/dt=0.015360 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true | 4
+R0/RAY/orig/arm_z4p8 | R0/RAY_orig.in | radiation/sn_nzeta=4 radiation/sn_npsi=8 | 8
+R0/RAY/orig/arm_z8p16 | R0/RAY_orig.in | radiation/sn_nzeta=8 radiation/sn_npsi=16 | 8
+R0/RAY/orig/arm_z24p48 | R0/RAY_orig.in | radiation/sn_nzeta=24 radiation/sn_npsi=48 | 8
+R0/RAY/orig/arm_z4p8sou | R0/RAY_orig.in | radiation/sn_nzeta=4 radiation/sn_npsi=8 radiation/sn_spatial=sou | 8

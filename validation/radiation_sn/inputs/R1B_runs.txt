@@ -1,0 +1,5 @@
+R1A/v10_verifyop | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_verify_operator=true | 1
+R1A/v11_nofixup | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_diamond_fixup=false | 1
+R1A/v12_precond0 | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_precond_sweeps=0 | 1
+R1A/v13_maxit3 | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_rel_tol=1.0e-30 radiation/sn_max_iterations=3 | 1
+R1A/v14_maxit4 | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_rel_tol=1.0e-30 radiation/sn_max_iterations=4 | 1

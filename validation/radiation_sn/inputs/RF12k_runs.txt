@@ -1,0 +1,1 @@
+RF12k/T1000_dbg | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=1 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_debug=true parthenon/output9/file_type=hdf5 parthenon/output9/dn=1 parthenon/output9/variables=sn.gd_dbg_rhs,sn.gd_dbg_y0,sn.kc_y,sn.gd_u,sn.gd_sig,sn.gd_dc,sn.gd_xi,sn.chis | 1

@@ -1,0 +1,1 @@
+R6/cpu/R8c | R8/point.in | radiation/sn_precond_stencil=sou | 1

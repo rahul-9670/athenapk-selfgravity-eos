@@ -19,6 +19,7 @@
 
 #include "outputs/restart_hdf5.hpp"
 #include "pgen/pgen.hpp"
+#include "radiation/radiation_sn.hpp"
 #include "tracers/tracers.hpp"
 // Initialize defaults for package specific callback functions
 namespace Hydro {
@@ -68,11 +69,17 @@ int main(int argc, char *argv[]) {
     // collapse_be_rhocrit alive -- and with it the ApplyBarotropicCooling task, which carries
     // the outside-sphere momentum BC. Without it every restart silently dropped that task.
     Hydro::ProblemInitPackageData = collapse_be::ProblemInitPackageData;
+  } else if (problem == "rad_pulse") {
+    // Radiation (Sn) validation problem; registers no Params and has no restart-sensitive task.
+    pman.app_input->ProblemGenerator = rad_pulse::ProblemGenerator;
+  } else if (problem == "rad_shock") {
+    // Lowrie & Edwards radiative shock (radiation in a moving flow).
+    pman.app_input->ProblemGenerator = rad_shock::ProblemGenerator;
   } else if (problem == "poisson_test") {
     // Self-gravity analytic gate (uniform sphere); see pgen/pgen.hpp.
     pman.app_input->ProblemGenerator = poisson_test::ProblemGenerator;
   } else if (problem == "grav_analytic") {
-    // Self-gravity validation suite (validation_tests/self_gravity): exact-potential fields.
+    // Self-gravity validation suite (validation/self_gravity): exact-potential fields.
     pman.app_input->ProblemGenerator = grav_analytic::ProblemGenerator;
   } else if (problem == "jeans_wave") {
     pman.app_input->ProblemGenerator = jeans_wave::ProblemGenerator;
@@ -92,7 +99,7 @@ int main(int argc, char *argv[]) {
     std::stringstream msg;
     msg << "Problem ID '" << problem
         << "' is not available in this build. Available: collapse_be, poisson_test, "
-           "grav_analytic, jeans_wave, grav_slab, polytrope, eos_test, profile1d, fofc_scalar.";
+           "grav_analytic, jeans_wave, grav_slab, polytrope, eos_test, profile1d, fofc_scalar, rad_pulse, rad_shock.";
     PARTHENON_THROW(msg);
   }
 
@@ -132,13 +139,81 @@ int main(int argc, char *argv[]) {
   pman.app_input->RegisterBoundaryCondition(BF::outer_x2, REFLV, ReflectValBC<X2DIR, BCSide::Outer>);
   pman.app_input->RegisterBoundaryCondition(BF::inner_x3, REFLV, ReflectValBC<X3DIR, BCSide::Inner>);
   pman.app_input->RegisterBoundaryCondition(BF::outer_x3, REFLV, ReflectValBC<X3DIR, BCSide::Outer>);
-  // VALIDATION-ONLY exact homologous ghosts for eos_test mode = compress (validation_tests E8).
+  // VALIDATION-ONLY exact homologous ghosts for eos_test mode = compress (validation E8).
   pman.app_input->RegisterBoundaryCondition(BF::inner_x1, "eos_homologous",
                                             eos_test::HomologousInnerX1);
   pman.app_input->RegisterBoundaryCondition(BF::outer_x1, "eos_homologous",
                                             eos_test::HomologousOuterX1);
-  // Mesh-level fused diode BC hook; only acts when hydro/fused_bc_mesh = true.
+  // Mesh-level fused diode/Sn BC hook; only acts when hydro/fused_bc_mesh = true.
   Hydro::BoundaryFunction::RegisterFusedDiodeBCMesh(pman.pinput.get());
+
+
+  // --------------------------------------------------------------------------------------
+  // Sn RESTART PRE-CHECK -- ask the restart FILE whether it carries the ordinate field.
+  //
+  // WHY HERE AND NOWHERE ELSE. parthenon's RestartReader is alive only between
+  // ParthenonInitEnv() (which opens the .rhdf, parthenon_manager.cpp:106-119) and the end of
+  // ParthenonInitPackagesAndMesh() (which nulls it at :223). Radiation::Sn::Initialize runs
+  // inside that window, from ProcessPackages, and is handed nothing but ParameterInput -- so
+  // this is the only point at which the question can be asked and the answer still be in
+  // time to choose sn.u's metadata. This replaces a re-seeding of the ordinates at every
+  // restart from their own first two angular moments, which did not conserve energy
+  // (it created ~4200 code units of energy at one restart in a collapse run).
+  //
+  // EVERY RANK opens its own reader (parthenon_manager.cpp:110), so this needs no
+  // communication and cannot disagree between ranks.
+  //
+  // NOT WRITTEN INTO pman.pinput deliberately: a fresh (non-restart) run must keep an
+  // untouched ParameterInput so its outputs' Input string is exactly its deck, and a deck
+  // without a <radiation> block must not acquire one.
+  if (pman.restartReader != nullptr) {
+    Radiation::Sn::g_restart_is_restart = true;
+    bool has_u = false;
+    try {
+      has_u = pman.restartReader->VariableExists(Radiation::Sn::USolName());
+    } catch (std::exception &) {
+      has_u = false; // unreadable file: treat as "no ordinates", i.e. re-seed
+    }
+    Radiation::Sn::g_restart_u_present = has_u;
+    Radiation::Sn::g_restart_u_ncomp = -1;
+    // R-F1: the file's own cycle number. Sn::Initialize re-seeds the ordinates only at cycle 0; the pin's
+    // parthenon/time/ncycle is stale at that point (0 in every restart of a run that began at t = 0).
+    Radiation::Sn::g_restart_ncycle = -1;
+    {
+      auto *h5c = dynamic_cast<parthenon::RestartReaderHDF5 *>(pman.restartReader.get());
+      if (h5c != nullptr) {
+        try {
+          Radiation::Sn::g_restart_ncycle = h5c->GetAttr<int>("Info", "NCycle");
+        } catch (std::exception &) {
+          Radiation::Sn::g_restart_ncycle = -1;
+        }
+      }
+    }
+    if (has_u) {
+      // Component count, so a changed ordinate set is caught BEFORE parthenon's ReadBlocks
+      // builds a hyperslab of the new nfa on the file's old nfa and H5Dread throws.
+      // Info/OutputDatasetNames and Info/NumComponents are written together, entry for
+      // entry, by parthenon_hdf5.cpp:478-480. GetAttrVec lives on the HDF5 reader rather
+      // than the RestartReader interface, hence the cast; -1 (unknown) if it is not one.
+      auto *h5 = dynamic_cast<parthenon::RestartReaderHDF5 *>(pman.restartReader.get());
+      if (h5 != nullptr) {
+        try {
+          const auto names = h5->GetAttrVec<std::string>("Info", "OutputDatasetNames");
+          // NumComponents is written from a std::vector<std::size_t> (parthenon_hdf5.cpp:459), and
+          // parthenon's attribute reader TYPE-CHECKS with H5Tequal and throws on a mismatch --
+          // so GetAttrVec<int> silently lost this to the catch below (observed: ncomp = -1 on a
+          // file that plainly had NumComponents = [9 1 1 1 1 32]). Read the type it was written as.
+          const auto ncmp = h5->GetAttrVec<std::size_t>("Info", "NumComponents");
+          for (std::size_t i = 0; i < names.size() && i < ncmp.size(); ++i) {
+            if (names[i] == Radiation::Sn::USolName())
+              Radiation::Sn::g_restart_u_ncomp = static_cast<int>(ncmp[i]);
+          }
+        } catch (std::exception &) {
+          Radiation::Sn::g_restart_u_ncomp = -1;
+        }
+      }
+    }
+  }
 
   pman.ParthenonInitPackagesAndMesh();
 

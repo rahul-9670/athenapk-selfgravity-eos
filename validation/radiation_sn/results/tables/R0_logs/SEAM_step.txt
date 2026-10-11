@@ -1,0 +1,38 @@
+THE DEFINITIVE TEST -- driven steady state, seam at the steepest gradient
+  --- amr ---
+    t = 2  cycle = 315  levels [0, 1]
+    total Er = 7.020242902409e-01   last-two-dump change 5.693e-14 (STEADY)
+    history: 8.941000e-01  7.020438e-01  7.020243e-01  7.020243e-01  7.020243e-01
+    PREMISE: max|v| = 0.000e+00   p spread = 0.000e+00 (both must be ~0)
+             T_max/T_min = 1.8571   <a_R T^4> = 8.941000000000e-01
+  --- coarse ---
+    t = 2  cycle = 158  levels [0]
+    total Er = 6.966820288457e-01   last-two-dump change 5.045e-13 (STEADY)
+    history: 8.941000e-01  6.967128e-01  6.966820e-01  6.966820e-01  6.966820e-01
+    PREMISE: max|v| = 0.000e+00   p spread = 0.000e+00 (both must be ~0)
+             T_max/T_min = 1.8571   <a_R T^4> = 8.941000000000e-01
+  --- fine ---
+    t = 2  cycle = 315  levels [0]
+    total Er = 6.909596609618e-01   last-two-dump change 1.105e-13 (STEADY)
+    history: 8.941000e-01  6.909782e-01  6.909597e-01  6.909597e-01  6.909597e-01
+    PREMISE: max|v| = 0.000e+00   p spread = 0.000e+00 (both must be ~0)
+             T_max/T_min = 1.8571   <a_R T^4> = 8.941000000000e-01
+
+  ================ VERDICT ================
+  source <a_R T^4> spread across arms: 3.725e-16
+  (sources identical to round-off: the arms differ ONLY in the mesh)
+
+  reference (uniform fine)   : 6.909596609618e-01
+  uniform coarse  error      : 8.282e-03   <- pure resolution error
+  static AMR      error      : 1.601e-02
+  ratio AMR/coarse           : 1.93
+
+  => THE SEAM COSTS 1.93x THE RESOLUTION ERROR, AND REFINING MAKES THE GLOBAL
+     ANSWER WORSE, NOT BETTER. (An earlier version of this line claimed
+     'refinement still helps or breaks even' -- that was wrong whenever the
+     ratio exceeds 1, which is exactly what it is reporting.)
+     Seam-attributable error = 7.732e-03, on top of a 8.282e-03 resolution error.
+     It is a BOUNDED steady-state BIAS, not a growing one: the state is steady
+     to ~1e-10. Quote it; decide whether a 0.77% bias in radiation energy
+     matters for the science before spending the memory win on a register.
+  =========================================

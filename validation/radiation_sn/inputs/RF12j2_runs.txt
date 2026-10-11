@@ -1,0 +1,1 @@
+RF12j/T1000_dump2 | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=1 parthenon/output9/file_type=hdf5 parthenon/output9/dn=1 parthenon/output9/variables=prim,sn.chia,sn.chis,sn.fleck,sn.src,sn.un,sn.u | 1

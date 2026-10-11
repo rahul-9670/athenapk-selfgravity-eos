@@ -1,0 +1,24 @@
+SPEED/WF4/cpu/G9_m0 | R0/G9_prod.in | radiation/creduc=1.0 | 1
+SPEED/WF4/cpu/G9_m3 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/G9_m4 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_sweep_wavefront=4 | 1
+SPEED/WF4/cpu/G9a_m0 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_norm=b radiation/sn_local_tol=1.0e-3 radiation/sn_conserve_residual=true radiation/sn_fc_scatter=true radiation/sn_sou_limiter=positive | 1
+SPEED/WF4/cpu/G9a_m3 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_norm=b radiation/sn_local_tol=1.0e-3 radiation/sn_conserve_residual=true radiation/sn_fc_scatter=true radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/G9a_m4 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_norm=b radiation/sn_local_tol=1.0e-3 radiation/sn_conserve_residual=true radiation/sn_fc_scatter=true radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=4 | 1
+SPEED/WF4/cpu/K4_m0 | R0/K4_prod.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true | 1
+SPEED/WF4/cpu/K4_m3 | R0/K4_prod.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/K4_m4 | R0/K4_prod.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_sweep_wavefront=4 | 1
+SPEED/WF4/cpu/R1_m0 | R1/base_g100r30_tab.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 | 1
+SPEED/WF4/cpu/R1_m3 | R1/base_g100r30_tab.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/R1_m4 | R1/base_g100r30_tab.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 radiation/sn_sweep_wavefront=4 | 1
+SPEED/WF4/cpu/R1a_m0 | R1/base_g100r30_tab.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 radiation/sn_norm=b radiation/sn_local_tol=1.0e-3 radiation/sn_conserve_residual=true radiation/sn_fc_scatter=true radiation/sn_sou_limiter=positive | 1
+SPEED/WF4/cpu/R1a_m3 | R1/base_g100r30_tab.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 radiation/sn_norm=b radiation/sn_local_tol=1.0e-3 radiation/sn_conserve_residual=true radiation/sn_fc_scatter=true radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/R1a_m4 | R1/base_g100r30_tab.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 radiation/sn_norm=b radiation/sn_local_tol=1.0e-3 radiation/sn_conserve_residual=true radiation/sn_fc_scatter=true radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=4 | 1
+SPEED/WF4/cpu/S1_m0 | R3/S1_sou.in | radiation/sn_sou_limiter=positive | 1
+SPEED/WF4/cpu/S1_m3 | R3/S1_sou.in | radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/S1_m4 | R3/S1_sou.in | radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=4 | 1
+SPEED/WF4/cpu/S3_m0 | R3/S3_sou.in | radiation/sn_sou_limiter=positive | 1
+SPEED/WF4/cpu/S3_m3 | R3/S3_sou.in | radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/S3_m4 | R3/S3_sou.in | radiation/sn_sou_limiter=positive radiation/sn_sweep_wavefront=4 | 1
+SPEED/WF4/cpu/S1p_m0 | R3/S1_sou.in | radiation/sn_sou_limiter=positive radiation/sn_precond_stencil=sou | 1
+SPEED/WF4/cpu/S1p_m3 | R3/S1_sou.in | radiation/sn_sou_limiter=positive radiation/sn_precond_stencil=sou radiation/sn_sweep_wavefront=3 | 1
+SPEED/WF4/cpu/S1p_m4 | R3/S1_sou.in | radiation/sn_sou_limiter=positive radiation/sn_precond_stencil=sou radiation/sn_sweep_wavefront=4 | 1

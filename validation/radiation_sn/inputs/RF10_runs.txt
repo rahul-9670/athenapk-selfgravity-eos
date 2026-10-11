@@ -1,0 +1,17 @@
+RF10/R3/S1_sou | R3/S1_sou.in | radiation/sn_sou_limiter=positive | 8
+RF10/R3/S2_sou | R3/S2_sou.in | radiation/sn_sou_limiter=positive | 8
+RF10/R3/S3_sou | R3/S3_sou.in | radiation/sn_sou_limiter=positive | 8
+RF10/R3/S4_sou | R3/S4_sou.in | radiation/sn_sou_limiter=positive | 8
+RF10/R3/S1_sou_hr | R3/S1_sou_hr.in | radiation/sn_sou_limiter=positive | 8
+RF10/R3/S4_sou_hr | R3/S4_sou_hr.in | radiation/sn_sou_limiter=positive | 8
+RF10/R3/S4_vop | R3/S4_sou.in | radiation/sn_sou_limiter=positive radiation/sn_verify_operator=true parthenon/time/tlim=0.5 | 8
+RF10/G9/prod/arm_creduc1 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_sou_limiter=positive | 8
+RF10/G9/prod/arm_creduc4 | R0/G9_prod.in | radiation/creduc=4.0 radiation/sn_sou_limiter=positive | 8
+RF10/G9/prod/arm_creduc1_tol12 | R0/G9_prod.in | radiation/creduc=1.0 radiation/sn_rel_tol=1.0e-12 radiation/sn_sou_limiter=positive | 8
+RF10/K4/prod/f_sou1_tau0p2 | R0/K4_prod.in | radiation/kappa_s_code=25.6 parthenon/time/tlim=0.030720 parthenon/time/cfl=0.0846 parthenon/output0/dt=0.003072 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_sou_limiter=positive | 4
+RF10/K4/prod/f_sou1_tau0p5 | R0/K4_prod.in | radiation/kappa_s_code=64.0 parthenon/time/tlim=0.076800 parthenon/time/cfl=0.2115 parthenon/output0/dt=0.007680 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_sou_limiter=positive | 4
+RF10/K4/prod/f_sou1_tau1 | R0/K4_prod.in | radiation/kappa_s_code=128.0 parthenon/time/tlim=0.153600 parthenon/time/cfl=0.4000 parthenon/output0/dt=0.015360 radiation/sn_solver=bicgstab radiation/sn_verify_operator=true radiation/sn_sou_limiter=positive | 4
+RF10/R2/base_p | R2/su_base_p.in | radiation/sn_sou_limiter=positive | 1
+RF10/R2/base_m | R2/su_base_m.in | radiation/sn_sou_limiter=positive | 1
+RF10/R2/dz2_p | R2/su_dz2_p.in | radiation/sn_sou_limiter=positive | 1
+RF10/R2/dz2_m | R2/su_dz2_m.in | radiation/sn_sou_limiter=positive | 1

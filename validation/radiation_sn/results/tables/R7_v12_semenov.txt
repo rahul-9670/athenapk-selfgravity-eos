@@ -1,0 +1,43 @@
+# R7-v12: Semenov 2003 (nrm_h_s) + Helling 2001 opacity table, format v4 (scripts/r7_v12.py)
+
+table opacity_table_v12_semenov_hs_fmt4.bin: format v4 flags 3 ng 3 grid 201x1859 edges [0.0, 1000000000000.0, 1000000000000000.0, 1e+30]
+
+(a) monochromatic column means vs opacity.f (rho 1e-13): ratio col_k / code, Planck | Rosseland
+region T[K]   col2 P   col3 P   col4 P  |  col2 R   col3 R   col4 R
+  1      50     1.150    1.151    1.143  |    0.913    0.913    0.911
+  1     100     0.988    0.993    0.965  |    1.017    1.018    1.007
+  2     200     0.998    1.023    0.934  |    1.003    1.020    0.952
+  3     350     0.997    1.092    0.843  |    1.003    1.113    0.758
+  4     550     0.993    1.207    0.635  |    1.005    1.263    0.377
+  5    1000     1.167    1.964    0.324  |    1.207    1.945    0.159
+
+(b) Helling gas port vs opacity.f (496 points, 4 rho, P and R): max |ln ratio| = 5.95e-06 (code prints 6 digits)
+
+(c) table vs independent quad evaluation at sampled nodes: max |rel| over kP, kR, kP_g, kR_g
+  120 nodes (T 3..2000 K): max |table/quad - 1| = 1.34e-04
+
+(d) C++ loaders vs numpy, 2000 random (rho, T): linear max rel 9.99e-16, log max rel 3.77e-15, dust weights max abs 0.00e+00
+
+(e) v12 / v11 (gray kappa_P | kappa_R) in the collapse-run range
+T[K]       rho=1e-16      rho=1e-13      rho=1e-10   
+    5.0     1.04 |   0.81      1.04 |   0.81      1.04 |   0.81  
+   10.0     1.38 |   0.82      1.38 |   0.82      1.38 |   0.82  
+   19.9     1.59 |   0.91      1.59 |   0.91      1.59 |   0.91  
+   50.1     2.52 |   1.09      2.52 |   1.09      2.52 |   1.09  
+   99.8     1.46 |   1.20      1.46 |   1.20      1.46 |   1.20  
+  130.3     0.61 |   0.59      0.89 |   0.87      1.17 |   1.16  
+  150.4     0.54 |   0.58      0.54 |   0.58      1.04 |   1.11  
+  170.0     0.57 |   0.66      0.57 |   0.66      0.57 |   0.66  
+  250.7     2.21 |   3.38      2.21 |   3.38      2.21 |   3.38  
+  348.9     1.72 |   3.17      1.72 |   3.17      1.72 |   3.17  
+  499.9     0.58 |   1.11      0.58 |   1.11      0.58 |   1.11  
+  797.8     0.24 |   0.75      0.24 |   0.75      0.24 |   0.75  
+  997.0     0.18 |   0.54      0.19 |   0.76      0.20 |   0.85  
+ 1502.2   596.18 |   1.64    134.82 |   1.43      5.02 |   0.05  
+
+(f) Semenov polynomial fit / monochromatic integral (rho 1e-13): the fit residual at the bottom of region 1
+  T  10 K: Planck fit/mono 2.112  Rosseland fit/mono 1.418
+  T  15 K: Planck fit/mono 1.855  Rosseland fit/mono 1.288
+  T  20 K: Planck fit/mono 1.697  Rosseland fit/mono 1.256
+  T  30 K: Planck fit/mono 1.200  Rosseland fit/mono 1.206
+  T  50 K: Planck fit/mono 0.869  Rosseland fit/mono 1.095

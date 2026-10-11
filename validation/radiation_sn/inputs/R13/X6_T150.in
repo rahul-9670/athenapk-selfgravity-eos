@@ -1,0 +1,121 @@
+<comment>
+problem = R5 hot core in a cold envelope (validation/radiation_sn, scripts/make_decks_R5.py): X6, T_core 150.0 K, 1-D
+
+<job>
+problem_id = rad_pulse
+
+<problem/rad_pulse>
+rho0 = 182915.67587342235
+p0 = 182639.09468065813
+E0 = 0.0
+Eamp = 0.0
+reduced_flux = 0.0
+thermal_wave = true
+thermal_tophat = true
+thermal_tophat_ndim = 1
+thermal_tophat_halfwidth = 0.001064753528113879
+thermal_tophat_rho_factor = 100.0
+temperature_K = 80.0
+thermal_amplitude = 0.875
+thermal_radiation_factor = 1.0
+
+<parthenon/mesh>
+refinement = none
+nghost = 2
+nx1 = 640
+x1min = -0.010647535281138789
+x1max = 0.010647535281138789
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+
+<parthenon/meshblock>
+nx1 = 640
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 1.2e-05
+nlim = 100000
+dt_force = 2e-07
+
+<hydro>
+fluid = glmmhd
+eos = adiabatic
+gamma = 1.6666666666666667
+riemann = hlld
+reconstruction = plm
+dfloor = 1.0e-10
+pfloor = 1.0e-12
+dual_energy = true   # R0 prod overlay
+dual_energy_eta1 = 5e-2   # R0 prod overlay
+dual_energy_sync_step_end = true   # R0 prod overlay
+dual_energy_unsigned_prim = true   # R0 prod overlay
+dual_energy_exact_resync = true   # R0 prod overlay
+dual_energy_eta2 = 0.1   # R0 prod overlay
+dual_energy_kappa = 3.0   # R0 prod overlay
+dual_energy_shock_comp = 0.02   # R0 prod overlay
+dual_energy_shared_select = true   # R0 prod overlay
+dual_comp_ghost = true   # R0 prod overlay
+dual_energy_heat_rkl2 = true   # R0 prod overlay
+boundary_clamp_dual = true   # R0 prod overlay
+ghost_sync_rounds = 1   # R0 prod overlay
+
+<physics>
+self_gravity = false
+radiation = true
+
+<radiation>
+transport = sn   # R0 prod overlay
+n_group = 6
+nu_edges_hz = 2000000000000.0 5000000000000.0 10000000000000.0 20000000000000.0 40000000000000.0
+nu_min_hz = 1000000000000.0
+nu_max_hz = 100000000000000.0
+creduc = 1.0
+sn_matter_coupling = true
+sn_rel_tol = 1.0e-8
+tfloor_code = 5.0e-2
+efloor = 1.0e-15
+opacity_model = tabulated
+opacity_table_file = $REPO/validation/radiation_sn/runs/R13/tables/opac_X6.bin
+sn_nzeta = 4   # R0 prod overlay
+sn_npsi = 8   # R0 prod overlay
+sn_solver = bicgstab   # R0 prod overlay
+sn_smoother = ordered   # R0 prod overlay
+sn_precond_sweeps = 1   # R0 prod overlay
+sn_spatial = sou   # R0 prod overlay
+sn_sou_kappa = 1.0   # R0 prod overlay
+sn_sou_linear_prolong = true   # R0 prod overlay
+sn_red_black = true   # R0 prod overlay
+sn_diamond_fixup = true   # R0 prod overlay
+sn_criterion = residual   # R0 prod overlay
+sn_rosseland_excess = true   # R0 prod overlay
+sn_fleck_alpha = 1.0   # R0 prod overlay
+sn_max_iterations = 4000   # R0 prod overlay
+sn_bc_incoming = planck   # R0 prod overlay
+sn_bc_tbg_K = 10.0   # R0 prod overlay
+sn_radiation_force = false   # R0 prod overlay
+sn_restart_reproject = false   # R0 prod overlay
+sn_dual_energy = true   # R0 prod overlay
+sn_fallback = true   # R0 prod overlay
+sn_krylov_dot_scale = true   # R0 prod overlay
+sn_skip_extinction = true   # R0 prod overlay
+sn_skip_group_rel = 1e-12   # R0 prod overlay
+opacity_interp = log   # adopted fix set
+sn_norm = b   # adopted fix set
+sn_local_tol = 1.0e-3   # adopted fix set
+sn_conserve_residual = true   # adopted fix set
+sn_fc_scatter = true   # adopted fix set
+sn_sou_limiter = positive   # adopted fix set
+
+<parthenon/output0>
+file_type = hdf5
+dt = 3e-06
+variables = prim, rad.Er, rad.Er_g1, rad.Er_g2, rad.Er_g3, rad.Er_g4, rad.Er_g5

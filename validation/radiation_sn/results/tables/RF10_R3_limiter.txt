@@ -1,0 +1,27 @@
+# R3 free streaming (scripts/analyze_R3.py): 2D, c = 1, Q = 1, no emission, no coupling. Conserved measure:
+# the transverse integral of the upwind FACE flux, sum_j F dy (= I0 H downstream of the source, exact in vacuum
+# until the spread beam reaches the y boundary); front = where it reaches half its steady value.
+== sou: beam ordinate 8 (nx 0.86885, ny 0.35989, w 0.51219); I0 = 0.224710, I0 H = 0.022471
+   t  0.5: front x -1.4062 vs -1.85 + nx t = -1.4156
+   t  1.0: front x -0.9688 vs -1.85 + nx t = -0.9812
+   t  1.5: front x -0.5312 vs -1.85 + nx t = -0.5467
+   t  2.0: front x -0.0938 vs -1.85 + nx t = -0.1123
+   t  2.5: front x +0.3438 vs -1.85 + nx t = +0.3308
+   t  3.0: front x +0.7812 vs -1.85 + nx t = +0.7652
+   t  3.5: front x +1.2188 vs -1.85 + nx t = +1.1996
+   t  4.0: front x +1.6562 vs -1.85 + nx t = +1.6341
+   t  4.5: front x +nan vs -1.85 + nx t = +2.0685
+   t  5.0: front x +nan vs -1.85 + nx t = +2.5029 | face-flux integral / (I0 H) on x in (-1.75, 1): min 0.999986 max 1.000001 | centre-line I/I0 at x = -1, 0, 1: 0.5653 0.4394 0.3784 | rms width at x = -1.5, 0.5, 1: 0.0505, 0.0860, 0.0916 (exact 0.0289) | min I/I0 -7.80e-07
+   t  5.5: front x +nan vs -1.85 + nx t = +2.9373 | face-flux integral / (I0 H) on x in (-1.75, 1): min 0.999986 max 1.000001 | centre-line I/I0 at x = -1, 0, 1: 0.5653 0.4394 0.3784 | rms width at x = -1.5, 0.5, 1: 0.0505, 0.0860, 0.0916 (exact 0.0289) | min I/I0 -9.13e-09
+   t  6.0: front x +nan vs -1.85 + nx t = +3.3631 | face-flux integral / (I0 H) on x in (-1.75, 1): min 0.999986 max 1.000001 | centre-line I/I0 at x = -1, 0, 1: 0.5653 0.4394 0.3784 | rms width at x = -1.5, 0.5, 1: 0.0505, 0.0860, 0.0916 (exact 0.0289) | min I/I0 -3.76e-11
+   crossing (S3 vs S1, S2 at t = 6): max|I_A(S3) - I_A(S1)|/I0 1.21e-13, max|I_B(S3) - I_B(S2)|/I0 1.51e-12
+   shadow S4/S1 face-flux integral (background removed): x -0.500: 0.9989 | x -0.188: 0.9989 | x +0.188: 0.0223 | x +0.500: 0.0223 | x +1.000: 0.0223 | predicted from S1's upstream profile (x -0.203): 0.0215 (beam fraction missing the column 0.0162; unspread beam e^-11.5 = 1.0e-5) | min I/I0 -3.71e-11 | gas |v|max 0.0e+00
+== sou_hr: beam ordinate 8 (nx 0.86885, ny 0.35989, w 0.51219); I0 = 0.224710, I0 H = 0.022471
+   t  0.5: front x -1.4062 vs -1.85 + nx t = -1.4156
+   t  1.0: front x -0.9688 vs -1.85 + nx t = -0.9812
+   t  1.5: front x -0.5312 vs -1.85 + nx t = -0.5467
+   t  2.0: front x -0.0938 vs -1.85 + nx t = -0.1123
+   t  2.5: front x +0.3438 vs -1.85 + nx t = +0.3308
+   t  3.0: front x +0.7812 vs -1.85 + nx t = +0.7652
+   t  3.5: front x +1.2031 vs -1.85 + nx t = +1.1910 | face-flux integral / (I0 H) on x in (-1.75, 0.5): min 0.999967 max 1.000001 | centre-line I/I0 at x = -1, 0, 1: 0.8215 0.6678 0.5218 | rms width at x = -1.5, 0.5: 0.0380, 0.0569 (exact 0.0289) | min I/I0 -9.94e-05
+   shadow S4/S1 face-flux integral (background removed): x -0.500: 0.9988 | x -0.203: 0.9988 | x +0.203: 0.0026 | x +0.500: 0.0026 | predicted from S1's upstream profile (x -0.195): 0.0020 (beam fraction missing the column 0.0015; unspread beam e^-11.5 = 1.0e-5) | min I/I0 -5.49e-07 | gas |v|max 0.0e+00

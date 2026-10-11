@@ -1,0 +1,111 @@
+<comment>
+problem = R8b radiative shock M0 = 2.0 (validation/radiation_sn, scripts/make_decks_R8.py); shock-frame rho1 = 2.2857142857142856
+
+<job>
+problem_id = rad_shock
+
+<problem/rad_shock>
+rho0 = 1.0
+T0 = 0.6
+v0 = 1.125
+smooth = 1.0e-4
+
+<parthenon/mesh>
+refinement = none
+nghost = 2
+nx1 = 4000
+x1min = -0.04
+x1max = 0.04
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+
+<parthenon/meshblock>
+nx1 = 4000
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.02
+nlim = 1000000
+
+<hydro>
+fluid = glmmhd
+eos = adiabatic
+gamma = 1.6666666666666667
+riemann = hlld
+reconstruction = plm
+dfloor = 1.0e-10
+pfloor = 1.0e-12
+dual_energy = true   # R0 prod overlay
+dual_energy_eta1 = 5e-2   # R0 prod overlay
+dual_energy_sync_step_end = true   # R0 prod overlay
+dual_energy_unsigned_prim = true   # R0 prod overlay
+dual_energy_exact_resync = true   # R0 prod overlay
+dual_energy_eta2 = 0.1   # R0 prod overlay
+dual_energy_kappa = 3.0   # R0 prod overlay
+dual_energy_shock_comp = 0.02   # R0 prod overlay
+dual_energy_shared_select = true   # R0 prod overlay
+dual_comp_ghost = true   # R0 prod overlay
+dual_energy_heat_rkl2 = true   # R0 prod overlay
+boundary_clamp_dual = true   # R0 prod overlay
+ghost_sync_rounds = 1   # R0 prod overlay
+
+<physics>
+self_gravity = false
+radiation = true
+
+<radiation>
+transport = sn   # R0 prod overlay
+n_group = 1
+c_code = 1000.0
+arad_code = 0.000771604938271605
+creduc = 1.0
+sn_matter_coupling = true
+sn_rel_tol = 1.0e-8
+opacity_model = constant
+kappa_a_code = 577.35
+kappa_s_code = 0.0
+efloor = 1.0e-30
+sn_bc_incoming = outflow   # R8b (not production)
+tfloor_code = 1.0e-3
+sn_solver = bicgstab   # R0 prod overlay
+sn_smoother = ordered   # R0 prod overlay
+sn_precond_sweeps = 1   # R0 prod overlay
+sn_spatial = sou   # R0 prod overlay
+sn_sou_kappa = 1.0   # R0 prod overlay
+sn_sou_linear_prolong = true   # R0 prod overlay
+sn_red_black = true   # R0 prod overlay
+sn_diamond_fixup = true   # R0 prod overlay
+sn_criterion = residual   # R0 prod overlay
+sn_rosseland_excess = true   # R0 prod overlay
+sn_fleck_alpha = 1.0   # R0 prod overlay
+sn_max_iterations = 4000   # R0 prod overlay
+sn_nzeta = 4   # R0 prod overlay
+sn_npsi = 8   # R0 prod overlay
+sn_bc_tbg_K = 10.0   # R0 prod overlay
+sn_radiation_force = false   # R0 prod overlay
+sn_restart_reproject = false   # R0 prod overlay
+sn_dual_energy = true   # R0 prod overlay
+sn_fallback = true   # R0 prod overlay
+sn_krylov_dot_scale = true   # R0 prod overlay
+sn_skip_extinction = true   # R0 prod overlay
+sn_skip_group_rel = 1e-12   # R0 prod overlay
+opacity_interp = log   # adopted fix set
+sn_norm = b   # adopted fix set
+sn_local_tol = 1.0e-3   # adopted fix set
+sn_conserve_residual = true   # adopted fix set
+sn_fc_scatter = true   # adopted fix set
+sn_sou_limiter = positive   # adopted fix set
+
+<parthenon/output0>
+file_type = hdf5
+dt = 0.005
+variables = prim, rad.Er

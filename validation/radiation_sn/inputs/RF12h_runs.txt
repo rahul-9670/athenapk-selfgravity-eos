@@ -1,0 +1,10 @@
+RF12h/P3_T1000_sou | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 | 1
+RF12h/P3_T1000_w0.0 | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=0.0 | 1
+RF12h/P3_T1000_w0.3 | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=0.3 | 1
+RF12h/P3_T1000_w0.5 | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=0.5 | 1
+RF12h/P3_T1000_w1.0 | R13/P3_T1000.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=1.0 | 1
+RF12h/P3_T300_sou | R13/P3_T300.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 | 1
+RF12h/P3_T300_w0.0 | R13/P3_T300.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=0.0 | 1
+RF12h/P3_T300_w0.3 | R13/P3_T300.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=0.3 | 1
+RF12h/P3_T300_w0.5 | R13/P3_T300.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=0.5 | 1
+RF12h/P3_T300_w1.0 | R13/P3_T300.in | radiation/sn_precond_stencil=sou parthenon/time/nlim=3 radiation/sn_gray_dsa=true radiation/sn_gray_dsa_damping=1.0 | 1

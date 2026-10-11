@@ -1,0 +1,3 @@
+RF10/SEAM/prod/arm_amr | R0/SEAM_prod.in |  radiation/sn_sou_limiter=positive | 8
+RF10/SEAM/prod/arm_coarse | R0/SEAM_prod.in |  parthenon/mesh/refinement=none radiation/sn_sou_limiter=positive | 8
+RF10/SEAM/prod/arm_fine | R0/SEAM_prod.in |  parthenon/mesh/refinement=none parthenon/mesh/nx1=32 parthenon/mesh/nx2=32 parthenon/mesh/nx3=32 parthenon/meshblock/nx1=8 parthenon/meshblock/nx2=8 parthenon/meshblock/nx3=8 radiation/sn_sou_limiter=positive | 8

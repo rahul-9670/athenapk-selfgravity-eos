@@ -1,0 +1,22 @@
+  z2p4     : missing/incomplete
+  z4p8     : t=0.06 cycle=18  steady(rms dEr/Er last two dumps)=5.68e-14  max|v|=7.59e-17  p spread=0.00e+00  T_in/T_out=19
+  z6p12    : missing/incomplete
+  z8p16    : t=0.06 cycle=18  steady(rms dEr/Er last two dumps)=5.09e-14  max|v|=7.59e-17  p spread=0.00e+00  T_in/T_out=19
+  z12p24   : missing/incomplete
+  z16p32   : missing/incomplete
+  z24p48   : t=0.06 cycle=18  steady(rms dEr/Er last two dumps)=4.75e-14  max|v|=7.59e-17  p spread=0.00e+00  T_in/T_out=19
+  z4p8sou  : t=0.06 cycle=18  steady(rms dEr/Er last two dumps)=7.90e-14  max|v|=7.59e-17  p spread=0.00e+00  T_in/T_out=19
+
+  shell cells: {0.15: 576, 0.25: 1872, 0.35: 3728}
+  exact Er on 80 sampled cells/shell (mean): {0.15: '4.8128e-03', 0.25: '8.6248e-04', 0.35: '2.7281e-04'}
+
+  arm      nang  | r=0.15: ptp     rms_ref  max_ref  rms_exact | r=0.25: ptp     rms_ref  max_ref  rms_exact | r=0.35: ptp     rms_ref  max_ref  rms_exact
+  z4p8     32    | 8.660e-01 1.753e-01 4.106e-01 1.448e-01 | 1.541e+00 3.694e-01 1.026e+00 3.188e-01 | 1.888e+00 4.443e-01 1.322e+00 4.083e-01 | global(r>0.1) rms 2.999e-01 max 1.322e+00
+  z8p16    128   | 1.109e+00 3.974e-02 1.188e-01 2.460e-01 | 1.154e+00 6.954e-02 2.287e-01 2.146e-01 | 6.723e-01 9.844e-02 3.563e-01 1.772e-01 | global(r>0.1) rms 7.536e-02 max 3.963e-01
+  z24p48   1152  | 1.183e+00 0.000e+00 0.000e+00 2.721e-01 | 1.320e+00 0.000e+00 0.000e+00 2.487e-01 | 9.685e-01 0.000e+00 0.000e+00 1.655e-01 | global(r>0.1) rms 0.000e+00 max 0.000e+00
+  z4p8sou  32    | 1.466e+00 5.243e-01 1.138e+00 3.339e-01 | 3.921e+00 1.223e+00 4.135e+00 1.087e+00 | 5.867e+00 1.340e+00 5.230e+00 1.271e+00 | global(r>0.1) rms 8.361e-01 max 5.230e+00
+
+  azimuthal profile, |z| < dx/2, |r - 0.25| < dx/2 (Er / shell mean), 16 phi bins:
+    z4p8     1.205 0.806 0.744 1.205 1.205 0.806 0.744 1.205 1.205 0.806 0.744 1.205 1.205 0.806 0.744 1.205
+    z24p48   1.150 0.839 0.830 1.150 1.150 0.839 0.830 1.150 1.150 0.839 0.830 1.150 1.150 0.839 0.830 1.150
+    z4p8sou  0.426 1.843 1.474 0.426 0.426 1.843 1.474 0.426 0.426 1.843 1.474 0.426 0.426 1.843 1.474 0.426

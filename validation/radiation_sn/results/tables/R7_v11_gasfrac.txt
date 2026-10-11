@@ -1,0 +1,10 @@
+# R-F9 table v11 check (scripts/r7_v11.py): opacity_table_v11_pollack_acc_gasfrac_fmt3.bin grid 201x1859; truth independent of the generator (own BL94 pollack walk, own shape, scipy.quad epsrel 1e-11)
+(a) kappa_R(node) vs BL94 pollack: rel max 2.007e-12  p99 1.851e-12  median 5.240e-14  (n 9765)
+(a) kappa_P/kappa_R(node) vs truth, rho every 10th x T every 4th node: rel max 2.098e-06  p99 1.133e-07  median 5.587e-11  (n 9765)
+(a) same in the collapse-run box (rho 1e-20..1e-8, T 5..2000 K): rel max 2.098e-06  p99 1.607e-07  median 5.804e-11  (n 2508)
+(b) mP_g(node T) vs truth at rho_ref 1e-12, groups with Planck fraction > 1e-12: rel max 4.566e-12  p99 2.014e-12  median 2.523e-14  (n 465)
+(c) T-only multipliers: mult(T) vs the multiplier at the cell's own rho, box, groups with Planck fraction > 1e-3: rel max 4.446e-06  p99 1.317e-06  median 9.289e-12  (n 1463); worst at log rho -8.0, T 167.6 K
+(d) kappa_P log-lookup vs truth at off-node points in the box (24 rho x 96 T): rel max 2.663e-02  p99 1.840e-05  median 7.260e-09  (n 2304)
+(e) kappa_P/kappa_R at rho 1e-12, v10b -> v11: 9.9997K 1.8708->1.8708 | 99.85K 1.8708->1.8708 | 140K 1.8708->1.8708 | 140K 1.8708->1.8708 | 141.01K 1.0568->1.8708 | 170K 0.9791->1.8708 | 200.58K 0.9741->1.8708 | 499.92K 0.9538->1.8436 | 797.8K 0.9604->1.6435 | 997.02K 0.9632->1.4780 | 1202K 0.9762->1.3393 | 1502.2K 1.0000->1.2020 | 2002.8K 1.0000->1.0116 | 2995.9K 1.0000->1.0000
+(e) largest node-to-node change of kappa_P/kappa_R over 100-300 K (rho 1e-12, dlogT 0.0031): v10b 0.8141 at 140 K, v11 1.99e-05 at 295.7 K
+(f) C++ DustOpacityWeightEvap(pollack) vs 1 - f_gas of the table shape: max |dw| 0.00e+00 over 864 points

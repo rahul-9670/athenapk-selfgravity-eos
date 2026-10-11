@@ -1,0 +1,4 @@
+R3/S4_sou | R3/S4_sou.in | | 8
+R3/S4_step | R3/S4_step.in | | 8
+R3/S4_sou_hr | R3/S4_sou_hr.in | | 8
+R3/S4_step_hr | R3/S4_step_hr.in | | 8

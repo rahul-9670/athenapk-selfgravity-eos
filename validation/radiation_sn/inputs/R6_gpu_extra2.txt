@@ -1,0 +1,3 @@
+R6/gpu/R5_steppc | R5/a_P3_T1000.in |  | 1
+R6/gpu/R5_pc_nofc | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_fc_scatter=false | 1
+R6/gpu/R5_pc_nolim | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_sou_limiter=none | 1

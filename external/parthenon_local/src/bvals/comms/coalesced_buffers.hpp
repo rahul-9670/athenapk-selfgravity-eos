@@ -81,6 +81,8 @@ struct CoalescedBuffer {
                                           int *pcomb_size = nullptr);
 
   void PackAndSend(const std::set<Uid_t> &vars);
+  int Pack(const std::set<Uid_t> &vars);                       // launch only (no fence); returns the message size
+  void Send(const std::set<Uid_t> &vars, const int comb_size);   // after a fence
 
   bool TryReceiveAndUnpack(const std::set<Uid_t> &vars);
 };
@@ -122,6 +124,7 @@ struct CoalescedBuffersRank {
   void ResolveAndSendBufInfo();
 
   void PackAndSend(MeshData<Real> *pmd);
+  CoalescedBuffer *GetBuffer(MeshData<Real> *pmd);   // nullptr if this partition sends nothing to this rank
 
   bool TryReceiveAndUnpack(MeshData<Real> *pmd, int partition);
 

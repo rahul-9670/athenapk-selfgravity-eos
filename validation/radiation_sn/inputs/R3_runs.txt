@@ -1,0 +1,8 @@
+R3/S1_sou | R3/S1_sou.in | | 8
+R3/S1_step | R3/S1_step.in | | 8
+R3/S2_sou | R3/S2_sou.in | | 8
+R3/S2_step | R3/S2_step.in | | 8
+R3/S3_sou | R3/S3_sou.in | | 8
+R3/S3_step | R3/S3_step.in | | 8
+R3/S4_sou | R3/S4_sou.in | | 8
+R3/S4_step | R3/S4_step.in | | 8

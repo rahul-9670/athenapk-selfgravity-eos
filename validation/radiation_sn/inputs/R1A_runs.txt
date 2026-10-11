@@ -1,0 +1,10 @@
+R1A/v0_repro | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_iter_verbose=1 | 1
+R1A/v1_nodotscale | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_krylov_dot_scale=false | 1
+R1A/v2_noskip | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_skip_group_rel=0.0 | 1
+R1A/v3_nofallback | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_fallback=false | 1
+R1A/v4_noskipext | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_skip_extinction=false | 1
+R1A/v5_tol1e-10 | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_rel_tol=1.0e-10 | 1
+R1A/v6_richardson | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_solver=richardson | 1
+R1A/v7_step | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 radiation/sn_spatial=step | 1
+R1A/v8_nodual | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 hydro/dual_energy=false radiation/sn_dual_energy=false | 1
+R1A/v9_8ranks_4blk | R1/base_g30r100_c0.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 parthenon/time/nlim=1 parthenon/meshblock/nx1=4 parthenon/meshblock/nx2=4 parthenon/meshblock/nx3=4 | 8

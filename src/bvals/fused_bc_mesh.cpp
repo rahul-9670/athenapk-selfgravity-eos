@@ -2,15 +2,16 @@
 // AthenaPK - mesh-level fused physical boundary conditions (hydro/fused_bc_mesh).
 //========================================================================================
 //! \file fused_bc_mesh.cpp
-//  \brief Diode boundary conditions for EVERY block of a MeshData in six launches (one per face
-//  direction), registered as parthenon::MeshDataBoundaryHook().
+//  \brief Diode + Sn incoming-ordinate boundary conditions for EVERY block of a MeshData in six
+//  launches (one per face direction), registered as parthenon::MeshDataBoundaryHook().
 //
 // WHY. Parthenon applies physical BCs block by block and face by face at every halo exchange;
-// on GPUs the per-face kernel launches dominate when exchanges are frequent.
+// on GPUs the per-face kernel launches dominate when exchanges are frequent (the Sn Krylov vector
+// is exchanged every BiCGSTAB iteration).
 //
 // WHAT IS IDENTICAL. The values written are those of Hydro::BoundaryFunction::DiodeBC with
-// hydro/fused_bc=true: every ghost takes the reference interior cell and the inward normal
-// momentum of `cons` is zeroed. The
+// hydro/fused_bc=true: every ghost takes the reference interior cell, the inward normal
+// momentum of `cons` is zeroed, and incoming Sn ordinates (sn.u, sn.k_y) are overwritten. The
 // faces are applied in Parthenon's order (inner_x1, outer_x1, inner_x2, outer_x2, inner_x3,
 // outer_x3) because corner ghosts are rewritten by later faces from cells earlier faces filled;
 // blocks are independent (a block's BC reads and writes only that block), so face-major order
@@ -27,6 +28,8 @@
 #include <parthenon/package.hpp>
 
 #include "../main.hpp"
+#include "../radiation/radiation.hpp"
+#include "../radiation/radiation_sn.hpp"
 #include "bvals/boundary_conditions.hpp"
 #include "mesh/mesh.hpp"
 #include "mesh/meshblock.hpp"
@@ -45,8 +48,8 @@ bool &AllDiode() {
 
 bool FusedDiodeBCMesh(std::shared_ptr<MeshData<Real>> &md, bool coarse) {
   if (!AllDiode()) return false;
-  // Task lists may run on several threads; the mask buffer below is shared, so one caller at a
-  // time.
+  // Task lists may run on several threads ; the
+  // mask buffer below is shared, so one caller at a time.
   static std::mutex mtx;
   std::lock_guard<std::mutex> lock(mtx);
   if (md->NumBlocks() == 0) return true;
@@ -104,8 +107,26 @@ bool FusedDiodeBCMesh(std::shared_ptr<MeshData<Real>> &md, bool coarse) {
     lo = ip.first < 0 ? -1 : ip.first;
     cnt = ip.first < 0 ? 0 : ip.second - ip.first + 1;
   };
-  int ic, nc;
+  int ic, nc, iu, nu, iy, ny, icy, ncy;
   rng("cons", ic, nc);
+  rng(Radiation::Sn::USolName(), iu, nu);
+  rng(Radiation::Sn::KyName(), iy, ny);
+  rng(Radiation::Sn::KcyName(), icy, ncy);   // R-F14: the coupled-solve (sn_fc_scatter) Krylov vector, nfa-wide
+  int mode = 0, nang = 1;
+  Kokkos::View<Real *> ubg;
+  Radiation::Sn::DeviceAngles ang;
+  auto &all = pmb0->packages.AllPackages();
+  auto it = all.find("radiation");
+  if (it != all.end() && it->second->AllParams().hasKey("sn_bc_mode")) {
+    mode = it->second->Param<int>("sn_bc_mode");
+    if (mode != 0) {
+      nang = it->second->Param<Radiation::Sn::SnParams>("sn_params").nang;
+      ubg = it->second->Param<Kokkos::View<Real *>>("sn_bc_ubg");
+      ang = it->second->Param<Radiation::Sn::DeviceAngles>("sn_angles");
+    }
+  }
+  if (mode == 0) nu = ny = ncy = 0;
+  auto nxv = ang.nx, nyv = ang.ny, nzv = ang.nz;
   auto mask = mask_d;
 
   const auto &bounds = coarse ? pmb0->c_cellbounds : pmb0->cellbounds;
@@ -133,6 +154,20 @@ bool FusedDiodeBCMesh(std::shared_ptr<MeshData<Real>> &md, bool coarse) {
           if (l == cmom) {
             const bool inward = inner ? (val > 0.0) : (val < 0.0);
             if (inward) val = 0.0;
+          }
+          if (nu > 0 && l >= iu && l < iu + nu) {
+            const int n = l - iu;
+            const int a = n % nang;
+            const Real nc_ = dir == 1 ? nxv(a) : (dir == 2 ? nyv(a) : nzv(a));
+            if (inner ? (nc_ > 0.0) : (nc_ < 0.0)) val = (mode == 2) ? ubg(n / nang) : 0.0;
+          } else if (ny > 0 && l >= iy && l < iy + ny && (l - iy) < nang) {
+            const int a = l - iy;
+            const Real nc_ = dir == 1 ? nxv(a) : (dir == 2 ? nyv(a) : nzv(a));
+            if (inner ? (nc_ > 0.0) : (nc_ < 0.0)) val = 0.0;
+          } else if (ncy > 0 && l >= icy && l < icy + ncy) {
+            const int a = (l - icy) % nang;
+            const Real nc_ = dir == 1 ? nxv(a) : (dir == 2 ? nyv(a) : nzv(a));
+            if (inner ? (nc_ > 0.0) : (nc_ < 0.0)) val = 0.0;
           }
           q(b, l, k, j, i) = val;
         });

@@ -1,0 +1,6 @@
+R4A/a05_ref | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=0.5 | 1
+R4A/a05_tol12 | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=0.5 radiation/sn_rel_tol=1.0e-12 | 1
+R4A/a05_nodual | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=0.5 hydro/dual_energy=false radiation/sn_dual_energy=false | 1
+R4A/a05_noross | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=0.5 radiation/sn_rosseland_excess=false | 1
+R4A/a10_ref | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=1.0 | 1
+R4A/a075_ref | R1/base_g100r30_c2.in | parthenon/time/dt_force=1.1e-05 radiation/sn_fleck_alpha=0.75 | 1

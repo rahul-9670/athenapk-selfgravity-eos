@@ -143,6 +143,13 @@ class Mesh {
   int task_collection_timeout_in_seconds;
 
   const bool do_coalesced_comms;
+  //! parthenon/mesh/flat_bnd_kernels (AthenaPK patch, 2026-10-10; default false): boundary pack (SendBoundBufs)
+  //! and unpack (SetBounds) with one thread per buffer element instead of one thread per i-row (coalesced accesses;
+  //! the copies and the sparse non-zero flags are unchanged, so results are bit-identical).
+  const bool flat_bnd_kernels;
+  //! parthenon/mesh/coalesced_batch_pack (AthenaPK patch, default false): coalesced sends pack for every neighbour
+  //! rank, fence once, then send (instead of pack + fence + send per rank). Same data: bit-identical.
+  const bool coalesced_batch_pack;
 
   BlockList_t block_list;
   Packages_t packages;
@@ -232,7 +239,7 @@ class Mesh {
   static void UserWorkAfterLoopDefault(Mesh *mesh, ParameterInput *pin,
                                        SimTime &tm); // called in main loop
   std::function<void(Mesh *, ParameterInput *, SimTime &)> UserWorkAfterLoop = nullptr;
-  // AthenaPK local (2026-10-06, validation_tests/eos_tabulated E7w2: EOS-consistent fill for double flux). Both null
+  // AthenaPK local (2026-10-06, validation/eos_tabulated E7w2: EOS-consistent fill for double flux). Both null
   // by default = no effect. PreSendBoundBufsHook: called by SendBoundBufs (any/local/nonlocal) right before the
   // send-side restriction, with the MeshData being sent. PostRegridHook: called by RedistributeAndRefineMeshBlocks
   // after the regrid prolongation/restriction of block interiors and before the first boundary exchange.

@@ -1,0 +1,12 @@
+R8/plane_o4x8_dt2e-03_sou | R8/plane.in | radiation/sn_nzeta=4 radiation/sn_npsi=8 parthenon/time/dt_force=0.002 | 1
+R8/plane_o4x8_dt2e-03_step | R8/plane.in | radiation/sn_nzeta=4 radiation/sn_npsi=8 parthenon/time/dt_force=0.002 radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1
+R8/plane_o4x8_dt5e-04_sou | R8/plane.in | radiation/sn_nzeta=4 radiation/sn_npsi=8 parthenon/time/dt_force=0.0005 | 1
+R8/plane_o4x8_dt5e-04_step | R8/plane.in | radiation/sn_nzeta=4 radiation/sn_npsi=8 parthenon/time/dt_force=0.0005 radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1
+R8/plane_o8x16_dt2e-03_sou | R8/plane.in | radiation/sn_nzeta=8 radiation/sn_npsi=16 parthenon/time/dt_force=0.002 | 1
+R8/plane_o8x16_dt2e-03_step | R8/plane.in | radiation/sn_nzeta=8 radiation/sn_npsi=16 parthenon/time/dt_force=0.002 radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1
+R8/plane_o8x16_dt5e-04_sou | R8/plane.in | radiation/sn_nzeta=8 radiation/sn_npsi=16 parthenon/time/dt_force=0.0005 | 1
+R8/plane_o8x16_dt5e-04_step | R8/plane.in | radiation/sn_nzeta=8 radiation/sn_npsi=16 parthenon/time/dt_force=0.0005 radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1
+R8/plane_o16x32_dt2e-03_sou | R8/plane.in | radiation/sn_nzeta=16 radiation/sn_npsi=32 parthenon/time/dt_force=0.002 | 1
+R8/plane_o16x32_dt2e-03_step | R8/plane.in | radiation/sn_nzeta=16 radiation/sn_npsi=32 parthenon/time/dt_force=0.002 radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1
+R8/plane_o16x32_dt5e-04_sou | R8/plane.in | radiation/sn_nzeta=16 radiation/sn_npsi=32 parthenon/time/dt_force=0.0005 | 1
+R8/plane_o16x32_dt5e-04_step | R8/plane.in | radiation/sn_nzeta=16 radiation/sn_npsi=32 parthenon/time/dt_force=0.0005 radiation/sn_spatial=step radiation/sn_sou_limiter=none | 1

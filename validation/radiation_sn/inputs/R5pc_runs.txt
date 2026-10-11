@@ -1,0 +1,9 @@
+R5/pc_G1_T1000 | R5/a_G1_T1000.in | radiation/sn_precond_stencil=sou | 1
+R5/pc_P3_T1000 | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou | 1
+R5/pc_L6_T1000 | R5/a_L6_T1000.in | radiation/sn_precond_stencil=sou | 1
+R5/pc_E8_T1000 | R5/a_E8_T1000.in | radiation/sn_precond_stencil=sou | 1
+R5/pc_P3_T300 | R5/a_P3_T300.in | radiation/sn_precond_stencil=sou | 1
+R5/pc_G1_T300 | R5/a_G1_T300.in | radiation/sn_precond_stencil=sou | 1
+R5/pc_P3_T1000_nolim | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_sou_limiter=none | 1
+R5/pc_P3_T1000_prod | R5/a_P3_T1000.in | radiation/sn_precond_stencil=sou radiation/sn_norm=rhs radiation/sn_local_tol=0.0 radiation/sn_conserve_residual=false radiation/sn_fc_scatter=false radiation/sn_sou_limiter=none radiation/opacity_interp=linear | 1
+R5/pc_P3_T300_off | R5/a_P3_T300.in |  | 1
