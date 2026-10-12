@@ -8,6 +8,7 @@
 #   fofc_scalar   first-order flux correction x passive scalar consistency
 #   grav_analytic, jeans_wave, grav_slab, polytrope, profile1d   self-gravity validation suite
 #   eos_test      tabulated-EOS validation suite (waves, Riemann problems, compression, slabs)
+#   diffusion     non-ideal MHD validation suite (Ohmic + ambipolar)
 target_sources(athenaPK PRIVATE
     collapse_be.cpp
     poisson_test.cpp
@@ -20,4 +21,5 @@ target_sources(athenaPK PRIVATE
     polytrope.cpp
     profile1d.cpp
     eos_test.cpp
+    diffusion.cpp
     )

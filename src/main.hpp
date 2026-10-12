@@ -38,8 +38,15 @@ enum class RiemannSolver { undefined, none, hlle, llf, hlld };
 enum class Reconstruction { undefined, dc, plm, ppm, wenoz, weno3, limo3 };
 enum class Integrator { undefined, rk1, rk2, vl2, rk3 };
 enum class Fluid { undefined, glmmhd };
-// No parabolic (diffusive) terms are part of this tree; DiffInt is kept so the hydro package
-// registers "diffint = none" and the integrator sees no parabolic substeps.
+// Parabolic (diffusive) terms in this tree: Ohmic resistivity and ambipolar diffusion (non-ideal MHD),
+// integrated unsplit or with RKL2 super-time-stepping. Hall, thermal conduction and viscosity of the
+// full code are not part of it.
+enum class Resistivity { none, ohmic };
+// ionization = equilibrium self-consistent x_e(rho,T) in the Wardle conductivity tensor;
+// density_power = c rho^p (validation only: an eta jump at a density step with an exact answer).
+enum class ResistivityCoeff { none, fixed, spitzer, ionization, density_power };
+enum class Ambipolar { none, ambipolar };
+enum class AmbipolarCoeff { none, fixed, ionization };
 enum class DiffInt { none, unsplit, rkl2 };
 
 enum class Hst { idx, ekin, emag, divb, divb_max };

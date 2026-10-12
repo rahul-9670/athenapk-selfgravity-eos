@@ -75,6 +75,10 @@ int main(int argc, char *argv[]) {
   } else if (problem == "rad_shock") {
     // Lowrie & Edwards radiative shock (radiation in a moving flow).
     pman.app_input->ProblemGenerator = rad_shock::ProblemGenerator;
+  } else if (problem == "diffusion") {
+    // Non-ideal MHD validation problems (Ohmic + ambipolar); see pgen/pgen.hpp.
+    pman.app_input->ProblemGenerator = diffusion::ProblemGenerator;
+    pman.app_input->UserWorkAfterLoop = diffusion::UserWorkAfterLoop;
   } else if (problem == "poisson_test") {
     // Self-gravity analytic gate (uniform sphere); see pgen/pgen.hpp.
     pman.app_input->ProblemGenerator = poisson_test::ProblemGenerator;
@@ -99,7 +103,7 @@ int main(int argc, char *argv[]) {
     std::stringstream msg;
     msg << "Problem ID '" << problem
         << "' is not available in this build. Available: collapse_be, poisson_test, "
-           "grav_analytic, jeans_wave, grav_slab, polytrope, eos_test, profile1d, fofc_scalar, rad_pulse, rad_shock.";
+           "grav_analytic, jeans_wave, grav_slab, polytrope, eos_test, profile1d, fofc_scalar, rad_pulse, rad_shock, diffusion.";
     PARTHENON_THROW(msg);
   }
 

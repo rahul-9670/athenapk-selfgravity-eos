@@ -1,0 +1,94 @@
+<comment>
+problem = A9_unsplit_N256 (nonideal_mhd A1/A3, production keys)
+# B_y(x,0) = amp/sqrt(4 pi eta t0) * exp(-x^2/(4 eta t0)); with v=0, rho=1 this is pure
+# Ohmic diffusion B_y(x,t) = amp/sqrt(4 pi eta (t0+t)) exp(-x^2/(4 eta (t0+t))). Peak(x=0)
+# decays as amp/sqrt(4 pi eta (t0+t)). The matched CT deck differs ONLY in divergence_control.
+
+<job>
+problem_id = diffusion
+
+<problem/diffusion>
+iprob = 40
+t0 = 0.5
+amp = 1.0e-3
+
+<parthenon/mesh>
+refinement = static
+numlevel = 2
+nghost = 2
+nx1 = 256
+x1min = -4.0
+x1max = 4.0
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 8
+x2min = -0.25
+x2max = 0.25
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.25
+x3max = 0.25
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 32
+nx2 = 8
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 2.0
+nlim = -1
+ncycle_out = 200
+
+<hydro>
+fluid = glmmhd
+eos = adiabatic
+gamma = 2.0
+riemann = hlld
+reconstruction = plm
+divergence_control = glm
+eos_table_allow_no_radiation = true
+dual_energy = true
+dual_energy_eta1 = 5e-2
+dual_energy_sync_step_end = true
+dual_energy_unsigned_prim = true
+dual_energy_exact_resync = true
+dual_energy_eta2 = 0.1
+dual_energy_kappa = 3.0
+dual_energy_shock_comp = 0.02
+dual_energy_shared_select = true
+dual_comp_ghost = true
+dual_energy_heat_rkl2 = false
+dual_energy_heat_exact = false
+boundary_clamp_dual = true
+boundary_flux_clamp = false
+
+
+<diffusion>
+cfl = 0.3
+integrator = unsplit
+eta_cache = true
+resistivity = ohmic
+resistivity_coeff = fixed
+ohm_diff_coeff_code = 0.25
+
+<parthenon/output0>
+file_type = hdf5
+dt = 2.0
+id = prim
+variables = prim
+
+<parthenon/output1>
+file_type = hst
+dt = 0.05
+
+<parthenon/static_refinement0>
+x1min = 0.1
+x1max = 3.9
+x2min = -0.25
+x2max = 0.25
+level = 1

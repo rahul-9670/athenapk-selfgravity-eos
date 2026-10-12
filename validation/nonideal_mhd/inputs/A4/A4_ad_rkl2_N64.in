@@ -1,0 +1,86 @@
+<comment>
+problem = A4_ad_rkl2_N64 3-D ABC field (nonideal_mhd A4): one cycle, RKL2 amplification of mode m=1, ratio cap 1000 (nonideal_mhd A7)
+
+<job>
+problem_id = diffusion
+
+<problem/diffusion>
+iprob = 44
+amp = 0.001
+nwave = 1
+
+<parthenon/mesh>
+refinement = none
+nx1 = 64
+x1min = 0.0
+x1max = 1.0
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 64
+x2min = 0.0
+x2max = 1.0
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 64
+x3min = 0.0
+x3max = 1.0
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 32
+nx2 = 32
+nx3 = 32
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.025
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+eos = adiabatic
+gamma = 1.6666666666666667
+riemann = hlld
+reconstruction = plm
+glmmhd_source = dedner_extended
+pfloor = 1.0e-8
+boundary_flux_clamp = false
+eos_table_allow_no_radiation = true
+dual_energy = true
+dual_energy_eta1 = 5e-2
+dual_energy_sync_step_end = true
+dual_energy_unsigned_prim = true
+dual_energy_exact_resync = true
+dual_energy_eta2 = 0.1
+dual_energy_kappa = 3.0
+dual_energy_shock_comp = 0.02
+dual_energy_shared_select = true
+dual_comp_ghost = true
+dual_energy_heat_rkl2 = true
+dual_energy_heat_exact = true
+boundary_clamp_dual = true
+
+<diffusion>
+integrator = rkl2
+rkl2_max_dt_ratio = 1000
+rkl2_freeze_eta = true
+cfl = 0.3
+eta_cache = true
+ambipolar = ambipolar
+ambipolar_coeff = fixed
+ambipolar_coeff_code = 1.0e6
+
+<physics>
+self_gravity = false
+radiation = false
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, cons
+dt = 1.0e9
+
+<parthenon/output1>
+file_type = hst
+dt = 1.0e9

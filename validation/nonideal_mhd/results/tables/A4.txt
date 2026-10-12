@@ -1,0 +1,12 @@
+ad  rkl2     N  16  G 0.967353 (exact 1.000000)  max|dB|/B 5.759e-02 (p   nan)  shape 3.26e-02  cycles 3
+ad  rkl2     N  32  G 0.991435 (exact 1.000000)  max|dB|/B 1.625e-02 (p  1.83)  shape 8.57e-03  cycles 5
+ad  rkl2     N  64  G 0.997830 (exact 1.000000)  max|dB|/B 4.202e-03 (p  1.95)  shape 2.17e-03  cycles 10
+ad  unsplit  N  16  G 0.967566 (exact 1.000000)  max|dB|/B 5.696e-02 (p   nan)  shape 3.24e-02  cycles 484
+ad  unsplit  N  32  G 0.991443 (exact 1.000000)  max|dB|/B 1.623e-02 (p  1.81)  shape 8.56e-03  cycles 2015
+ad  unsplit  N  64  G 0.997830 (exact 1.000000)  max|dB|/B 4.201e-03 (p  1.95)  shape 2.17e-03  cycles 8160
+ohm rkl2     N  16  G 0.379008 (exact 0.372708)  |G/exact-1| 1.690e-02 (p   nan)  shape 7.79e-07  cycles 3
+ohm rkl2     N  32  G 0.374302 (exact 0.372708)  |G/exact-1| 4.278e-03 (p  1.98)  shape 1.47e-07  cycles 5
+ohm rkl2     N  64  G 0.373110 (exact 0.372708)  |G/exact-1| 1.080e-03 (p  1.99)  shape 4.40e-08  cycles 8
+ohm unsplit  N  16  G 0.377444 (exact 0.372708)  |G/exact-1| 1.271e-02 (p   nan)  shape 4.79e-07  cycles 130
+ohm unsplit  N  32  G 0.373890 (exact 0.372708)  |G/exact-1| 3.172e-03 (p  2.00)  shape 9.06e-08  cycles 513
+ohm unsplit  N  64  G 0.373003 (exact 0.372708)  |G/exact-1| 7.928e-04 (p  2.00)  shape 1.50e-08  cycles 2050

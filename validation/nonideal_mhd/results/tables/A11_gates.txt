@@ -1,0 +1,22 @@
+--- GATE 1/2: sigma_O == scalar conductivity (B-independent); eta_O identity ---
+  worst |sigma_O - sigma_scalar|/sigma = 4.44e-16 ; eta_O identity = 4.63e-16  PASS
+--- GATE 3: parity in B (eta_O,eta_A even; eta_H odd -> Hall sign) ---
+  worst parity residual = 0.00e+00  PASS
+--- GATE 4: sigma_perp^2 == sigma_H^2 + sigma_P^2 ---
+  worst residual = 0.00e+00  PASS
+--- GATE 5: canonical eta(rho) crossover (ambipolar -> Ohmic) ---
+  eta_A/eta_O: low-rho=2.69e+06  high-rho=2.69e-03  (ambipolar dominant low, drops toward Ohmic)  PASS
+--- GATE 6: grain solve self-consistency (neutrality + ionization balance) ---
+  worst neutrality residual = 6.97e-14 ; ionization-balance residual = 4.56e-11  PASS
+--- GATE 7: grain physics structure (sign, Z~a, e- depletion, sublimation) ---
+  Z_k<0 all bins=True ; |Z_k/a_k| spread=1.12e-16 (expect ~0, Z=psi*tau~a) ; n_e 2.495e-01 < gas-only 3.678e-01 = True ; sublimated>T_subl=True  PASS
+--- GATE 8: C++-vs-Python GRAIN-INCLUSIVE cross-check (charge state + eta) ---
+    worst rel diff n_e    = 5.068e-11   at (1e-08, 300.0, 1e-05)
+    worst rel diff n_i    = 4.498e-11   at (1e-08, 300.0, 1e-05)
+    worst rel diff Z      = 6.308e-11   at (1e-08, 300.0, 1e-05, 2)
+    worst rel diff eta_O  = 6.459e-11   at (1e-08, 300.0, 0.001)
+    worst rel diff eta_H  = 4.248e-04   at (1e-08, 300.0, 1e-05)
+    worst rel diff eta_A  = 2.926e-03   at (1e-08, 50.0, 1e-05)
+  40 sample points, 5 grain bins  PASS
+
+ALL GATES PASS (0 failures)

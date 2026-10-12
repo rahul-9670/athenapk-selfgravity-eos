@@ -1,0 +1,8 @@
+A10_unsplit_N128
+A10_unsplit_N256
+A10_unsplit_N512
+A10_unsplit_N1024
+A10_rkl2_N128
+A10_rkl2_N256
+A10_rkl2_N512
+A10_rkl2_N1024

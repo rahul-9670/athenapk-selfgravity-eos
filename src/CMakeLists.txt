@@ -6,6 +6,7 @@ add_executable(
         main.cpp
         eos/adiabatic_glmmhd.cpp
         units.hpp
+        units/ionization_environment.hpp
         units/physical_units.hpp
         bvals/boundary_conditions_apk.hpp
         bvals/fused_bc_mesh.cpp
@@ -13,6 +14,15 @@ add_executable(
         diagnostics/cons_diag.hpp
         diagnostics/grav_diag.cpp
         diagnostics/grav_diag.hpp
+        hydro/diffusion/ambipolar.cpp
+        hydro/diffusion/diffusion.cpp
+        hydro/diffusion/diffusion.hpp
+        hydro/diffusion/dual_energy_heating.cpp
+        hydro/diffusion/ionization.hpp
+        hydro/diffusion/ionization_build.hpp
+        hydro/diffusion/resistivity.cpp
+        hydro/dual_heat_exact.cpp
+        hydro/dual_heat_exact.hpp
         hydro/double_flux.cpp
         hydro/dual_flux_density.cpp
         hydro/dual_double_flux.cpp

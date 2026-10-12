@@ -38,6 +38,8 @@
 #include "glmmhd/glmmhd.hpp"
 #include "double_flux.hpp"
 #include "dual_flux_density.hpp"
+#include "diffusion/diffusion.hpp"
+#include "diffusion/ionization_build.hpp"
 #include "hydro.hpp"
 #include "interface/params.hpp"
 #include "outputs/outputs.hpp"
@@ -650,6 +652,9 @@ TaskStatus AddSplitSourcesStrang(MeshData<Real> *md, const SimTime &tm) {
   return TaskStatus::complete;
 }
 
+// BuildIonizationModel lives in diffusion/ionization_build.hpp.
+using Ionization::BuildIonizationModel;
+
 std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   auto pkg = std::make_shared<StateDescriptor>("Hydro");
 
@@ -1149,15 +1154,354 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
       eceil = Tceil / mbar_over_kb / (gamma - 1.0);
     }
 
-    // No parabolic (diffusion) terms in this tree: the parabolic timestep is infinite and the
-    // diffusion integrator is off. Both are still registered because the timestep report and the
-    // driver read them.
-    PARTHENON_REQUIRE_THROWS(
-        pin->GetOrAddString("diffusion", "integrator", "none") == "none",
-        "<diffusion> is not part of this build (no conduction, viscosity or resistivity).");
+    // Only Ohmic and ambipolar diffusion are part of this tree. The Hall term, thermal conduction and
+    // viscosity of the full code are refused rather than silently ignored.
+    PARTHENON_REQUIRE_THROWS(pin->GetOrAddString("diffusion", "hall", "none") == "none",
+                             "diffusion/hall is not part of this tree (Ohmic + ambipolar only).");
+    PARTHENON_REQUIRE_THROWS(pin->GetOrAddString("diffusion", "conduction", "none") == "none",
+                             "diffusion/conduction is not part of this tree.");
+    PARTHENON_REQUIRE_THROWS(pin->GetOrAddString("diffusion", "viscosity", "none") == "none",
+                             "diffusion/viscosity is not part of this tree.");
+    auto resistivity = Resistivity::none;
+    auto resistivity_str = pin->GetOrAddString("diffusion", "resistivity", "none");
+    if (resistivity_str == "ohmic") {
+      resistivity = Resistivity::ohmic;
+    } else if (resistivity_str != "none") {
+      PARTHENON_FAIL("Unknown resistivity method. Options are: none, ohmic");
+    }
+    // If resistivity is enabled, process supported coefficients
+    if (resistivity != Resistivity::none) {
+      auto resistivity_coeff_str =
+          pin->GetOrAddString("diffusion", "resistivity_coeff", "none");
+      auto resistivity_coeff = ResistivityCoeff::none;
+      // Ceiling on the ionization-model eta_O (code units; default disabled). Bounds the
+      // parabolic dt in the diffusion-decoupled first-core interior; ignored for
+      // resistivity_coeff=fixed. See OhmicDiffusivity::eta_cap_.
+      const Real eta_ohm_cap_code = pin->GetOrAddReal(
+          "diffusion", "eta_ohm_cap_code", std::numeric_limits<Real>::max());
+
+      if (resistivity_coeff_str == "spitzer") {
+        // If this is implemented, check how the Spitzer coeff for thermal conduction is
+        // handled.
+        PARTHENON_FAIL("needs impl");
+
+      } else if (resistivity_coeff_str == "fixed") {
+        resistivity_coeff = ResistivityCoeff::fixed;
+        Real ohm_diff_coeff_code = pin->GetReal("diffusion", "ohm_diff_coeff_code");
+        auto ohm_diff = OhmicDiffusivity(resistivity, resistivity_coeff,
+                                         ohm_diff_coeff_code, 0.0, 0.0, 0.0);
+        pkg->AddParam<>("ohm_diff", ohm_diff);
+
+      } else if (resistivity_coeff_str == "density_power") {
+        // VALIDATION ONLY (nonideal_mhd A5): eta = ohm_diff_coeff_code * rho^ohm_rho_power.
+        resistivity_coeff = ResistivityCoeff::density_power;
+        const Real c = pin->GetReal("diffusion", "ohm_diff_coeff_code");
+        const Real pw = pin->GetOrAddReal("diffusion", "ohm_rho_power", 0.0);
+        pkg->AddParam<>("ohm_diff", OhmicDiffusivity(resistivity, resistivity_coeff, c, 0.0, 0.0, 0.0,
+                                                     Ionization::IonizationModel(),
+                                                     std::numeric_limits<Real>::max(), pw));
+
+      } else if (resistivity_coeff_str == "ionization") {
+        // Self-consistent Ohmic resistivity eta_O = c^2/(4 pi sigma_O) from the reduced
+        // CR+thermal+grain ionization model (no ohm_diff_coeff_code needed).
+        resistivity_coeff = ResistivityCoeff::ionization;
+        Ionization::IonizationModel ion = BuildIonizationModel(pin);
+        auto ohm_diff = OhmicDiffusivity(resistivity, resistivity_coeff, 0.0, 0.0, 0.0,
+                                         0.0, ion, eta_ohm_cap_code);
+        pkg->AddParam<>("ohm_diff", ohm_diff);
+        if (parthenon::Globals::my_rank == 0) {
+          std::cout << "## Ohmic resistivity: self-consistent ionization model "
+                       "(conductivity-tensor sigma_O)"
+                    << std::endl;
+          if (eta_ohm_cap_code < std::numeric_limits<Real>::max()) {
+            std::cout << "## Ohmic eta_O cap: " << eta_ohm_cap_code << " (code units)"
+                      << std::endl;
+          }
+        }
+
+      } else {
+        PARTHENON_FAIL("Resistivity is enabled but no valid coefficient is set. Set "
+                       "diffusion/resistivity_coeff to 'fixed' (+ohm_diff_coeff_code) or "
+                       "'ionization'.");
+      }
+    }
+    pkg->AddParam<>("resistivity", resistivity);
+
+    auto ambipolar = Ambipolar::none;
+    auto ambipolar_str = pin->GetOrAddString("diffusion", "ambipolar", "none");
+    if (ambipolar_str == "ambipolar") {
+      ambipolar = Ambipolar::ambipolar;
+    } else if (ambipolar_str != "none") {
+      PARTHENON_FAIL("Unknown ambipolar method. Options are: none, ambipolar");
+    }
+    // If ambipolar diffusion is enabled, process supported coefficients
+    if (ambipolar != Ambipolar::none) {
+      PARTHENON_REQUIRE_THROWS(fluid == Fluid::glmmhd,
+                               "Ambipolar diffusion requires MHD (hydro/fluid=glmmhd).");
+      auto ambipolar_coeff_str =
+          pin->GetOrAddString("diffusion", "ambipolar_coeff", "none");
+      auto ambipolar_coeff = AmbipolarCoeff::none;
+      // Ceiling on eta_A for the ionization families (code units; ignored for `fixed`): bounds the
+      // eta_A ~ B^2/(rho_i rho) low-density runaway. Default 10 (audit F-31) keeps the cap diagnostic
+      // live while being a no-op on the measured physics; production passes its own value on the CLI
+      // (100 through leg 2, 1e30 = uncapped from the next leg).
+      const Real eta_ad_cap_code =
+          pin->GetOrAddReal("diffusion", "eta_ad_cap_code", 10.0);
+      if (parthenon::Globals::my_rank == 0) {
+        std::cout << "## Ambipolar eta_A cap: " << eta_ad_cap_code
+                  << " (code units). Default 10.0 is ~8x above the maximum eta_A measured on"
+                     " the production snapshot (1.23), so it is a no-op that makes cap-VA/MA/DA"
+                     " a live alarm rather than a constant zero. See audit F-31." << std::endl;
+      }
+
+      if (ambipolar_coeff_str == "fixed") {
+        ambipolar_coeff = AmbipolarCoeff::fixed;
+        Real ambipolar_coeff_code = pin->GetReal("diffusion", "ambipolar_coeff_code");
+        auto ad_diff = AmbipolarDiffusivity(ambipolar, ambipolar_coeff,
+                                            ambipolar_coeff_code, 0.0, 0.0, 0.0);
+        pkg->AddParam<>("ad_diff", ad_diff);
+        // AUDIT 2026-08-05 (B5). AmbipolarDiffusivity::Get's `fixed` branch returns
+        // coeff*B^2 UNCAPPED by design (diffusion.hpp) -- eta_ad_cap_code is threaded only
+        // into the ionization-family constructors above/below. That is correct (the fixed
+        // path is the Athena++-matched idealised coefficient), but it makes the key a
+        // silent no-op for anyone A/B-ing the cap against the fixed path. Say so.
+        if (parthenon::Globals::my_rank == 0 &&
+            eta_ad_cap_code < std::numeric_limits<Real>::max()) {
+          std::cout << "## WARNING: diffusion/eta_ad_cap_code = " << eta_ad_cap_code
+                    << " is IGNORED with ambipolar_coeff=fixed (eta_A = coeff*B^2 is "
+                       "uncapped by design). The cap applies only to the "
+                       "ionization coefficient family."
+                    << std::endl;
+        }
+
+      } else if (ambipolar_coeff_str == "ionization") {
+        // Self-consistent eta_A = B^2/(4 pi gamma_AD rho_i rho) with rho_i from the
+        // reduced CR+thermal+grain ionization model (replaces the constant Q_A). Defaults
+        // are the shared FHC code-unit calibration; override per <diffusion> ion_* keys.
+        ambipolar_coeff = AmbipolarCoeff::ionization;
+        Ionization::IonizationModel ion = BuildIonizationModel(pin);
+        auto ad_diff = AmbipolarDiffusivity(ambipolar, ambipolar_coeff, 0.0, 0.0, 0.0, 0.0,
+                                            ion, eta_ad_cap_code);
+        pkg->AddParam<>("ad_diff", ad_diff);
+        if (parthenon::Globals::my_rank == 0) {
+          const bool tensor = ion.ad_closure == Ionization::ADClosure::tensor;
+          std::cout << "## Ambipolar diffusion: self-consistent ionization model"
+                    << " (CR zeta=" << ion.zeta << " s^-1, MRN dust f_dg=" << ion.f_dg
+                    << ", thermal K x_K=" << ion.x_K
+                    << ", AD closure=" << (tensor ? "tensor" : "single_fluid") << ")"
+                    << std::endl;
+          if (eta_ad_cap_code < std::numeric_limits<Real>::max()) {
+            std::cout << "## Ambipolar eta_A cap: " << eta_ad_cap_code << " (code units)"
+                      << std::endl;
+          }
+        }
+
+      } else {
+        PARTHENON_FAIL("Ambipolar diffusion is enabled but no valid coefficient is set. "
+                       "Set diffusion/ambipolar_coeff to 'fixed' (+ambipolar_coeff_code) or "
+                       "'ionization'.");
+      }
+    }
+    pkg->AddParam<>("ambipolar", ambipolar);
+
+    auto diffint_str = pin->GetOrAddString("diffusion", "integrator", "none");
+    auto diffint = DiffInt::none;
+    if (diffint_str == "unsplit") {
+      diffint = DiffInt::unsplit;
+    } else if (diffint_str == "rkl2") {
+      diffint = DiffInt::rkl2;
+      auto rkl2_dt_ratio = pin->GetOrAddReal("diffusion", "rkl2_max_dt_ratio", -1.0);
+      pkg->AddParam<>("rkl2_max_dt_ratio", rkl2_dt_ratio);
+    } else if (diffint_str != "none") {
+      PARTHENON_FAIL("AthenaPK unknown integration method for diffusion processes. "
+                     "Options are: none, unsplit, rkl2");
+    }
+    if (diffint != DiffInt::none) {
+      // As in Athena++ a cfl safety factor is also applied to the theoretical limit.
+      // By default it is equal to the hyperbolic cfl.
+      auto cfl_diff = pin->GetOrAddReal("diffusion", "cfl", pkg->Param<Real>("cfl"));
+      pkg->AddParam<>("cfl_diff", cfl_diff);
+    }
     pkg->AddParam<Real>("dt_diff", std::numeric_limits<Real>::max(),
-                        Params::Mutability::Mutable);
-    pkg->AddParam<>("diffint", DiffInt::none);
+                        Params::Mutability::Mutable); // diffusive timestep constraint
+    pkg->AddParam<>("diffint", diffint);
+
+    // Fused non-ideal diffusive-timestep path. The per-cell Wardle conductivity tensor
+    // (Ionization::Diffusivities) is the dominant GPU cost, and the three per-term dt
+    // reductions each recompute the full tensor but keep only one eta. When EVERY active
+    // non-ideal term uses the "ionization" coefficient, the reductions share ONE tensor
+    // evaluation per cell (FusedNonidealEval) where the per-term path ran three.
+    // Fixed-coeff (cheap) terms keep their exact per-term estimators.
+    {
+      bool any_nonideal = false;
+      bool all_ionization = true;
+      if (resistivity != Resistivity::none) {
+        any_nonideal = true;
+        const auto ct = pkg->Param<OhmicDiffusivity>("ohm_diff").GetCoeffType();
+        if (ct != ResistivityCoeff::ionization)
+          all_ionization = false;
+      }
+      if (ambipolar != Ambipolar::none) {
+        any_nonideal = true;
+        const auto ct = pkg->Param<AmbipolarDiffusivity>("ad_diff").GetCoeffType();
+        if (ct != AmbipolarCoeff::ionization)
+          all_ionization = false;
+      }
+      // NOTE (profiled 2026-07-11, job 2321477): the per-term estimators were ~15% of
+      // all GPU kernel time in the mixed production run (2x843ms + 2x421ms per cycle).
+      const bool fusable = any_nonideal && all_ionization;
+      // Optional override (default = auto-on when fusable). Setting
+      // diffusion/fused_nonideal_dt=false forces the exact per-term estimators (used for
+      // A/B validation and as an escape hatch); it can never enable fusion where the
+      // coefficients are not all ionization-family.
+      const bool fused = pin->GetOrAddBoolean("diffusion", "fused_nonideal_dt", fusable);
+      pkg->AddParam<>("nonideal_dt_fused", fused && fusable);
+      // diffusion/dt_sum_ohm_ad (audit P-12, default false = legacy separate minima). For a current
+      // perpendicular to B the EMF is (eta_O + eta_A) J, so the explicit limit is set by the SUM;
+      // the legacy estimate can be up to 2x optimistic (covered so far only by cfl_diff = 0.3).
+      pkg->AddParam<>("dt_sum_ohm_ad", pin->GetOrAddBoolean("diffusion", "dt_sum_ohm_ad", false));
+
+    }
+
+    // Cell-centered non-ideal diffusivity cache. When enabled, CalcDiffFluxes first
+    // fills a 3-component derived field (eta_O, eta_H, eta_A) once per stage
+    // (PrecomputeNonidealEta) and the Ohmic/ambipolar flux kernels face-average
+    // the cached per-cell values instead of re-running the (expensive) ionization
+    // solve per face -- cutting up to 9 tensor evaluations per cell per stage to 1.
+    // This is the Athena++ pattern (cell-centered CalcDiffusivity, then face/edge
+    // averaging). Face eta becomes the arithmetic mean of the two adjacent cell
+    // values rather than eta(face-averaged state): same order of accuracy, but not
+    // bit-identical -- diffusion/eta_cache=false restores the per-face evaluation
+    // for A/B validation. Default: on when any active term uses an ionization-type
+    // coefficient (where it pays), off for purely fixed coefficients (where the
+    // per-face evaluation is trivially cheap and bit-identical history matters).
+    {
+      const bool any_nonideal = (resistivity != Resistivity::none) ||
+                                (ambipolar != Ambipolar::none);
+      bool any_ionization = false;
+      if (resistivity != Resistivity::none) {
+        const auto ct = pkg->Param<OhmicDiffusivity>("ohm_diff").GetCoeffType();
+        any_ionization |= (ct == ResistivityCoeff::ionization);
+      }
+      if (ambipolar != Ambipolar::none) {
+        const auto ct = pkg->Param<AmbipolarDiffusivity>("ad_diff").GetCoeffType();
+        any_ionization |= (ct == AmbipolarCoeff::ionization);
+      }
+      const bool eta_cache =
+          pin->GetOrAddBoolean("diffusion", "eta_cache", any_ionization) && any_nonideal;
+      // Under eos=hydrogen the correct code temperature for the ionization model comes from
+      // the EOS table; that plumbing exists on the cached path (PrecomputeNonidealEta + the
+      // fused dt estimator) but not the per-face cache-off flux kernels, so require the
+      // cache there (it is the default when any term uses an ionization coefficient).
+      PARTHENON_REQUIRE(!(use_h2diss && any_ionization) || eta_cache,
+                        "eos=hydrogen with ionization-coefficient non-ideal MHD requires "
+                        "diffusion/eta_cache=true (the default).");
+      // Audit A5: under eos=hydrogen the per-term dt estimators (T = P/rho, ideal-gas identity) are
+      // wrong; only the fused estimator uses the table T. Refuse the non-fused path (mixed coefficient
+      // families or fused_nonideal_dt=false). Production is fused.
+      PARTHENON_REQUIRE(
+          !(use_h2diss && any_ionization) || pkg->Param<bool>("nonideal_dt_fused"),
+          "eos=hydrogen with ionization-coefficient non-ideal MHD requires the FUSED "
+          "non-ideal dt estimator (diffusion/fused_nonideal_dt): the per-term estimators "
+          "derive the ionization temperature as p/rho, which holds only for an ideal gas. "
+          "Keep every active non-ideal coefficient in the ionization family so fusion is "
+          "available, leave diffusion/fused_nonideal_dt at its default, or use eos=adiabatic.");
+      pkg->AddParam<>("nonideal_eta_cache", eta_cache);
+      // diffusion/eta_face_harmonic (nonideal_mhd A5, default false = arithmetic, unchanged): harmonic mean of the two
+      // cached cell etas at OHMIC faces only (FaceEta, diffusion.hpp; AD stays arithmetic, see ambipolar.cpp).
+      pkg->AddParam<>("eta_face_harmonic", pin->GetOrAddBoolean("diffusion", "eta_face_harmonic", false));
+      if (eta_cache) {
+        Metadata m_eta({Metadata::Cell, Metadata::Derived, Metadata::OneCopy},
+                       std::vector<int>({3}),
+                       std::vector<std::string>{"eta_ohmic", "eta_hall", "eta_ambipolar"});
+        pkg->AddField("nonideal_eta", m_eta);
+        if (parthenon::Globals::my_rank == 0) {
+          std::cout << "## Non-ideal eta cache: cell-centered (eta_O, eta_H, eta_A) "
+                       "precomputed once per stage; flux kernels use face-averaged "
+                       "cached values (diffusion/eta_cache=false to disable)."
+                    << std::endl;
+        }
+      }
+
+      // The per-cell dust -> conductivity coupling of the full code (diffusion/dust_coupling) needs the
+      // dust-evolution package, which is not part of this tree: the ionization model uses its static
+      // MRN grain population.
+      PARTHENON_REQUIRE_THROWS(!pin->GetOrAddBoolean("diffusion", "dust_coupling", false),
+                               "diffusion/dust_coupling is not part of this tree (no dust package).");
+      // AUDIT ITEM 1 -- non-ideal cap-activation diagnostic.
+      // eta_ohm_cap_code / eta_ad_cap_code are numerical stabilizers
+      // that MODIFY the induction equation, so a flux-retention number is uninterpretable
+      // without knowing where and how hard they bit. Filled inside PrecomputeNonidealEta
+      // from the same tensor solve (no extra solve, no extra task); OFF by default, and
+      // bit-identical when off (it only writes a Derived field, never feeds back).
+      const bool cap_diag = pin->GetOrAddBoolean("diffusion", "cap_diag", false);
+      PARTHENON_REQUIRE(!cap_diag || eta_cache,
+                        "diffusion/cap_diag=true requires diffusion/eta_cache=true.");
+      pkg->AddParam<>("nonideal_cap_diag", cap_diag);
+      if (cap_diag) {
+        Metadata m_cap({Metadata::Cell, Metadata::Derived, Metadata::OneCopy},
+                       std::vector<int>({CapDiagIdx::NCOMP}),
+                       std::vector<std::string>{"cap_flag_O", "cap_flag_H", "cap_flag_A",
+                                                "cap_dec_O", "cap_dec_H", "cap_dec_A"});
+        pkg->AddField("diff.capdiag", m_cap);
+        auto hst_cap = pkg->Param<parthenon::HstVar_list>(parthenon::hist_param_key);
+        using parthenon::HistoryOutputVar;
+        using parthenon::UserHistoryOperation;
+        // Normalizer: the summed volume of exactly the cells the flags are summed over.
+        // Volume fraction capped = cap-V<term> / cap-Vtot; mass fraction = cap-M<term>/mass;
+        // volume-weighted mean clipped decades over the capped set = cap-D<term>/cap-V<term>.
+        hst_cap.emplace_back(HistoryOutputVar(UserHistoryOperation::sum,
+                                              NonidealCapHstVol, "cap-Vtot"));
+        const std::pair<int, const char *> terms[3] = {{CapDiagIdx::flagO, "O"},
+                                                       {CapDiagIdx::flagH, "H"},
+                                                       {CapDiagIdx::flagA, "A"}};
+        for (const auto &tm : terms) {
+          const int c = tm.first;
+          hst_cap.emplace_back(HistoryOutputVar(
+              UserHistoryOperation::sum,
+              [c](MeshData<Real> *md) { return NonidealCapHstFlag(md, c); },
+              std::string("cap-V") + tm.second));
+          hst_cap.emplace_back(HistoryOutputVar(
+              UserHistoryOperation::sum,
+              [c](MeshData<Real> *md) { return NonidealCapHstMassFlag(md, c); },
+              std::string("cap-M") + tm.second));
+          hst_cap.emplace_back(HistoryOutputVar(
+              UserHistoryOperation::sum,
+              [c](MeshData<Real> *md) { return NonidealCapHstDecade(md, c); },
+              std::string("cap-D") + tm.second));
+        }
+        pkg->UpdateParam(parthenon::hist_param_key, hst_cap);
+        if (parthenon::Globals::my_rank == 0) {
+          std::cout << "## Non-ideal cap diagnostic ON (diffusion/cap_diag): hst cap-V*/"
+                       "cap-M*/cap-D* + field diff.capdiag (add to an output block for "
+                       "the spatial picture)."
+                    << std::endl;
+        }
+      }
+      // Freeze the cached eta across the RKL2 stages of each Strang half: the stage
+      // tasks skip the PrecomputeNonidealEta refresh, so eta stays at its value from
+      // the half's first stage (refreshed 2x per cycle instead of once per stage).
+      // RKL2's stability polynomial (Meyer+2012) is derived for an operator held fixed
+      // across the super-step, and the coefficient lag is O(dt/2) on eta(rho,T,B),
+      // which evolves on the collapse timescale >> dt. Requires the eta cache; only
+      // meaningful with integrator=rkl2. Default off (bit-identical history matters
+      // for A/B validation).
+      const bool freeze_eta =
+          pin->GetOrAddBoolean("diffusion", "rkl2_freeze_eta", false);
+      PARTHENON_REQUIRE(!freeze_eta || (eta_cache && diffint == DiffInt::rkl2),
+                        "diffusion/rkl2_freeze_eta=true requires diffusion/eta_cache=true "
+                        "and diffusion/integrator=rkl2.");
+      pkg->AddParam<>("rkl2_freeze_eta", freeze_eta && eta_cache);
+      // See AddSTSTasks: skip the RKL2 super-steps when no parabolic term is left on the
+      // explicit path at all (dt_diff = inf). Default false = unchanged / bit-identical.
+      pkg->AddParam<>("rkl2_skip_empty",
+                      pin->GetOrAddBoolean("diffusion", "rkl2_skip_empty", false));
+      if (freeze_eta && parthenon::Globals::my_rank == 0) {
+        std::cout << "## RKL2 eta freeze: non-ideal eta cache refreshed at the first "
+                     "stage of each Strang half only (diffusion/rkl2_freeze_eta)."
+                  << std::endl;
+      }
+    }
 
     if (fluid == Fluid::glmmhd) {
       // DUAL ENERGY. One extra conserved component holding rho*e_int, advected with the mass flux like a
@@ -1241,6 +1585,15 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   // radiation on the barotropic overwrite is skipped (radiation owns the energy, collapse_be.cpp) and the
   // radiation thermal exchange updates the internal energy, so that combination is allowed.
   if (dual_energy) {
+    // Ohmic + ambipolar dissipation IS wired into the internal energy (diffusion/dual_energy_heating.cpp,
+    // hydro/dual_heat_exact.cpp); it reads the cell-centred eta cache, so that has to be on.
+    const auto res = pin->GetOrAddString("diffusion", "resistivity", "none");
+    const auto amb = pin->GetOrAddString("diffusion", "ambipolar", "none");
+    PARTHENON_REQUIRE_THROWS(
+        (res == "none" && amb == "none") ||
+            (pkg->AllParams().hasKey("nonideal_eta_cache") && pkg->Param<bool>("nonideal_eta_cache")),
+        "hydro/dual_energy with resistivity/ambipolar needs diffusion/eta_cache=true: the "
+        "dissipation is evaluated from the cached cell-centred eta.");
     PARTHENON_REQUIRE_THROWS(!(pin->DoesParameterExist("job", "problem_id") &&
                                pin->GetString("job", "problem_id") == "collapse_be") ||
                                  pin->GetOrAddBoolean("physics", "radiation", false),
@@ -1321,6 +1674,40 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   const bool dual_shared_select =
       dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_shared_select", false);
   pkg->AddParam("dual_energy_shared_select", dual_shared_select);
+  // hydro/dual_energy_heat_rkl2 (audit P-03, default false = legacy). The legacy path adds
+  // tau * (eta_O J^2 + eta_A J_perp^2) once per RKL2 half, AFTER the half, i.e. with the DIFFUSED
+  // end-of-half field -- in a stiff cell (t_diff << tau) J has decayed and the advected energy is
+  // under-heated. An E-budget ((E-KE-ME)_end - (E-KE-ME)_start) does NOT work instead: every STS
+  // stage's ConsToPrim rewrites E from the dual energy in switched cells, erasing exactly the heat
+  // that matters. With the key on, the heating is a SOURCE of the dual component inside the RKL2
+  // recurrence itself -- the same stages and weights that advance B (see AddSTSTasks) -- and the
+  // post-half DualEnergyDiffusionHeating is skipped.
+  pkg->AddParam("dual_energy_heat_rkl2",
+                dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_heat_rkl2", false));
+  // hydro/dual_energy_heat_face (validation_tests/dual_energy DE-F6, default false = centred-J heating): the heat of
+  // the RKL2 source is the dissipation of the applied B diffusion fluxes, per face (dual_energy_heating.cpp).
+  {
+    const bool hf = dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_heat_face", false);
+    PARTHENON_REQUIRE_THROWS(!hf || pkg->Param<bool>("dual_energy_heat_rkl2"),
+                             "hydro/dual_energy_heat_face needs hydro/dual_energy_heat_rkl2 = true");
+    pkg->AddParam("dual_energy_heat_face", hf);
+    // hydro/dual_energy_heat_exact (DE-F6, default false): exact end-of-half energy closure (hydro/dual_heat_exact.cpp)
+    const bool hx = dual_energy && pin->GetOrAddBoolean("hydro", "dual_energy_heat_exact", false);
+    // The closure acts inside the RKL2 super-steps only; the frozen-eta requirement applies when they exist (a run
+    // without parabolic terms has nothing to close and is unaffected by the key).
+    const bool rkl2_on = pin->GetOrAddString("diffusion", "integrator", "none") == "rkl2";
+    PARTHENON_REQUIRE_THROWS(!hx || (pkg->Param<bool>("dual_energy_heat_rkl2") &&
+                                     (!rkl2_on || pin->GetOrAddBoolean("diffusion", "rkl2_freeze_eta", false))),
+                             "hydro/dual_energy_heat_exact needs hydro/dual_energy_heat_rkl2 = true and, with "
+                             "diffusion/integrator = rkl2, diffusion/rkl2_freeze_eta = true");
+    pkg->AddParam("dual_energy_heat_exact", hx);
+    if (hx) {
+      Metadata m_ex({Metadata::Cell, Metadata::Derived, Metadata::OneCopy});
+      pkg->AddField("dual_ex_a1", m_ex);
+      pkg->AddField("dual_ex_a2", m_ex);
+      pkg->AddField("dual_ex_m0", m_ex);
+    }
+  }
   // hydro/boundary_clamp_dual (audit P-10, default false = legacy): ClampBoundaryFluxes also zeroes
   // the dual-energy flux of a clamped inflow face (it zeroed only the passive scalars before).
   pkg->AddParam("boundary_clamp_dual",
@@ -1732,7 +2119,38 @@ Real EstimateTimestep(MeshData<Real> *md) {
     min_dt = std::min(min_dt, dt_hyp);
   }
 
-  // No parabolic terms in this tree (dt_diff stays infinite, see Initialize).
+  auto dt_diff = std::numeric_limits<Real>::max();
+  if (hydro_pkg->Param<DiffInt>("diffint") != DiffInt::none) {
+    const auto diffint = hydro_pkg->Param<DiffInt>("diffint");
+    // When every active non-ideal term uses the "ionization" coefficient, evaluate the
+    // (expensive) Wardle conductivity tensor ONCE per cell and reduce the Ohmic/ambipolar
+    // dt together; otherwise (fixed / density_power coefficients) the exact per-term estimators.
+    if (hydro_pkg->Param<bool>("nonideal_dt_fused")) {
+      dt_diff = std::min(dt_diff, EstimateNonidealTimestepIonizationFused(md));
+    } else {
+      if (hydro_pkg->Param<Resistivity>("resistivity") != Resistivity::none) {
+        dt_diff = std::min(dt_diff, EstimateResistivityTimestep(md));
+      }
+      if (hydro_pkg->Param<Ambipolar>("ambipolar") != Ambipolar::none) {
+        dt_diff = std::min(dt_diff, EstimateAmbipolarTimestep(md));
+      }
+    }
+    if (diffint == DiffInt::unsplit) {
+      // unsplit integration: the strict explicit limit
+      min_dt = std::min(min_dt, dt_diff);
+    } else if (diffint == DiffInt::rkl2) {
+      // RKL2: no strict limit (that is what super-time-stepping is for), only the optional cap
+      // on the super-step ratio dt / dt_diff
+      const auto max_dt_ratio = hydro_pkg->Param<Real>("rkl2_max_dt_ratio");
+      if (max_dt_ratio > 0.0 && dt_hyp / dt_diff > max_dt_ratio) {
+        min_dt = std::min(min_dt, max_dt_ratio * dt_diff);
+      }
+    } else {
+      PARTHENON_THROW("unknown diffusion integrator");
+    }
+    auto dt_diff_param = hydro_pkg->Param<Real>("dt_diff");
+    hydro_pkg->UpdateParam("dt_diff", std::min(dt_diff, dt_diff_param));
+  }
 
   if (ProblemEstimateTimestep != nullptr) {
     min_dt = std::min(min_dt, ProblemEstimateTimestep(md));
@@ -1982,6 +2400,12 @@ TaskStatus CalculateFluxes(std::shared_ptr<MeshData<Real>> &md) {
             wlb.assign_data(tmp);
           }
         });
+  }
+
+  // Unsplit diffusion: the Ohmic/ambipolar fluxes ride on the hyperbolic fluxes of every stage
+  // under the strict explicit dt. With RKL2 they are applied by the super-step tasks instead.
+  if (pkg->Param<DiffInt>("diffint") == DiffInt::unsplit) {
+    CalcDiffFluxes(pkg.get(), md.get(), DiffTermSet::all);
   }
 
   return TaskStatus::complete;

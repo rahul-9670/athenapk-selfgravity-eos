@@ -1,0 +1,8 @@
+unsplit  N   64  L1 6.967e-04 (p   nan)  coarse 1.145e-03 fine 4.723e-04  [A1 uniform N 1.168e-03, 2N 2.918e-04]  C/F cells 1.39e-03
+unsplit  N  128  L1 1.735e-04 (p  2.01)  coarse 2.864e-04 fine 1.171e-04  [A1 uniform N 2.918e-04, 2N 7.287e-05]  C/F cells 3.45e-04
+unsplit  N  256  L1 4.332e-05 (p  2.00)  coarse 7.161e-05 fine 2.917e-05  [A1 uniform N 7.287e-05, 2N 1.820e-05]  C/F cells 8.58e-05
+unsplit  N  512  L1 1.081e-05 (p  2.00)  coarse 1.789e-05 fine 7.277e-06  [A1 uniform N 1.820e-05, 2N nan]  C/F cells 2.14e-05
+rkl2     N   64  L1 6.969e-04 (p   nan)  coarse 1.146e-03 fine 4.725e-04  [A1 uniform N 1.169e-03, 2N 2.927e-04]  C/F cells 1.39e-03
+rkl2     N  128  L1 1.737e-04 (p  2.00)  coarse 2.866e-04 fine 1.173e-04  [A1 uniform N 2.927e-04, 2N 7.310e-05]  C/F cells 3.45e-04
+rkl2     N  256  L1 4.336e-05 (p  2.00)  coarse 7.166e-05 fine 2.921e-05  [A1 uniform N 7.310e-05, 2N 1.825e-05]  C/F cells 8.59e-05
+rkl2     N  512  L1 1.083e-05 (p  2.00)  coarse 1.790e-05 fine 7.287e-06  [A1 uniform N 1.825e-05, 2N nan]  C/F cells 2.14e-05

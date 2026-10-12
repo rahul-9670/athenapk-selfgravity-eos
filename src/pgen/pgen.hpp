@@ -41,6 +41,15 @@ namespace rad_shock {
 void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
 } // namespace rad_shock
 
+// Non-ideal MHD validation suite (validation/nonideal_mhd): Ohmic Gaussian (iprob 40), circularly
+// polarized decay (41), eta jump (42), Barenblatt AD spreading (43), 3-D ABC field (44), ambipolar
+// C-shock (45), damped Alfven wave with AD (50) and its eta_A-bump variant (51).
+namespace diffusion {
+using namespace parthenon::driver::prelude;
+void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin);
+void UserWorkAfterLoop(Mesh *mesh, parthenon::ParameterInput *pin, parthenon::SimTime &tm);
+} // namespace diffusion
+
 // Self-gravity validation suite (validation/self_gravity, 2026-10-03).
 namespace grav_analytic {
 void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
