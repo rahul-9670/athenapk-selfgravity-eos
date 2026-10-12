@@ -6,11 +6,12 @@ each written by a saved script with a `--check` mode.
 
 *Public edition.* The validation was carried out in a larger private research code from which this repository was
 extracted. That code also has the Hall term, thermal conduction, viscosity and a dust-evolution package coupled to the
-ionization model, and its non-ideal module was additionally gated on 3-D production collapse restarts (a cell-by-cell
-check of the production diffusivities against an independent evaluation, a diagnosis of an envelope hot spot that
-turned out to be the donor-cell VL2 predictor, the production ceilings, restart and GPU equivalence). Those parts, the
-private development history and the production adoption are not part of this repository and are left out. Section
-numbers follow the full report. Every result of the tests shipped here is unchanged.
+ionization model. Its non-ideal module was additionally tested on a 3-D production collapse state of that code: a
+diagnosis of an envelope hot spot (S0), a cell-by-cell check of the production diffusivities against an independent
+evaluation (A8), the occupancy of the diffusivity ceilings (N7) and restart / GPU equivalence (N8). Those results are
+reported in Sec. 3, 13, 15 and 16 as results of the research code: the collapse state, its decks and the run scripts are
+not part of this repository, so they cannot be re-run from it. The private development history and the production
+adoption are left out. Section numbers follow the full report. Every result of the tests shipped here is unchanged.
 
 ---
 
@@ -28,6 +29,12 @@ numbers follow the full report. Every result of the tests shipped here is unchan
 | A9 | A1 across a static coarse-fine boundary at the peak | same solution | order 2.00, coarse-fine cells 2nd order | **PASS** |
 | A10 | ambipolar C-shock | steady single-fluid profile (`scripts/cshock_ref.py`) | profile L1 1e-4, downstream 1e-3 (long box) | **PASS** (caveat NI-O1) |
 | A11 | conductivity gates 1-8 | identities, limits, C++ vs independent Python | all pass; eta_A tensor C++ vs Python 2.9e-3 | **PASS** |
+| S0* | an envelope cell heated 48 -> 1008 K in one cycle: which operator? (per-stage trace + 9 runs) | -- | the donor-cell VL2 predictor at a sharp low-beta density step, NOT the RKL2 super-step (diffusion off: still 757 K; PLM predictor: 34 K) | diagnosed; fixed (PLM predictor) |
+| A8* | production diffusivities vs an independent evaluation, cell by cell | independent Python model | <= 1.2e-12 over 5e-19 .. 1e-11 g/cm^3, T 10-503 K | **PASS** |
+| N7* | how often the diffusivity ceilings bind in a production run | -- | Ohmic ceiling never; ambipolar ceiling <= 6.8e-6 of the volume | measured |
+| N8* | restart and CPU/GPU equivalence of the diffusion path | bit-identical restart; GPU = CPU | covered by the research code's gates | covered |
+
+\* research-code results on a 3-D production collapse state (Sec. 3, 13, 15, 16); not re-runnable from this repository.
 
 ## 1. Scope
 
@@ -86,6 +93,54 @@ flags), `2d66e869` (`-ffp-contract=off`).
 
 Source comments were edited after these builds (line numbers unchanged); the shipped source rebuilds to byte-identical
 binaries (`cd69c066`, `2d66e869`). The GPU build of this tree was not compiled or run for this check.
+
+## 3. S0* — research code: which operator heated an envelope cell?
+
+*Research-code result; the collapse state and scripts are not part of this repository.*
+
+**Origin.** In a 3-D production collapse state of the research code (all production physics: self-gravity, tabulated
+EOS, dual energy, radiation, Ohmic + ambipolar with the RKL2 cap 1000, dust), one level-8 envelope cell (rho 3.3e-15
+g/cm^3, beta 0.6, beside a x3.7 density step) went from 48 K to 1008 K in a single cycle, and a lower RKL2 ratio cap
+removed it (cap 1000: 1008 K; 500: 62 K; 300: 21 K; 100: 26 K at equal end time). The first hypothesis was that the
+RKL2 super-step at ratio 1000 creates heat.
+
+**Method.** One cycle from that state, 64 CPU ranks, with an env-gated trace (research code) that prints the cell after
+every RKL2 stage and at every checkpoint of the cycle (rho, E, KE, ME, E-KE-ME, the dual energy, P, B and the six face
+neighbours' E-KE-ME). Score: the cell's temperature and the number of isolated envelope hot spots (rho < 1e-13 g/cm^3,
+T > 100 K and > 5x the median of the six neighbours).
+
+**Trace.** Through all 2 x 45 RKL2 stages the cell's E-KE-ME moves by < 0.1 %. In the hydro step:
+
+| checkpoint | cell E-KE-ME | cell e_dual | -i neighbour E-KE-ME |
+|---|---|---|---|
+| cycle start | 4.313e4 | 4.313e4 | 9.349e4 |
+| after VL2 stage 1 (donor-cell predictor) | 4.680e4 | 4.351e4 | **6.956e6** |
+| after VL2 stage 2 | **1.341e6** | 2.531e5 | **-3.608e6** |
+| after the radiation step + dual resync | 9.668e5 | 9.668e5 | 1.103e4 |
+
+(code units.) The predictor drives the neighbour on the density step to 74x its internal energy, the corrector swings it
+negative and heats the cell; the dual-energy resync rebuilds the negative cell from its dual energy, which is where the
+apparent energy source comes from. The starting state carries no hidden energy (E-KE-ME = dual energy in every cell).
+
+**Falsification runs** (one cycle from the same state; cell T in K):
+
+| change | cell T | spikes | envelope max T |
+|---|---|---|---|
+| none (production keys, donor-cell predictor) | 1007.5 | 5 | 1008 |
+| ambipolar off | 1047.5 | 4 | 1047 |
+| Ohmic off | 1006.8 | 5 | 1007 |
+| `dt_sum_ohm_ad = true` (smaller dt), equal end time | 44.4 | 2 | 359 |
+| Ohmic + ambipolar OFF (`integrator = none`), same dt (`hydro/max_dt`) | 757.4 | 4 | 787 |
+| `hydro/double_flux = false` | 1007.5 | 5 | 1008 |
+| PLM predictor (`vl2_predictor_recon = same`) | 33.9 | 2 | 506 |
+| diffusion off + PLM predictor, same dt | 34.0 | 2 | 506 |
+| `first_order_flux_correct` (double flux off) | 51.0 | 2 | 506 |
+
+The two spikes that remain are already in the starting state. **Conclusion:** the heating is made by the first-order
+(donor-cell) VL2 predictor at a sharp low-beta density step and survives with non-ideal MHD switched off; the RKL2 ratio
+cap acted only through dt (a smaller dt shrinks the predictor's overshoot). Over 20 cycles both predictors end with 0
+spikes (envelope max 61 K donor-cell, 56 K PLM): the donor-cell hot spots are transient. The PLM predictor
+(`hydro/vl2_predictor_recon = same`) is the default in this repository.
 
 ## 4. A7 — RKL2 amplification of single Fourier modes (PASS)
 
@@ -297,6 +352,31 @@ Comparison: By aligned at the midpoint (B0+B1)/2, L1 over +-3W relative to B1 - 
 * **NI-O1:** unsplit diffusion WITH dual energy (the heat closures require rkl2) does not deliver the AD heat to the dual
   energy: downstream P -76 %, the shock 0.05 behind. Not a production combination; a startup guard is recommended.
 
+## 13. A8* — research code: the production coefficient path, cell by cell (PASS)
+
+*Research-code result; the collapse state is not part of this repository (the dump hook is: `APK_ETADUMP`).*
+
+**Method.** The env-gated dump in `PrecomputeNonidealEta` (fused path, `APK_ETADUMP=<gid>`, first call only, host-execution
+builds) prints per cell of one block the evaluator's inputs (rho, code T as derived from the EOS table, |B|, f_dg, a_c)
+and the raw and capped eta_O/H/A, plus once the full model parameter set and grain bins. One cycle of the production
+collapse state with the production keys, for four blocks spanning the density range. Every 4th cell (1458 per block,
+ghosts included) is re-evaluated with the INDEPENDENT Python model of `src/hydro/diffusion/tests/test_conductivity.py`
+(brentq grain-charge solve, tensor eta_A) in cgs: zeta from a re-implementation of the cosmic-ray attenuation with the
+calibrated local column, the research code's dust coupling as a rescaled grain population (f_dg x f_dg/f_ref,
+a_k x a_c/a_ref); the Python constants are checked against the dumped parameters first. Compared with the raw code
+eta / eta_unit (`results/tables/A8.{json,txt}`):
+
+| block | rho [g/cm^3] | T [K] | eta_O median / max rel. diff | eta_A median / max |
+|---|---|---|---|---|
+| 1 | 4.9e-19 .. 2.0e-18 | 9.9-10.1 | 7.6e-14 / 3.0e-13 | 3.4e-15 / 2.6e-14 |
+| 2 | 6.1e-17 .. 1.9e-16 | 10.3-12.3 | 4.4e-15 / 2.0e-14 | 1.1e-14 / 6.4e-14 |
+| 3 | 1.1e-15 .. 1.4e-13 | 10.3-16.6 | 1.1e-15 / 8.1e-13 | 5.0e-16 / 2.1e-13 |
+| 4 | 2.1e-15 .. 1.1e-11 | 14.4-503 | 3.0e-14 / 1.2e-12 | 1.4e-14 / 1.2e-12 |
+
+Tensor closure active; grain coupling exercised (a_c/a_ref up to 2.24 in block 4; f_dg = f_ref everywhere in this
+state); no cell capped. Not covered: the EOS temperature itself (validated in `../eos_tabulated/`), f_dg != f_ref,
+capped cells.
+
 ## 14. A11 — conductivity gates (PASS)
 
 `src/hydro/diffusion/tests/test_conductivity.py --xcheck-csv runs/A11/xcheck_grains.csv` (`xcheck_conductivity.cpp`
@@ -314,6 +394,21 @@ built with host shims; it evaluates the tensor closure) -> `A11_gates.txt`:
 
 NICIL (Wurster 2016) not compared (no offline copy).
 
+## 15. N7* — research code: how often the diffusivity ceilings bind
+
+*Research-code result (the production run's history file).* The `cap_diag` history columns of a production collapse
+run (727 rows over 725 cycles; that run used `eta_ohm_cap_code = 100`, `eta_ad_cap_code = 100`):
+* Ohmic ceiling: the capped volume, mass and dissipation are 0 in every row -- it **never bound**.
+* Ambipolar ceiling (100): bound in <= 6.8e-6 of the volume (<= 4.8e-7 of the mass), on average 0.025 dex above the
+  ceiling, carrying <= 2.2e-8 of the ambipolar dissipation.
+* What limits that run is the RKL2 **ratio** cap (it caps dt), not the diffusivity ceilings.
+
+## 16. N8* — research code: restart and CPU/GPU equivalence
+
+Full-physics restarts of the research code, including the explicit RKL2 Ohmic + ambipolar path, are bit-identical with
+`self_gravity/solver_params/seed_from_phi = true` (CPU and GPU), and its GPU runs equal its CPU runs to the solver
+tolerance on the production key set; every key-off gate of this module there was bitwise. No separate test here.
+
 ## 17. Findings
 
 | ID | finding | evidence | status |
@@ -323,10 +418,8 @@ NICIL (Wurster 2016) not compared (no offline copy).
 | NI-O1 | unsplit diffusion + dual energy loses the AD heating | A10 | open; use rkl2 with the heat closures |
 | NI-O2 | AD on a force-free field: spurious change ~(k dx)^2 | A4 | expected truncation, quantified |
 | NI-O3 | RKL2 at ratio 1000 does not damp grid-scale modes (16-32 % per cycle) | A7 | expected property; per-cell energy budget exact (A2) |
+| NI-F1 | an envelope cell heated 48 -> 1008 K in one cycle (research code): the donor-cell VL2 predictor at a sharp low-beta density step, NOT the RKL2 super-step | S0 | fixed: PLM predictor (`hydro/vl2_predictor_recon = same`, the default here) |
 
-A further research-code finding concerns the ideal-MHD step rather than this module: the donor-cell (first-order)
-VL2 predictor (`hydro/vl2_predictor_recon = dc`) can drive a cell on a sharp low-beta density step to a negative
-internal energy in one stage; the PLM predictor (`same`, the default) does not.
 
 ## 18. Reproduction
 

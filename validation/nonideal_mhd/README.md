@@ -25,13 +25,20 @@ check of the code shipped here against the research code it was taken from, Sec.
 | A9 | Ohmic Gaussian across a coarse-fine boundary | PASS: 2nd order |
 | A10 | ambipolar C-shock vs the steady single-fluid profile | PASS: profile 1e-4, downstream state 1e-3 |
 | A11 | ionization model and conductivity tensor gates 1-8 | PASS (C++ vs an independent Python solve: eta_O 6.5e-11, eta_A 2.9e-3) |
+| S0* | an envelope cell heated 48 -> 1008 K in one cycle: which operator? | the donor-cell VL2 predictor at a sharp low-beta density step, not RKL2 (fixed: PLM predictor, the default) |
+| A8* | production diffusivities vs an independent evaluation, cell by cell | PASS: <= 1.2e-12 over 5e-19 .. 1e-11 g/cm^3 |
+| N7* | how often the diffusivity ceilings bind in a production run | Ohmic never; ambipolar <= 6.8e-6 of the volume |
+| N8* | restart and CPU/GPU equivalence | covered by the research code's gates |
+
+\* results of the research code on a 3-D production collapse state (report Sec. 3, 13, 15, 16): the state, its decks and
+the run scripts are not shipped, so these cannot be re-run from this repository.
 
 ## Layout
 * `inputs/<test>/` — decks (written by `scripts/make_decks_<test>.py`) and `runs.txt` (one deck name per line);
   `inputs/base/` — the two base decks of A1/A3.
 * `scripts/` — `run_set.sh` (runs one test set), deck generators and their templates (`A5/A6/A7_template.in`),
   analyses (`analyze_<test>.py`, each with `--check`), the C-shock reference (`cshock_ref.py`).
-* `results/tables/` — the tables quoted in the report.
+* `results/tables/` — the tables quoted in the report (A8 and N7: research-code results, see above).
 * A11 runs from the source tree: `src/hydro/diffusion/tests/test_conductivity.py` (gates 1-7) and, after building
   `xcheck_conductivity.cpp` with the host shims, `--xcheck-csv` (gate 8).
 

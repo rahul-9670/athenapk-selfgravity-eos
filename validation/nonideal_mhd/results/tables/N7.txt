@@ -1,0 +1,27 @@
+cycle   680 t 1.093960  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells nan   AD cap vol 0.0e+00
+cycle   710 t 1.094230  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.3e-06
+cycle   740 t 1.094470  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.4e-06
+cycle   770 t 1.094670  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.4e-06
+cycle   801 t 1.094850  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.4e-06
+cycle   831 t 1.095000  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.5e-06
+cycle   861 t 1.095120  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.6e-06
+cycle   891 t 1.095240  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.6e-06
+cycle   922 t 1.095350  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.7e-06
+cycle   952 t 1.095440  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.7e-06
+cycle   982 t 1.095530  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.7e-06
+cycle  1012 t 1.095610  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.7e-06
+cycle  1043 t 1.095700  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.7e-06
+cycle  1073 t 1.095770  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1103 t 1.095850  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1133 t 1.095930  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1164 t 1.096010  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1194 t 1.096080  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1224 t 1.096160  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1254 t 1.096250  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1284 t 1.096330  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1314 t 1.096410  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1344 t 1.096490  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1374 t 1.096580  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+cycle  1405 t 1.096670  Ohm cap: vol 0.000e+00 mass 0.000e+00 clipped   nan dex  diss in capped cells 0.000e+00   AD cap vol 6.8e-06
+AD cap (100 in this leg): max vol 6.79e-06 mass 4.75e-07 mean clipped 0.025 dex diss frac 2.19e-08
+rows 727, cycles 680..1405; max over run: vol 0.000e+00 mass 0.000e+00 diss frac 0.000e+00 clipped nan dex; AD capped ever: True
