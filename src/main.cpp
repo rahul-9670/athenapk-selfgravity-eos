@@ -99,6 +99,21 @@ int main(int argc, char *argv[]) {
   } else if (problem == "fofc_scalar") {
     // First-order flux correction x passive-scalar consistency gate (2026-09-16).
     pman.app_input->ProblemGenerator = fofc_scalar::ProblemGenerator;
+  } else if (problem == "linear_wave_mhd") {
+    // Ideal-MHD validation suite (validation/ideal_mhd).
+    pman.app_input->InitUserMeshData = linear_wave_mhd::InitUserMeshData;
+    pman.app_input->ProblemGenerator = linear_wave_mhd::ProblemGenerator;
+    pman.app_input->UserWorkAfterLoop = linear_wave_mhd::UserWorkAfterLoop;
+    Hydro::ProblemInitPackageData = linear_wave_mhd::ProblemInitPackageData;
+  } else if (problem == "cpaw") {
+    pman.app_input->InitUserMeshData = cpaw::InitUserMeshData;
+    pman.app_input->ProblemGenerator = cpaw::ProblemGenerator;
+    pman.app_input->UserWorkAfterLoop = cpaw::UserWorkAfterLoop;
+  } else if (problem == "field_loop") {
+    pman.app_input->ProblemGenerator = field_loop::ProblemGenerator;
+    Hydro::ProblemInitPackageData = field_loop::ProblemInitPackageData;
+  } else if (problem == "ideal_mhd") {
+    pman.app_input->ProblemGenerator = ideal_mhd::ProblemGenerator;
   } else {
     std::stringstream msg;
     msg << "Problem ID '" << problem

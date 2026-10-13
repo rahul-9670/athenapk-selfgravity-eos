@@ -1,0 +1,12 @@
+I1/I1_3d_fast_N32 | I1/I1_3d_fast_N32.in | | 2
+I1/I1_3d_fast_N32_lb | I1/I1_3d_fast_N32_lb.in | | 2
+I1/I1_3d_fast_N32_lb_nd | I1/I1_3d_fast_N32_lb_nd.in | | 2
+I1/I1_3d_alfven_N32 | I1/I1_3d_alfven_N32.in | | 2
+I1/I1_3d_alfven_N32_lb | I1/I1_3d_alfven_N32_lb.in | | 2
+I1/I1_3d_alfven_N32_lb_nd | I1/I1_3d_alfven_N32_lb_nd.in | | 2
+I1/I1_3d_slow_N32 | I1/I1_3d_slow_N32.in | | 2
+I1/I1_3d_slow_N32_lb | I1/I1_3d_slow_N32_lb.in | | 2
+I1/I1_3d_slow_N32_lb_nd | I1/I1_3d_slow_N32_lb_nd.in | | 2
+I1/I1_3d_entropy_N32 | I1/I1_3d_entropy_N32.in | | 2
+I1/I1_3d_entropy_N32_lb | I1/I1_3d_entropy_N32_lb.in | | 2
+I1/I1_3d_entropy_N32_lb_nd | I1/I1_3d_entropy_N32_lb_nd.in | | 2

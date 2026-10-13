@@ -1,0 +1,485 @@
+# Port check of the ideal-MHD module into this repository (2026-10-13); IDEAL_MHD_VALIDATION.md Sec. 2.4.
+# Columns: run | max|new-ref|/max|ref| and sum|new-ref|/sum|ref| over all dumps and float fields (worst field) | dumps | history | rc ref/new
+
+## 1. Keys off: this repository (d9671240, default flags) vs commit 9626856 (cd69c066), the 47 regression runs
+srun: job 3011496 queued and waiting for resources
+srun: job 3011496 has been allocated resources
+D12_jeans_nJ0.5_n32                              maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+D12_jeans_nJ1.5_n32                              maxN 0.0e+00 L1 0.0e+00                  dumps 12 hst 0.0e+00 rc 0/0
+D4_slab_n32                                      maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+D7_freefall_n64                                  maxN 0.0e+00 L1 0.0e+00                  dumps 38 hst 0.0e+00 rc 0/0
+DA1_be_ic_deep_static                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E10_probe_control_fcfalse                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_control_fctrue                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_negative_fcfalse                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_negative_fctrue                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_subedge_fcfalse                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_subedge_fctrue                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E6_wave_S1_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S2_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S3_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S4_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S5_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_n400                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_n400_dflux                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_over_rho_n400                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_over_rho_n400_dflux           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_n400                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_n400_dflux                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_over_rho_n400              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_over_rho_n400_dflux        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_n400                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_n400_dflux                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_over_rho_n400              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_over_rho_n400_dflux        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_n400                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_n400_dflux                   maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_over_rho_n400                maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_over_rho_n400_dflux          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7q_slab111_3d_n64_mb16_dflux                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7q_slab11_2d_n128_mb32_dflux                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7r_R4_mov_1d_amr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_R4_mov_1d_amr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_R4_mov_1d_smr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_R4_mov_1d_smr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_amr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_amr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_smr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_smr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7x_wave_S3_smr_n64_dflux                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E8_leg2                                          maxN 0.0e+00 L1 0.0e+00                  dumps 61  rc 0/0
+L10_hennebelle_mu5_c300                          maxN 0.0e+00 L1 0.0e+00                  dumps 33 hst 0.0e+00 rc 0/0
+L6_be_xi6.45_f1_c200                             maxN 0.0e+00 L1 0.0e+00                  dumps 15 hst 0.0e+00 rc 0/0
+S1_sinusoid_n64                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+TOTAL 47 BITWISE-fields 47
+
+## 2. Keys on: the 422 sampled lines of this report's run lists (<= 8 ranks, <= 600 core-s originally), this repository (b9d5181e) vs the research code's validation branch (17c5f35b), both -ffp-contract=off
+srun: job 3011412 queued and waiting for resources
+srun: job 3011412 has been allocated resources
+runs/F/c7_glm_I5_2d_lam10_N512                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/c7_wall_u0.1_By1.0_f2                     maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/dbg_f1k_3d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/F/dbg_prod_3d_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/F/f1_D3_M10                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1_D3_M3                                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1_D3_M30                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-2                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-3                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-4                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-5                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_N2048                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_N4096                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_pj0.5                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_pj2.0                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh_3d_N64                             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_D3_M10                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1k_D3_M3                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1k_D3_M30                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-2                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-3                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-4                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-5                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_N2048                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_N4096                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_j0.3                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_j3.0                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh_3d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1kreg_D1b_M1000_N256_f1                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1only_pjump_noh1d_P1e-6                  maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1reg_D1b_M1000_N256_f1                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1reg_D1b_M1000_N256_prod                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_D3_M10                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_D3_M3                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_D3_M30                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-2                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-3                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-4                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-5                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_N2048                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_N4096                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_dv0.15                    maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_dv0.5                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh_3d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1vreg_D1b_M1000_N256_f1                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f2_I7_BW                                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f2_I7_RJ2a_div                            maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f2_I7_divb_a0                             maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/F/f2_I7_divb_prod                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/F/glm_I4_2d_prod_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N1024                     maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N128                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N256                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N512                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N512_cfl0.075             maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N512_cfl0.15              maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N64                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N128                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N256                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N512                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N512_cfl0.15              maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N64                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N256                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N512                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N64                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch0                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch1                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch2                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch3                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/keyoff_I1_1d_fast_N64                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/F/keyoff_I5_2d_prod_N128                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/keyoff_I7_BW_diode                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/keyoff_noh_1d_prod_N1024                  maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/wall_u0.01_By0.0_f2                       maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By0.0_legacy                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By0.0_wallonly                 maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By1.0_f2                       maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By1.0_legacy                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By1.0_wallonly                 maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By0.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By0.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By0.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By1.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By1.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By1.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By0.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By0.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By0.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By1.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By1.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By1.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/I1/I1_1d_alfven_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N128_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N128_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N16                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N16_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N16_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N256                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N256_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N256_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N32_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N32_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N512                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N512_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N512_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N64                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N64_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N64_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N128_lb                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N128_lb_nd                 maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N16                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N16_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N16_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N256                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N256_lb                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N256_lb_nd                 maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N32                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N32_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N32_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N512                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N512_lb                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N512_lb_nd                 maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N64                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N64_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N64_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N16                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N64                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N8                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N16                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N32                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N64                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N8                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N16                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N16_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N16_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N32_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N32_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N8                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N8_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N8_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N16                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N16_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N16_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N32                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N32_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N32_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N8                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N8_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N8_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N8_lb                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N8_lb_nd                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N8_lb                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N8_lb_nd                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/verify_dualsw_1d_fast_N64_lb             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I1c/I1c_ac_N128                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N128_pr                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N16                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N256                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N256_pr                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N32                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N512                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N512_pr                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N64                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N64_pr                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N128_pr                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N16                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N256                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N256_pr                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N32                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N512                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N512_pr                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N64_pr                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N128_pr                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N16                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N256_pr                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N32                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N512_pr                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N64_pr                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N128                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N16                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N256                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N32                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N512                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N64                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I2/I2_2d_left_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_long16_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 17 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N16                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N32                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N8                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_3d_trav_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_3d_trav_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_3d_trav_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I3/I3_BW_N1024                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N128                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N16384                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N2048                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N256                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N4096                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N512                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N1024                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N128                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N2048                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N256                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N4096                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N512                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N1024                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N2048                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N4096                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I4/I4_2d_a04_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_a0_N128                            maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_drat10_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_prod_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_prod_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_prod_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_3d_prod_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N1024                           maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N128                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N256                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N512                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N64                             maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N1024                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N512_cfl0.075                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N512_cfl0.15                 maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N1024                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N128                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N256                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N512                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N64                             maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N512_cfl0.15                 maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_a0_N128_smr1                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_a0_N128_smr2                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_prod_N128_smr1                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_prod_N128_smr2                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch0                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch1                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch2                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch3                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_dc_dualfalse                maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_dc_dualtrue                 maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_same_dualfalse              maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_same_dualtrue               maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N4096_dc_dualfalse                maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N4096_same_dualfalse              maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_dc_dualfalse                maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_dc_dualtrue                 maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_same_dualfalse              maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_same_dualtrue               maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_dc_N1024                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N1024                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N2048                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N256                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N512                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N1024                        maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N2048                        maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_2d_nd_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_2d_prod_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_dc_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_nd_N32                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_nd_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_prod_N32                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_prod_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-2_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-2_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-3_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-3_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-4_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-4_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-5_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-5_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_eta1_0.01                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_eta1_0.02                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_eta2off                     maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_noresync                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_shocketa1                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_shocketa1_N2048             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_shocketa1_N4096             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M10_N1024_same_dualoff               maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M10_N1024_same_dualon                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M10_N1024_same_shocketa1             maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M30_N1024_same_dualoff               maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M30_N1024_same_dualon                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M30_N1024_same_shocketa1             maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M3_N1024_same_dualoff                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M3_N1024_same_dualon                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M3_N1024_same_shocketa1              maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_diode                              maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_diode_keyoff                       maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_diodewall                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_outfl                              maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_ref                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_diode                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_diodewall                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_outfl                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_divb_a0_diode                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_diode_keyoff                  maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_diodewall                     maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_outfl                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_ref                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_diode                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_diodewall                   maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_outfl                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_ref                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+TOTAL 422 BITWISE-fields 422
+
+## Strict grading (rc 0/0, every dump field and every history file identical, at least one dump or history file)
+im/keyoff_cmp.txt: 47/47 PASS (strict)
+im/on_cmp.txt: 422/422 PASS (strict)

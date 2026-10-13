@@ -21,6 +21,10 @@ void DednerSource(MeshData<Real> *md, const Real beta_dt);
 
 using SourceFun_t = std::function<void(MeshData<Real> *md, const Real beta_dt)>;
 
+// hydro/glmmhd_damping = midpoint (validation_tests/ideal_mhd IM-F3, 2026-10-12): second-order (exponential
+// integrator) psi damping for VL2. md0 = the live register after the stage update, md1 = "u1" = the step-start state.
+TaskStatus GLMDampingExponential(MeshData<Real> *md0, MeshData<Real> *md1, const int stage, const Real dt);
+
 } // namespace Hydro::GLMMHD
 
 #endif // HYDRO_GLMMHD_GLMMHD_HPP_

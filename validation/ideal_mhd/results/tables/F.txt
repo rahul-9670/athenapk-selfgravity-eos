@@ -1,0 +1,92 @@
+Fix campaign (binary d4ca78e9)
+key-off bitwise vs the earlier runs: {'I7_BW_diode': 'IDENTICAL', 'I5_2d_prod_N128': 'IDENTICAL', 'noh_1d_prod_N1024': 'IDENTICAL', 'I1_1d_fast_N64': 'IDENTICAL'}
+
+GLM midpoint vs lie (I5, L1 Bx / L1 psi at t 0.3):
+  I5_1d_lam10_N1024              Bx 2.073e-08 (lie 1.317e-07)  psi 2.065e-08 (lie 9.964e-08)  rel 2.34e-04
+  I5_1d_lam10_N128               Bx 1.339e-06 (lie 1.455e-06)  psi 1.320e-06 (lie 1.264e-06)  rel 1.51e-02
+  I5_1d_lam10_N256               Bx 3.480e-07 (lie 5.005e-07)  psi 3.478e-07 (lie 3.883e-07)  rel 3.93e-03
+  I5_1d_lam10_N512               Bx 8.565e-08 (lie 2.536e-07)  psi 8.546e-08 (lie 1.918e-07)  rel 9.66e-04
+  I5_1d_lam10_N512_cfl0.075      Bx 7.550e-08 (lie 7.918e-08)  psi 7.518e-08 (lie 6.442e-08)  rel 8.52e-04
+  I5_1d_lam10_N512_cfl0.15       Bx 7.746e-08 (lie 1.211e-07)  psi 7.724e-08 (lie 9.140e-08)  rel 8.74e-04
+  I5_1d_lam10_N64                Bx 3.916e-06 (lie 4.115e-06)  psi 3.957e-06 (lie 3.900e-06)  rel 4.42e-02
+  I5_2d_lam10_N128               Bx 3.242e-07 (lie 2.926e-07)  psi 2.845e-07 (lie 2.455e-07)  rel 2.50e-02
+  I5_2d_lam10_N256               Bx 7.316e-08 (lie 7.746e-08)  psi 7.253e-08 (lie 7.599e-08)  rel 5.63e-03
+  I5_2d_lam10_N512               Bx 1.679e-08 (lie 3.405e-08)  psi 1.780e-08 (lie 3.716e-08)  rel 1.29e-03
+  I5_2d_lam10_N512_cfl0.075      Bx 1.462e-08 (lie 1.247e-08)  psi 1.506e-08 (lie 1.199e-08)  rel 1.13e-03
+  I5_2d_lam10_N512_cfl0.15       Bx 1.505e-08 (lie 1.768e-08)  psi 1.561e-08 (lie 1.825e-08)  rel 1.16e-03
+  I5_2d_lam10_N64                Bx 1.224e-06 (lie 1.170e-06)  psi 8.697e-07 (lie 8.103e-07)  rel 9.43e-02
+  I5_2d_prod_N128                Bx 2.478e-07 (lie 2.412e-07)  psi 1.902e-07 (lie 1.740e-07)  rel 2.01e-02
+  I5_2d_prod_N256                Bx 2.249e-08 (lie 6.792e-08)  psi 9.147e-09 (lie 3.281e-08)  rel 2.09e-03
+  I5_2d_prod_N512                Bx 3.079e-09 (lie 5.298e-08)  psi 4.873e-10 (lie 1.449e-08)  rel 3.25e-04
+  I5_2d_prod_N64                 Bx 1.700e-06 (lie 1.622e-06)  psi 1.464e-06 (lie 1.383e-06)  rel 1.20e-01
+  I5c_2d_prod_N64_patch0         Bx 1.700e-06 (lie 1.622e-06)  psi 1.464e-06 (lie 1.383e-06)  rel 1.20e-01
+  I5c_2d_prod_N64_patch1         Bx 9.693e-07 (lie 9.469e-07)  psi 5.580e-07 (lie 5.311e-07)  rel 7.85e-02
+  I5c_2d_prod_N64_patch2         Bx 6.228e-07 (lie 6.246e-07)  psi 1.347e-07 (lie 1.318e-07)  rel 5.78e-02
+  I5c_2d_prod_N64_patch3         Bx 5.603e-07 (lie 5.558e-07)  psi 7.305e-08 (lie 7.370e-08)  rel 5.91e-02
+  I4_2d_prod_N128: ME 0.9089 (lie 0.9089) mean divB 5.91e-05 (lie 5.92e-05) max 2.36e-03 (lie 2.38e-03)
+  I4_3d_prod_N64: ME 0.8600 (lie 0.8600) mean divB 3.84e-04 (lie 3.86e-04) max 4.04e-03 (lie 4.07e-03)
+
+F1 (shock_eta1 + pjump 1.0):
+  f1_noh1d_P1e-2               Mach +7.746e+00 plateau -2.201e-04 r_shock_rel -6.635e-03
+  f1_noh1d_P1e-3               Mach +2.449e+01 plateau +1.461e-04 r_shock_rel -2.760e-03
+  f1_noh1d_P1e-4               Mach +7.746e+01 plateau -1.864e-04 r_shock_rel -9.161e-03
+  f1_noh1d_P1e-5               Mach +2.449e+02 plateau -1.908e-04 r_shock_rel -8.826e-03
+  f1_noh1d_P1e-6               Mach +7.746e+02 plateau -1.924e-04 r_shock_rel -8.793e-03
+  f1_noh1d_P1e-6_N2048         Mach +7.746e+02 plateau +9.778e-06 r_shock_rel -1.469e-03
+  f1_noh1d_P1e-6_N4096         Mach +7.746e+02 plateau -2.057e-06 r_shock_rel -2.479e-04
+  f1_noh1d_P1e-6_pj0.5         Mach +7.746e+02 plateau -1.606e-04 r_shock_rel -8.793e-03
+  f1_noh1d_P1e-6_pj2.0         Mach +7.746e+02 plateau -2.113e-04 r_shock_rel -8.793e-03
+  f1k_noh1d_P1e-2              Mach +7.746e+00 plateau -2.124e-04 r_shock_rel -6.635e-03
+  f1k_noh1d_P1e-3              Mach +2.449e+01 plateau -1.994e-04 r_shock_rel -1.249e-02
+  f1k_noh1d_P1e-4              Mach +7.746e+01 plateau +1.050e-04 r_shock_rel -1.892e-02
+  f1k_noh1d_P1e-5              Mach +2.449e+02 plateau +1.225e-04 r_shock_rel -1.859e-02
+  f1k_noh1d_P1e-6              Mach +7.746e+02 plateau +1.242e-04 r_shock_rel -1.856e-02
+  f1k_noh1d_P1e-6_N2048        Mach +7.746e+02 plateau +7.122e-06 r_shock_rel -1.123e-02
+  f1k_noh1d_P1e-6_N4096        Mach +7.746e+02 plateau +5.207e-07 r_shock_rel -5.131e-03
+  f1k_noh1d_P1e-6_j0.3         Mach +7.746e+02 plateau -7.962e-05 r_shock_rel -8.793e-03
+  f1k_noh1d_P1e-6_j3.0         Mach +7.746e+02 plateau +1.888e-04 r_shock_rel -2.832e-02
+  f1only_pjump_noh1d_P1e-6     Mach +7.746e+02 plateau +8.007e-03 r_shock_rel -1.856e-02
+  f1v_noh1d_P1e-2              Mach +7.746e+00 plateau -5.133e-04 r_shock_rel -6.635e-03
+  f1v_noh1d_P1e-3              Mach +2.449e+01 plateau -2.312e-04 r_shock_rel -1.249e-02
+  f1v_noh1d_P1e-4              Mach +7.746e+01 plateau +1.021e-04 r_shock_rel -1.892e-02
+  f1v_noh1d_P1e-5              Mach +2.449e+02 plateau +1.239e-04 r_shock_rel -1.859e-02
+  f1v_noh1d_P1e-6              Mach +7.746e+02 plateau +1.250e-04 r_shock_rel -1.856e-02
+  f1v_noh1d_P1e-6_N2048        Mach +7.746e+02 plateau +6.755e-06 r_shock_rel -1.123e-02
+  f1v_noh1d_P1e-6_N4096        Mach +7.746e+02 plateau +5.368e-07 r_shock_rel -5.131e-03
+  f1v_noh1d_P1e-6_dv0.15       Mach +7.746e+02 plateau +1.250e-04 r_shock_rel -1.856e-02
+  f1v_noh1d_P1e-6_dv0.5        Mach +7.746e+02 plateau +1.248e-04 r_shock_rel -1.856e-02
+  f1_noh_2d_N256               plateau -2.102e-02 pre_min +9.900e-01 pre_max +2.604e+00 aniso -2.066e-02
+  f1_noh_2d_N512               plateau -1.077e-02 pre_min +9.998e-01 pre_max +1.001e+00 aniso -1.131e-02
+  f1_noh_3d_N128               plateau -8.974e-02 pre_min +9.875e-01 pre_max +3.076e+01 aniso -1.212e-01
+  f1_noh_3d_N64                plateau -1.662e-01 pre_min +2.719e+01 pre_max +2.465e+02 aniso -1.699e-01
+  f1k_noh_2d_N256              plateau -1.752e-02 pre_min +9.898e-01 pre_max +2.641e+00 aniso -2.018e-02
+  f1k_noh_2d_N512              plateau -1.022e-02 pre_min +9.994e-01 pre_max +1.001e+00 aniso -1.079e-02
+  f1k_noh_3d_N128              plateau -8.367e-02 pre_min +9.750e-01 pre_max +1.958e+01 aniso -8.447e-02
+  f1k_noh_3d_N64               plateau -1.148e-01 pre_min +9.424e+00 pre_max +1.593e+02 aniso -1.174e-01
+  f1v_noh_2d_N256              plateau -1.728e-02 pre_min +9.963e-01 pre_max +1.002e+00 aniso -2.023e-02
+  f1v_noh_2d_N512              plateau -1.015e-02 pre_min +9.997e-01 pre_max +1.001e+00 aniso -1.093e-02
+  f1v_noh_3d_N128              plateau -8.126e-02 pre_min +9.811e-01 pre_max +1.006e+00 aniso -8.173e-02
+  f1v_noh_3d_N64               plateau -1.102e-01 pre_min +9.816e-01 pre_max +1.032e+00 aniso -1.177e-01
+  D3 tabulated with F1 (plateau rho/P): {"f1_M3": {"rho_plateau": 8.259104931260252e-07, "P_plateau": 8.351254456862023e-09}, "f1_M10": {"rho_plateau": 3.1716971400924666e-06, "P_plateau": -3.9634857324361005e-07}, "f1_M30": {"rho_plateau": 2.308741064918629e-06, "P_plateau": -1.3707929935527497e-06}, "f1k_M3": {"rho_plateau": 8.259104931260252e-07, "P_plateau": 8.351254456862023e-09}, "f1k_M10": {"rho_plateau": 4.3253178418117825e-06, "P_plateau": -7.159533189216027e-07}, "f1k_M30": {"rho_plateau": 4.286064332159056e-06, "P_plateau": 2.0331521523420104e-07}, "f1v_M3": {"rho_plateau": 8.259104931260252e-07, "P_plateau": 8.351254456862023e-09}, "f1v_M10": {"rho_plateau": -0.00017174526738353957, "P_plateau": 4.369242664655326e-05}, "f1v_M30": {"rho_plateau": -6.64456050566975e-07, "P_plateau": 7.569852898370311e-07}}
+  D1b regression (max|P/P_ad-1|): {"prod": {"t": 9.951164143397586e-05, "max_dP": 0.005429785632417694, "L1_dP": 0.00019524824515357135}, "pjump": {"t": 9.951164143397586e-05, "max_dP": 0.005429785632417694, "L1_dP": 0.00019524824515357135}, "kjump": {"t": 9.951164143397586e-05, "max_dP": 0.005429785632417694, "L1_dP": 0.00019524824515357135}, "kv": {"t": 9.951164143397586e-05, "max_dP": 0.005429785632417694, "L1_dP": 0.00019524824515357135}}
+
+F2 I7 (last dump vs big box): {"BW": {"max_rho": 0.071815, "max_P": 0.278125, "max_By": 0.331522, "mass_rel": -0.010827}, "RJ2a_div": {"max_rho": 0.031665, "max_P": 0.040332, "max_By": 0.021915, "mass_rel": -0.00807}, "divb_a0": {"max_Bx": 0.0, "max_psi": 0.0}, "divb_prod": {"max_Bx": 2e-06, "max_psi": 1e-06}}
+F2 wall test (rho of the 3 wall cells / exact rho* - 1):
+  wall_u0.01_By0.0_f2        rho* 0.99003  lo -1.34e-05  hi -1.34e-05  |u| wall 2.7e-07
+  wall_u0.01_By0.0_legacy    rho* 0.99003  lo -3.51e-02  hi -3.51e-02  |u| wall 4.0e-02
+  wall_u0.01_By0.0_wallonly  rho* 0.99003  lo -1.34e-05  hi -1.34e-05  |u| wall 2.7e-07
+  wall_u0.01_By1.0_f2        rho* 0.99294  lo -1.16e-04  hi -1.16e-04  |u| wall 1.7e-05
+  wall_u0.01_By1.0_legacy    rho* 0.99294  lo -3.37e-02  hi -3.37e-02  |u| wall 5.4e-02
+  wall_u0.01_By1.0_wallonly  rho* 0.99294  lo -1.16e-04  hi -1.16e-04  |u| wall 1.7e-05
+  wall_u0.0_By0.0_f2         rho* 1.00000  lo +0.00e+00  hi +0.00e+00  |u| wall 0.0e+00
+  wall_u0.0_By0.0_legacy     rho* 1.00000  lo +0.00e+00  hi +0.00e+00  |u| wall 0.0e+00
+  wall_u0.0_By0.0_wallonly   rho* 1.00000  lo +0.00e+00  hi +0.00e+00  |u| wall 0.0e+00
+  wall_u0.0_By1.0_f2         rho* 1.00000  lo +0.00e+00  hi +0.00e+00  |u| wall 0.0e+00
+  wall_u0.0_By1.0_legacy     rho* 1.00000  lo +0.00e+00  hi +0.00e+00  |u| wall 0.0e+00
+  wall_u0.0_By1.0_wallonly   rho* 1.00000  lo +0.00e+00  hi +0.00e+00  |u| wall 0.0e+00
+  wall_u0.1_By0.0_f2         rho* 0.90330  lo -1.40e-03  hi -1.40e-03  |u| wall 1.4e-05
+  wall_u0.1_By0.0_legacy     rho* 0.90330  lo -6.63e-02  hi -6.63e-02  |u| wall 6.5e-02
+  wall_u0.1_By0.0_wallonly   rho* 0.90330  lo -1.40e-03  hi -1.40e-03  |u| wall 1.4e-05
+  wall_u0.1_By1.0_f2         rho* 0.93074  lo -1.78e-03  hi -1.78e-03  |u| wall 1.5e-04
+  wall_u0.1_By1.0_legacy     rho* 0.93074  lo -5.11e-03  hi -5.11e-03  |u| wall 5.8e-03
+  wall_u0.1_By1.0_wallonly   rho* 0.93074  lo -1.80e-03  hi -1.80e-03  |u| wall 1.5e-04

@@ -1,0 +1,12 @@
+I1c/I1c_ac_N64_pr | I1c/I1c_ac_N64.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_ac_N128_pr | I1c/I1c_ac_N128.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_ac_N256_pr | I1c/I1c_ac_N256.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_ac_N512_pr | I1c/I1c_ac_N512.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fast_N64_pr | I1c/I1c_fast_N64.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fast_N128_pr | I1c/I1c_fast_N128.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fast_N256_pr | I1c/I1c_fast_N256.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fast_N512_pr | I1c/I1c_fast_N512.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fastlb_N64_pr | I1c/I1c_fastlb_N64.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fastlb_N128_pr | I1c/I1c_fastlb_N128.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fastlb_N256_pr | I1c/I1c_fastlb_N256.in | hydro/eos_interp=p_over_rho | 1
+I1c/I1c_fastlb_N512_pr | I1c/I1c_fastlb_N512.in | hydro/eos_interp=p_over_rho | 1

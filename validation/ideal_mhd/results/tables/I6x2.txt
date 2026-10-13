@@ -1,0 +1,12 @@
+I6/X2: planar tabulated-EOS Noh, t <= 0.012. Tfloor/T0 = 0.2726. undershoot = snapshots with min P/P0 < 0.99 among pre-shock cells
+run                            Tfloor hits  hst rows  undershoot  min P/P0
+X2_M10_N1024_dc_dualfalse               10    5/27      9/25     2.729e-01
+X2_M10_N1024_dc_dualtrue                 8    4/27      4/25     2.726e-01
+X2_M10_N1024_same_dualfalse              0    0/27      0/25     1.000e+00
+X2_M10_N1024_same_dualtrue               0    0/27      0/25     1.000e+00
+X2_M10_N4096_dc_dualfalse               10    5/27     11/25     2.728e-01
+X2_M10_N4096_same_dualfalse              0    0/27      0/25     1.000e+00
+X2_M30_N1024_dc_dualfalse               22   11/28     10/25     2.692e-01
+X2_M30_N1024_dc_dualtrue                14    7/28      8/25     2.686e-01
+X2_M30_N1024_same_dualfalse              0    0/28      0/25     1.000e+00
+X2_M30_N1024_same_dualtrue               0    0/28      0/25     1.000e+00

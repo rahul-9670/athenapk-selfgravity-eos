@@ -1,0 +1,9 @@
+I4/I4_2d_prod_N32 | I4/I4_2d_prod_N32.in | | 1
+I4/I4_2d_prod_N64 | I4/I4_2d_prod_N64.in | | 2
+I4/I4_2d_prod_N128 | I4/I4_2d_prod_N128.in | | 8
+I4/I4_2d_prod_N256 | I4/I4_2d_prod_N256.in | | 32
+I4/I4_3d_prod_N32 | I4/I4_3d_prod_N32.in | | 2
+I4/I4_3d_prod_N64 | I4/I4_3d_prod_N64.in | | 16
+I4/I4_2d_a0_N128 | I4/I4_2d_a0_N128.in | | 8
+I4/I4_2d_a04_N128 | I4/I4_2d_a04_N128.in | | 8
+I4/I4_2d_drat10_N128 | I4/I4_2d_drat10_N128.in | | 8

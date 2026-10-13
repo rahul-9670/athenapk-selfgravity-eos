@@ -157,6 +157,10 @@ void DiodeBC(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
   const bool fine = false;
 
   const auto nv = IndexRange{0, cons.GetDim(4) - 1};
+  // hydro/diode_energy_consistent (validation_tests/ideal_mhd IM-F2, 2026-10-12; default false = the copy below):
+  // when the inward normal momentum is zeroed, take its kinetic energy out of the ghost's total energy too. The plain
+  // copy keeps E, so an inflow ghost carried P + (gamma-1) rho u_n^2/2 (internal energy made from the removed motion).
+  const bool econs = pmb->packages.Get("Hydro")->Param<bool>("diode_energy_consistent");
   pmb->par_for_bndry(
       "DiodeBC", nv, domain, parthenon::TopologicalElement::CC, coarse, fine,
       KOKKOS_LAMBDA(const int &v, const int &k, const int &j, const int &i) {
@@ -167,6 +171,13 @@ void DiodeBC(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
         // "Inward" is +normal on an inner face and -normal on an outer face.
         const bool normal_mom = (v == DIR);
         const bool inward = INNER ? (val > 0.0) : (val < 0.0);
+        if (econs && v == IEN) {
+          const Real mn = cons(DIR, X3 ? ref : k, X2 ? ref : j, X1 ? ref : i);
+          const bool in_n = INNER ? (mn > 0.0) : (mn < 0.0);
+          cons(v, k, j, i) =
+              in_n ? val - 0.5 * mn * mn / cons(IDN, X3 ? ref : k, X2 ? ref : j, X1 ? ref : i) : val;
+          return;
+        }
         cons(v, k, j, i) = (normal_mom && inward) ? 0.0 : val;
       });
 

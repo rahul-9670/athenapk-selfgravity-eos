@@ -1,0 +1,2 @@
+F/c7_glm_I5_2d_lam10_N512 | I5/I5_2d_lam10_N512.in | hydro/glmmhd_damping=midpoint | 1
+F/c7_wall_u0.1_By1.0_f2 | F/wall_u0.1_By1.0.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1

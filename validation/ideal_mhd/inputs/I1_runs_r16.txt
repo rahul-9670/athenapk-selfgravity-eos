@@ -1,0 +1,12 @@
+I1/I1_3d_fast_N64 | I1/I1_3d_fast_N64.in | | 16
+I1/I1_3d_fast_N64_lb | I1/I1_3d_fast_N64_lb.in | | 16
+I1/I1_3d_fast_N64_lb_nd | I1/I1_3d_fast_N64_lb_nd.in | | 16
+I1/I1_3d_alfven_N64 | I1/I1_3d_alfven_N64.in | | 16
+I1/I1_3d_alfven_N64_lb | I1/I1_3d_alfven_N64_lb.in | | 16
+I1/I1_3d_alfven_N64_lb_nd | I1/I1_3d_alfven_N64_lb_nd.in | | 16
+I1/I1_3d_slow_N64 | I1/I1_3d_slow_N64.in | | 16
+I1/I1_3d_slow_N64_lb | I1/I1_3d_slow_N64_lb.in | | 16
+I1/I1_3d_slow_N64_lb_nd | I1/I1_3d_slow_N64_lb_nd.in | | 16
+I1/I1_3d_entropy_N64 | I1/I1_3d_entropy_N64.in | | 16
+I1/I1_3d_entropy_N64_lb | I1/I1_3d_entropy_N64_lb.in | | 16
+I1/I1_3d_entropy_N64_lb_nd | I1/I1_3d_entropy_N64_lb_nd.in | | 16

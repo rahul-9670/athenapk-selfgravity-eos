@@ -1,0 +1,14 @@
+I2/I2_2d_trav_N8 | I2/I2_2d_trav_N8.in | | 1
+I2/I2_2d_trav_N16 | I2/I2_2d_trav_N16.in | | 1
+I2/I2_2d_trav_N32 | I2/I2_2d_trav_N32.in | | 1
+I2/I2_2d_trav_N64 | I2/I2_2d_trav_N64.in | | 2
+I2/I2_2d_trav_N128 | I2/I2_2d_trav_N128.in | | 8
+I2/I2_3d_trav_N8 | I2/I2_3d_trav_N8.in | | 1
+I2/I2_3d_trav_N16 | I2/I2_3d_trav_N16.in | | 1
+I2/I2_3d_trav_N32 | I2/I2_3d_trav_N32.in | | 2
+I2/I2_2d_stand_N8 | I2/I2_2d_stand_N8.in | | 1
+I2/I2_2d_stand_N16 | I2/I2_2d_stand_N16.in | | 1
+I2/I2_2d_stand_N32 | I2/I2_2d_stand_N32.in | | 1
+I2/I2_2d_stand_N64 | I2/I2_2d_stand_N64.in | | 2
+I2/I2_2d_left_N32 | I2/I2_2d_left_N32.in | | 1
+I2/I2_2d_long16_N32 | I2/I2_2d_long16_N32.in | | 1

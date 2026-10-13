@@ -1,0 +1,73 @@
+I7 outgoing waves: [0,1] run minus the [0,1] part of the [-4,5] reference (same dx). max = max |diff|; scale = max |reference| in [0,1]
+BW_diode
+   t 0.000  rho: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  mass +0.00e+00
+   t 0.075  
+   t 0.150  
+   t 0.225  
+   t 0.300  rho: L1 3.56e-02 max 3.45e-01 (scale 9.52e-01)  P: L1 7.87e-02 max 6.05e-01 (scale 9.06e-01)  By: L1 1.33e-01 max 1.50e+00 (scale 9.41e-01)  mass -1.81e-02
+BW_diodewall
+   t 0.000  rho: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  mass +0.00e+00
+   t 0.075  rho: L1 4.68e-16 max 7.59e-15 (scale 1.00e+00)  P: L1 3.47e-16 max 2.04e-14 (scale 1.00e+00)  By: L1 2.86e-16 max 1.51e-14 (scale 1.00e+00)  mass +0.00e+00
+   t 0.150  
+   t 0.225  
+   t 0.300  rho: L1 8.97e-03 max 7.06e-02 (scale 9.52e-01)  P: L1 2.52e-02 max 2.90e-01 (scale 9.06e-01)  By: L1 2.27e-02 max 3.36e-01 (scale 9.41e-01)  mass -1.04e-02
+BW_outfl
+   t 0.000  rho: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  mass +0.00e+00
+   t 0.075  rho: L1 4.45e-16 max 3.68e-15 (scale 1.00e+00)  P: L1 2.74e-16 max 2.00e-15 (scale 1.00e+00)  By: L1 2.38e-16 max 6.77e-15 (scale 1.00e+00)  mass +0.00e+00
+   t 0.150  
+   t 0.225  
+   t 0.300  rho: L1 4.17e-05 max 1.97e-03 (scale 9.52e-01)  P: L1 1.35e-04 max 7.81e-03 (scale 9.06e-01)  By: L1 1.04e-04 max 5.92e-03 (scale 9.41e-01)  mass +4.06e-05
+RJ2a_div_diode
+   t 0.000  rho: L1 0.00e+00 max 0.00e+00 (scale 1.08e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.13e+00)  mass +0.00e+00
+   t 0.125  rho: L1 0.00e+00 max 0.00e+00 (scale 1.08e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.13e+00)  mass +0.00e+00
+   t 0.250  
+   t 0.375  
+   t 0.500  rho: L1 6.76e-03 max 2.39e-02 (scale 7.83e-01)  P: L1 8.65e-03 max 3.06e-02 (scale 5.56e-01)  By: L1 9.56e-03 max 3.75e-02 (scale 8.15e-01)  mass -9.29e-03
+RJ2a_div_diodewall
+   t 0.000  rho: L1 0.00e+00 max 0.00e+00 (scale 1.08e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.13e+00)  mass +0.00e+00
+   t 0.125  rho: L1 0.00e+00 max 0.00e+00 (scale 1.08e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.13e+00)  mass +0.00e+00
+   t 0.250  
+   t 0.375  
+   t 0.500  rho: L1 5.90e-03 max 3.16e-02 (scale 7.83e-01)  P: L1 7.62e-03 max 4.03e-02 (scale 5.56e-01)  By: L1 4.26e-03 max 2.19e-02 (scale 8.15e-01)  mass -8.06e-03
+RJ2a_div_outfl
+   t 0.000  rho: L1 0.00e+00 max 0.00e+00 (scale 1.08e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.13e+00)  mass +0.00e+00
+   t 0.125  rho: L1 0.00e+00 max 0.00e+00 (scale 1.08e+00)  P: L1 0.00e+00 max 0.00e+00 (scale 1.00e+00)  By: L1 0.00e+00 max 0.00e+00 (scale 1.13e+00)  mass +0.00e+00
+   t 0.250  
+   t 0.375  
+   t 0.500  rho: L1 1.31e-04 max 4.11e-04 (scale 7.83e-01)  P: L1 1.67e-04 max 5.33e-04 (scale 5.56e-01)  By: L1 9.18e-05 max 1.98e-04 (scale 8.15e-01)  mass +1.83e-04
+divb_a0_diode
+   t 0.000  Bx: L1 0.00e+00 max 0.00e+00 (scale 1.00e-03)  psi: L1 0.00e+00 max 0.00e+00 (scale 0.00e+00)
+   t 0.200  Bx: L1 6.71e-23 max 1.03e-20 (scale 4.95e-04)  psi: L1 6.29e-23 max 1.03e-20 (scale 4.95e-04)
+   t 0.400  
+   t 0.601  
+   t 0.800  Bx: L1 1.52e-06 max 8.41e-06 (scale 1.42e-11)  psi: L1 1.58e-06 max 8.72e-06 (scale 1.55e-11)
+divb_a0_diodewall
+   t 0.000  Bx: L1 0.00e+00 max 0.00e+00 (scale 1.00e-03)  psi: L1 0.00e+00 max 0.00e+00 (scale 0.00e+00)
+   t 0.200  Bx: L1 6.71e-23 max 1.03e-20 (scale 4.95e-04)  psi: L1 6.29e-23 max 1.03e-20 (scale 4.95e-04)
+   t 0.400  Bx: L1 3.29e-09 max 6.77e-07 (scale 4.93e-04)  psi: L1 3.29e-09 max 6.77e-07 (scale 4.93e-04)
+   t 0.601  
+   t 0.800  Bx: L1 1.70e-11 max 2.48e-10 (scale 1.42e-11)  psi: L1 1.70e-11 max 2.48e-10 (scale 1.55e-11)
+divb_a0_outfl
+   t 0.000  Bx: L1 0.00e+00 max 0.00e+00 (scale 1.00e-03)  psi: L1 0.00e+00 max 0.00e+00 (scale 0.00e+00)
+   t 0.200  Bx: L1 6.71e-23 max 1.03e-20 (scale 4.95e-04)  psi: L1 6.29e-23 max 1.03e-20 (scale 4.95e-04)
+   t 0.400  Bx: L1 3.29e-09 max 6.77e-07 (scale 4.93e-04)  psi: L1 3.29e-09 max 6.77e-07 (scale 4.93e-04)
+   t 0.601  
+   t 0.800  Bx: L1 1.72e-11 max 2.47e-10 (scale 1.42e-11)  psi: L1 1.72e-11 max 2.47e-10 (scale 1.55e-11)
+divb_prod_diode
+   t 0.000  Bx: L1 0.00e+00 max 0.00e+00 (scale 1.00e-03)  psi: L1 0.00e+00 max 0.00e+00 (scale 0.00e+00)
+   t 0.200  Bx: L1 2.73e-22 max 6.78e-21 (scale 3.68e-04)  psi: L1 2.85e-22 max 1.02e-20 (scale 4.95e-05)
+   t 0.400  Bx: L1 2.51e-12 max 1.29e-10 (scale 2.71e-04)  psi: L1 2.53e-12 max 1.99e-10 (scale 2.55e-05)
+   t 0.601  
+   t 0.800  Bx: L1 1.22e-06 max 2.45e-06 (scale 1.96e-04)  psi: L1 3.37e-07 max 5.44e-07 (scale 1.31e-05)
+divb_prod_diodewall
+   t 0.000  Bx: L1 0.00e+00 max 0.00e+00 (scale 1.00e-03)  psi: L1 0.00e+00 max 0.00e+00 (scale 0.00e+00)
+   t 0.200  Bx: L1 2.73e-22 max 6.78e-21 (scale 3.68e-04)  psi: L1 2.85e-22 max 1.02e-20 (scale 4.95e-05)
+   t 0.400  Bx: L1 2.51e-12 max 1.29e-10 (scale 2.71e-04)  psi: L1 2.53e-12 max 1.99e-10 (scale 2.55e-05)
+   t 0.601  Bx: L1 1.28e-08 max 2.18e-07 (scale 2.25e-04)  psi: L1 6.92e-09 max 1.26e-07 (scale 1.73e-05)
+   t 0.800  Bx: L1 1.41e-07 max 1.55e-06 (scale 1.96e-04)  psi: L1 5.47e-08 max 5.83e-07 (scale 1.31e-05)
+divb_prod_outfl
+   t 0.000  Bx: L1 0.00e+00 max 0.00e+00 (scale 1.00e-03)  psi: L1 0.00e+00 max 0.00e+00 (scale 0.00e+00)
+   t 0.200  Bx: L1 2.73e-22 max 6.78e-21 (scale 3.68e-04)  psi: L1 2.85e-22 max 1.02e-20 (scale 4.95e-05)
+   t 0.400  Bx: L1 2.51e-12 max 1.29e-10 (scale 2.71e-04)  psi: L1 2.53e-12 max 1.99e-10 (scale 2.55e-05)
+   t 0.601  Bx: L1 1.28e-08 max 2.18e-07 (scale 2.25e-04)  psi: L1 6.92e-09 max 1.26e-07 (scale 1.73e-05)
+   t 0.800  Bx: L1 1.41e-07 max 1.55e-06 (scale 1.96e-04)  psi: L1 5.47e-08 max 5.83e-07 (scale 1.31e-05)

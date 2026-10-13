@@ -1,0 +1,6 @@
+I1/I1_1d_fast_N64 | I1/I1_1d_fast_N64.in | | 1
+I1/I1_1d_fast_N64_lb | I1/I1_1d_fast_N64_lb.in | | 1
+I1/I1_2d_alfven_N16 | I1/I1_2d_alfven_N16.in | | 1
+I3/I3_RJ2a_N256 | I3/I3_RJ2a_N256.in | | 1
+I4/I4_2d_prod_N32 | I4/I4_2d_prod_N32.in | | 1
+I6/X2_M10_N1024_same_dualfalse | I6/D3_M10_N1024.in | parthenon/time/tlim=0.012 parthenon/output0/dt=0.00046358844721949144 parthenon/output0/variables=prim hydro/vl2_predictor_recon=same hydro/dual_energy=false | 1

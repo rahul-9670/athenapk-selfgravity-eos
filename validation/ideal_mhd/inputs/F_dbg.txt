@@ -1,0 +1,2 @@
+F/dbg_f1k_3d_N64 | I6/noh_3d_prod_N64.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump parthenon/output0/dt=0.02 parthenon/output0/variables=prim,dual_switched,dual_comp parthenon/time/tlim=0.2 | 8
+F/dbg_prod_3d_N64 | I6/noh_3d_prod_N64.in | parthenon/output0/dt=0.02 parthenon/output0/variables=prim,dual_switched,dual_comp parthenon/time/tlim=0.2 | 8

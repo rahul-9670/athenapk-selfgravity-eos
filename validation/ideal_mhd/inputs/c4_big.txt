@@ -1,0 +1,3 @@
+I6/noh_2d_se1_N256 | I6/noh_2d_prod_N256.in | hydro/dual_energy_shock_eta1=true | 64
+I6/noh_2d_se1_N512 | I6/noh_2d_prod_N512.in | hydro/dual_energy_shock_eta1=true | 64
+I6/noh_3d_se1_N128 | I6/noh_3d_prod_N128.in | hydro/dual_energy_shock_eta1=true | 64

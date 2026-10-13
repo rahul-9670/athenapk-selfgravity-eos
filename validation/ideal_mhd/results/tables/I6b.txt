@@ -1,0 +1,19 @@
+I6b 1D Noh t 0.6: plateau = mean rho(0.5..0.9 r_s)/rho2_exact - 1 (finite-Mach RH); sw_* = switched fraction
+run                                  Mach    rho2   plateau  dr_s/r_s sw_plat sw_shock  sw_up
+noh1d_P1e-2_dualfalse                   8  3.8925 -1.94e-04 -6.63e-03       -       -       -
+noh1d_P1e-2_dualtrue                    8  3.8925 -8.35e-04 -6.63e-03   0.000   0.333   1.000
+noh1d_P1e-3_dualfalse                  24  3.9888 +2.06e-04 -2.76e-03       -       -       -
+noh1d_P1e-3_dualtrue                   24  3.9888 +5.78e-03 -1.25e-02   0.000   0.500   1.000
+noh1d_P1e-4_dualfalse                  77  3.9989 -1.06e-04 +6.01e-04       -       -       -
+noh1d_P1e-4_dualtrue                   77  3.9989 +7.52e-03 -9.16e-03   0.000   0.500   1.000
+noh1d_P1e-5_dualfalse                 245  3.9999 -1.23e-04 +9.39e-04       -       -       -
+noh1d_P1e-5_dualtrue                  245  3.9999 +8.38e-03 -1.86e-02   0.000   0.500   1.000
+noh1d_P1e-6_dualfalse                 775  4.0000 -1.21e-04 +9.73e-04       -       -       -
+noh1d_P1e-6_dualtrue                  775  4.0000 +8.27e-03 -1.86e-02   0.000   0.500   1.000
+noh1d_P1e-6_eta1_0.01                 775  4.0000 +3.74e-04 -8.79e-03   0.000   0.333   1.000
+noh1d_P1e-6_eta1_0.02                 775  4.0000 +1.53e-03 -8.79e-03   0.000   0.333   1.000
+noh1d_P1e-6_eta2off                   775  4.0000 +8.29e-03 -1.86e-02   0.000   0.500   1.000
+noh1d_P1e-6_noresync                  775  4.0000 +8.27e-03 -1.86e-02   0.000   0.500   1.000
+noh1d_P1e-6_shocketa1                 775  4.0000 -1.27e-04 +9.73e-04   0.000   0.167   1.000
+noh1d_P1e-6_shocketa1_N2048           775  4.0000 -4.69e-06 -1.47e-03       -       -       -
+noh1d_P1e-6_shocketa1_N4096           775  4.0000 -1.23e-07 -2.48e-04       -       -       -

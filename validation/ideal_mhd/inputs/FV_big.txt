@@ -1,0 +1,3 @@
+F/f1v_noh_2d_N256 | I6/noh_2d_prod_N256.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 64
+F/f1v_noh_2d_N512 | I6/noh_2d_prod_N512.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 64
+F/f1v_noh_3d_N128 | I6/noh_3d_prod_N128.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 64

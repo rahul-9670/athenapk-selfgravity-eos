@@ -1,0 +1,17 @@
+I6b/noh1d_P1e-2_dualtrue | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-2 hydro/dual_energy=true parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-2_dualfalse | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-2 hydro/dual_energy=false parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-3_dualtrue | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-3 hydro/dual_energy=true parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-3_dualfalse | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-3 hydro/dual_energy=false parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-4_dualtrue | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-4 hydro/dual_energy=true parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-4_dualfalse | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-4 hydro/dual_energy=false parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-5_dualtrue | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-5 hydro/dual_energy=true parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-5_dualfalse | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-5 hydro/dual_energy=false parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_dualtrue | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-6 hydro/dual_energy=true parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_dualfalse | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-6 hydro/dual_energy=false parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_shocketa1 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_eta1_0.01 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_eta1=0.01 parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_eta1_0.02 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_eta1=0.02 parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_eta2off | I6/noh_1d_prod_N1024.in | hydro/dual_energy_eta2=0.0 parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_noresync | I6/noh_1d_prod_N1024.in | hydro/dual_energy_exact_resync=false parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.2 | 1
+I6b/noh1d_P1e-6_shocketa1_N2048 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048 | 1
+I6b/noh1d_P1e-6_shocketa1_N4096 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096 | 1

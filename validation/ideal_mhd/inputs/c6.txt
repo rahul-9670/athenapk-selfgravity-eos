@@ -1,0 +1,3 @@
+I6/noh_3d_se1sc05_N128 | I6/noh_3d_prod_N128.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_comp=0.05 | 64
+I6/noh_3d_se1cfl015_N128 | I6/noh_3d_prod_N128.in | hydro/dual_energy_shock_eta1=true parthenon/time/cfl=0.15 | 64
+I6/noh_3d_prodcfl015_N128 | I6/noh_3d_prod_N128.in | parthenon/time/cfl=0.15 | 64

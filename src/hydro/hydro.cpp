@@ -532,6 +532,14 @@ TaskStatus ClampBoundaryFluxes(MeshData<Real> *md) {
   // both document.
   auto cf = md->PackVariablesAndFluxes(std::vector<std::string>{"cons"},
                                        std::vector<std::string>{"cons"});
+  // hydro/boundary_flux_clamp_wall (validation_tests/ideal_mhd I7, 2026-10-12; default false = the zeroing below,
+  // bit-identical): on a clamped (inflow) face, keep the clamp's zero mass/energy/scalar flux but give the face the
+  // momentum flux of a WALL AT REST with the adjacent interior cell's state, P + B^2/2 - Bn^2 (normal) and -Bn Bt
+  // (tangential). Zeroing the whole momentum flux removes the outside pressure: a boundary cell at rest with a tiny
+  // inward mass flux is then pushed outward and a rarefaction runs into the box (I7: static atmosphere, rho -4.8 %).
+  const bool clamp_wall = hydro_pkg->Param<bool>("boundary_flux_clamp_wall");
+  const auto &eos = hydro_pkg->Param<AdiabaticGLMMHDEOS>("eos");
+  const auto prim_pack = md->PackVariables(std::vector<std::string>{"prim"});
 
   IndexRange ib = md->GetBlockData(0)->GetBoundsI(IndexDomain::interior);
   IndexRange jb = md->GetBlockData(0)->GetBoundsJ(IndexDomain::interior);
@@ -555,9 +563,28 @@ TaskStatus ClampBoundaryFluxes(MeshData<Real> *md) {
           const Real fm = cfb.flux(dir, IDN, kk, jj, ii);
           if (sign * fm >= 0.0) return; // outflow (or exactly zero) -- leave it alone
           cfb.flux(dir, IDN, kk, jj, ii) = 0.0;
-          cfb.flux(dir, IM1, kk, jj, ii) = 0.0;
-          cfb.flux(dir, IM2, kk, jj, ii) = 0.0;
-          cfb.flux(dir, IM3, kk, jj, ii) = 0.0;
+          if (clamp_wall) {
+            // (k, j, i) is the interior cell adjacent to this face (both callers below). Flux of a reflecting
+            // wall: the Riemann problem between the cell and its mirror image has u = 0 at the face and total
+            // pressure P* = P_tot - rho c_f u_away (acoustic/linearised two-wave solution; u_away = the cell's
+            // normal velocity pointing AWAY from the wall, > 0 on every clamped face because its mass flux is
+            // inward): gas leaving the wall lowers the wall pressure (rarefaction), gas at rest keeps P_tot.
+            const auto &w = prim_pack(b);
+            const int dn = dir - X1DIR;
+            const Real bn = w(IB1 + dn, k, j, i);
+            const Real b2 = SQR(w(IB1, k, j, i)) + SQR(w(IB2, k, j, i)) + SQR(w(IB3, k, j, i));
+            const Real u_away = -sign * w(IV1 + dn, k, j, i);
+            const Real bt1 = w(IB1 + (dn + 1) % 3, k, j, i), bt2 = w(IB1 + (dn + 2) % 3, k, j, i);
+            const Real cf = eos.FastMagnetosonicSpeed(w(IDN, k, j, i), w(IPR, k, j, i), bn, bt1, bt2);
+            const Real ptot = w(IPR, k, j, i) + 0.5 * b2;
+            const Real pstar = Kokkos::fmax(ptot - w(IDN, k, j, i) * cf * Kokkos::fmax(u_away, 0.0), 0.0);
+            for (int m = 0; m < 3; ++m)
+              cfb.flux(dir, IM1 + m, kk, jj, ii) = (m == dn) ? pstar - bn * bn : -bn * w(IB1 + m, k, j, i);
+          } else {
+            cfb.flux(dir, IM1, kk, jj, ii) = 0.0;
+            cfb.flux(dir, IM2, kk, jj, ii) = 0.0;
+            cfb.flux(dir, IM3, kk, jj, ii) = 0.0;
+          }
           cfb.flux(dir, IEN, kk, jj, ii) = 0.0;
           for (int n = 0; n < nscalars; ++n)
             cfb.flux(dir, nhydro + n, kk, jj, ii) = 0.0;
@@ -600,6 +627,24 @@ void DualEnergyPdV(MeshData<Real> *md, const Real beta_dt) {
   const bool pdv_face = pkg->Param<bool>("dual_energy_pdv_face");
   auto comp_pack = write_comp ? md->PackVariables(std::vector<std::string>{"dual_comp"})
                               : cons_pack;
+  // hydro/dual_energy_shock_detector (validation_tests/ideal_mhd IM-F1, 2026-10-12; default "comp" = the legacy
+  // per-stage compression -div v * beta_dt, written as is). The alternatives write a dt-INDEPENDENT flag 1 / 0 into
+  // dual_comp, so both readers (eta2's distrust_high and shock_eta1's shock_keep, each testing comp >= shock_comp)
+  // see the physical shock and not the step size (the legacy value fired in smooth 3D infall at large dt/r and sat AT
+  // the threshold in the production accretion shock):
+  //   pjump: div v < 0 and the pressure across the two neighbours in some direction differs by > (1 + jump).
+  //          Misfires in smooth, grid-scale-steep convergence (3D Noh near the origin: ratio ~2 per two cells).
+  //   kjump: div v < 0 and the ENTROPY proxy K = P / rho^gk differs by > (1 + jump): smooth adiabatic compression
+  //          keeps K whatever its steepness; a strong shock raises it by orders of magnitude.
+  //          Fixes 1D, but in 3D the cell AHEAD of the front is flagged, takes E - KE - ME (truncation noise of
+  //          oblique hypersonic flow), heats, and flags ITS upstream neighbour: a chain walks outward (I6 3D N 64).
+  //   kv:    kjump AND a velocity jump: max_d -(v_d(+1) - v_d(-1)) > dv * max(|v|, c_s) over the neighbours. Across a
+  //          strong shock the normal velocity drops by ~ the inflow speed within two cells; smooth convergence gives
+  //          ~2 dx / r of it, and the cell ahead of a noise-heated neighbour sees almost no jump -> the chain breaks.
+  const int shock_det = pkg->Param<int>("dual_energy_shock_detector");   // 0 comp, 1 pjump, 2 kjump, 3 kv
+  const Real sdv = pkg->Param<Real>("dual_energy_shock_dv");
+  const Real sjump = pkg->Param<Real>("dual_energy_shock_jump");
+  const Real sgk = pkg->Param<Real>("dual_energy_shock_gamma");
   parthenon::par_for(
       DEFAULT_LOOP_PATTERN, "DualEnergyPdV", parthenon::DevExecSpace(), 0,
       cons_pack.GetDim(5) - 1, kb.s, kb.e, jb.s, jb.e, ib.s, ib.e,
@@ -616,7 +661,42 @@ void DualEnergyPdV(MeshData<Real> *md, const Real beta_dt) {
           divv += (prim(IV3, k + 1, j, i) - prim(IV3, k - 1, j, i)) /
                   (2.0 * coords.template Dxc<3>(k, j, i));
         if (!pdv_face) cons(idual, k, j, i) -= beta_dt * prim(IPR, k, j, i) * divv;
-        if (write_comp) comp_pack(b, 0, k, j, i) = -divv * beta_dt;
+        if (write_comp) {
+          if (shock_det > 0) {
+            // q = P (pjump) or P / rho^gk (kjump) of a neighbour
+            auto q = [&](const int kk, const int jj, const int ii) {
+              const Real pr = prim(IPR, kk, jj, ii);
+              return (shock_det == 1) ? pr : pr / Kokkos::pow(prim(IDN, kk, jj, ii), sgk);
+            };
+            auto ratio = [](const Real a, const Real c) { return Kokkos::fmax(a, c) / Kokkos::fmin(a, c); };
+            Real r = ratio(q(k, j, i + 1), q(k, j, i - 1));
+            if (ndim > 1) r = Kokkos::fmax(r, ratio(q(k, j + 1, i), q(k, j - 1, i)));
+            if (ndim > 2) r = Kokkos::fmax(r, ratio(q(k + 1, j, i), q(k - 1, j, i)));
+            bool shock = (divv < 0.0 && r > 1.0 + sjump);
+            if (shock && shock_det == 3) {
+              // velocity jump vs the largest speed scale among the neighbours (|v| and the sound speed)
+              Real vscale = 0.0, dvmax = 0.0;
+              auto spd = [&](const int kk, const int jj, const int ii) {
+                const Real v2 = SQR(prim(IV1, kk, jj, ii)) + SQR(prim(IV2, kk, jj, ii)) + SQR(prim(IV3, kk, jj, ii));
+                return Kokkos::sqrt(v2 + prim(IPR, kk, jj, ii) / prim(IDN, kk, jj, ii));
+              };
+              vscale = Kokkos::fmax(spd(k, j, i + 1), spd(k, j, i - 1));
+              dvmax = -(prim(IV1, k, j, i + 1) - prim(IV1, k, j, i - 1));
+              if (ndim > 1) {
+                vscale = Kokkos::fmax(vscale, Kokkos::fmax(spd(k, j + 1, i), spd(k, j - 1, i)));
+                dvmax = Kokkos::fmax(dvmax, -(prim(IV2, k, j + 1, i) - prim(IV2, k, j - 1, i)));
+              }
+              if (ndim > 2) {
+                vscale = Kokkos::fmax(vscale, Kokkos::fmax(spd(k + 1, j, i), spd(k - 1, j, i)));
+                dvmax = Kokkos::fmax(dvmax, -(prim(IV3, k + 1, j, i) - prim(IV3, k - 1, j, i)));
+              }
+              shock = dvmax > sdv * vscale;
+            }
+            comp_pack(b, 0, k, j, i) = shock ? 1.0 : 0.0;
+          } else {
+            comp_pack(b, 0, k, j, i) = -divv * beta_dt;
+          }
+        }
       });
   if (pdv_face) Hydro::DualEnergyPdVFace(md, beta_dt);
 }
@@ -712,6 +792,13 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     // ratio of diffusive to advective timescale of the divergence cleaning
     auto glmmhd_alpha = pin->GetOrAddReal("hydro", "glmmhd_alpha", 0.1);
     pkg->AddParam<Real>("glmmhd_alpha", glmmhd_alpha);
+    // hydro/glmmhd_damping (IM-F3): "lie" (default, per-stage multiply in DednerSource) or "midpoint" (second-order
+    // exponential integrator, GLMDampingExponential; VL2 only).
+    const auto glm_damp = pin->GetOrAddString("hydro", "glmmhd_damping", "lie");
+    PARTHENON_REQUIRE_THROWS(glm_damp == "lie" || glm_damp == "midpoint", "hydro/glmmhd_damping must be lie or midpoint");
+    PARTHENON_REQUIRE_THROWS(glm_damp == "lie" || pin->GetString("parthenon/time", "integrator") == "vl2",
+                             "hydro/glmmhd_damping = midpoint is written for the vl2 integrator");
+    pkg->AddParam<bool>("glmmhd_damping_midpoint", glm_damp == "midpoint");
     calc_c_h = true;
   } else {
     PARTHENON_FAIL("AthenaPK hydro: Unknown fluid method. This build supports "
@@ -724,6 +811,17 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   // Default false => the task is never added to the driver and the OFF state is bit-identical.
   const bool bflux_clamp = pin->GetOrAddBoolean("hydro", "boundary_flux_clamp", false);
   pkg->AddParam<>("boundary_flux_clamp", bflux_clamp);
+  pkg->AddParam<>("boundary_flux_clamp_wall",
+                  bflux_clamp && pin->GetOrAddBoolean("hydro", "boundary_flux_clamp_wall", false));
+  {
+    // hydro/diode_energy_consistent (IM-F2): see DiodeBC. Only the standard diode kernel implements it.
+    const bool dec = pin->GetOrAddBoolean("hydro", "diode_energy_consistent", false);
+    PARTHENON_REQUIRE_THROWS(!dec || (!pin->GetOrAddBoolean("hydro", "fused_bc", false) &&
+                                      !pin->GetOrAddBoolean("hydro", "fused_bc_mesh", false)),
+                             "hydro/diode_energy_consistent is implemented in the standard DiodeBC only "
+                             "(fused_bc / fused_bc_mesh must be false)");
+    pkg->AddParam<>("diode_energy_consistent", dec);
+  }
   if (bflux_clamp && parthenon::Globals::my_rank == 0) {
     std::cout << "## Boundary flux clamp ON (hydro/boundary_flux_clamp): inward mass/momentum/"
                  "energy/scalar fluxes on the physical domain faces are zeroed after the "
@@ -1536,6 +1634,13 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
           dual_energy ? pin->GetOrAddReal("hydro", "dual_energy_eta2", 0.0) : 0.0;
       const Real dual_kappa = pin->GetOrAddReal("hydro", "dual_energy_kappa", 3.0);
       const Real dual_shock = pin->GetOrAddReal("hydro", "dual_energy_shock_comp", 0.02);
+      const auto shock_det_s = pin->GetOrAddString("hydro", "dual_energy_shock_detector", "comp");
+      PARTHENON_REQUIRE_THROWS(shock_det_s == "comp" || shock_det_s == "pjump" || shock_det_s == "kjump" ||
+                                   shock_det_s == "kv",
+                               "hydro/dual_energy_shock_detector must be comp, pjump, kjump or kv");
+      PARTHENON_REQUIRE_THROWS(shock_det_s == "comp" || dual_eta2 > 0.0,
+                               "hydro/dual_energy_shock_detector != comp needs hydro/dual_energy_eta2 > 0 (it writes dual_comp)");
+      const int shock_det_i = (shock_det_s == "comp") ? 0 : (shock_det_s == "pjump") ? 1 : (shock_det_s == "kjump") ? 2 : 3;
       // F2 (2026-10-07): shock exemption also from the eta1 criterion (needs eta2 > 0: it reads dual_comp)
       const bool dual_shock_eta1 =
           dual_eta2 > 0.0 && pin->GetOrAddBoolean("hydro", "dual_energy_shock_eta1", false);
@@ -1547,6 +1652,11 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
                              floor_consistent, dual_unsigned, dual_exact, dual_eta2, dual_kappa,
                              dual_shock, dual_shock_eta1);
       pkg->AddParam<>("eos", eos);
+      // IM-F1 (read by DualEnergyPdV)
+      pkg->AddParam<>("dual_energy_shock_detector", shock_det_i);
+      pkg->AddParam<>("dual_energy_shock_jump", pin->GetOrAddReal("hydro", "dual_energy_shock_jump", 1.0));
+      pkg->AddParam<>("dual_energy_shock_gamma", pin->GetOrAddReal("hydro", "dual_energy_shock_gamma", 5.0 / 3.0));
+      pkg->AddParam<>("dual_energy_shock_dv", pin->GetOrAddReal("hydro", "dual_energy_shock_dv", 0.3));
       // Per-cycle [DTREPORT] line naming the binding dt constraint (see PreStepMeshUserWorkInLoop).
       pkg->AddParam<>("dt_report", pin->GetOrAddBoolean("hydro", "dt_report", false));
       // Per-cycle report of out-of-range EOS-table lookups (see PreStepMeshUserWorkInLoop).

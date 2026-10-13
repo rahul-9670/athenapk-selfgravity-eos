@@ -1,0 +1,87 @@
+<comment>
+problem = ideal_mhd I1 linear wave alfven 1D N=32
+
+<job>
+problem_id = linear_wave_mhd
+
+<problem/linear_wave>
+wave_flag = 1
+amp = 1.0e-6
+vflow = 0.0
+ang_2 = 0.0
+ang_3 = 0.0
+test = true
+compute_error = true
+
+<parthenon/mesh>
+refinement = none
+nghost = 2
+nx1 = 32
+x1min = 0
+x1max = 1
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 32
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 1.0   # periods (test = true)
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+riemann = hlld
+reconstruction = plm
+divergence_control = glm
+glmmhd_source = dedner_extended
+glmmhd_alpha = 0.1
+first_order_flux_correct = false
+vl2_predictor_recon = same
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+eos_floor_consistent = true
+lean_registers = true
+ghost_sync_rounds = 1
+eos = adiabatic
+gamma = 1.6666666666666667
+Tfloor = -1             # forced (S tier): ideal-gas Tfloor needs units + He fraction
+double_flux = false     # forced (S tier): double_flux needs eos = hydrogen
+eos_table_allow_no_radiation = true   # validation-only escape: dual energy without radiation (hydro.cpp:2195)
+boundary_flux_clamp = false   # periodic box: DE-F2 (clamp ignores the BC type)
+dual_energy = true
+dual_energy_eta1 = 5e-2
+dual_energy_eta2 = 0.1
+dual_energy_kappa = 3.0
+dual_energy_shock_comp = 0.02
+dual_energy_sync_step_end = true
+dual_energy_unsigned_prim = true
+dual_energy_exact_resync = true
+dual_energy_shared_select = true
+dual_comp_ghost = true
+dual_energy_heat_rkl2 = true
+dual_energy_heat_exact = true
+dual_energy_flux = density
+boundary_clamp_dual = true
+
+<physics>
+self_gravity = false
+radiation = false
+
+<parthenon/output0>
+file_type = hst
+dn = 10

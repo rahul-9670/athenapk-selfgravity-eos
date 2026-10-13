@@ -1,0 +1,7 @@
+I1/I1_1d_fast_N64 | I1/I1_1d_fast_N64.in | | 1
+I1/I1_1d_fast_N64_lb | I1/I1_1d_fast_N64_lb.in | | 1
+I1/I1_2d_alfven_N16 | I1/I1_2d_alfven_N16.in | | 1
+I1/I1_3d_slow_N8 | I1/I1_3d_slow_N8.in | | 1
+I5/I5_1d_a0_N128 | I5/I5_1d_a0_N128.in | | 1
+I5/I5_2d_prod_N64 | I5/I5_2d_prod_N64.in | | 1
+I5/I5b_2d_a0_N128_smr1 | I5/I5b_2d_a0_N128_smr1.in | | 1

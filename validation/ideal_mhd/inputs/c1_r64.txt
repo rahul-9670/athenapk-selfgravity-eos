@@ -1,0 +1,8 @@
+I4/I4_2d_prod_N256 | I4/I4_2d_prod_N256.in | | 32
+I6/noh_2d_prod_N256 | I6/noh_2d_prod_N256.in | | 64
+I6/noh_2d_nd_N256 | I6/noh_2d_nd_N256.in | | 64
+I6/noh_2d_dc_N256 | I6/noh_2d_dc_N256.in | | 64
+I6/noh_2d_prod_N512 | I6/noh_2d_prod_N512.in | | 64
+I6/noh_2d_nd_N512 | I6/noh_2d_nd_N512.in | | 64
+I6/noh_3d_prod_N128 | I6/noh_3d_prod_N128.in | | 64
+I6/noh_3d_nd_N128 | I6/noh_3d_nd_N128.in | | 64

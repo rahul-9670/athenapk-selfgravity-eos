@@ -1,0 +1,4 @@
+I1/I1_3d_fast_N128 | I1/I1_3d_fast_N128.in | | 64
+I1/I1_3d_alfven_N128 | I1/I1_3d_alfven_N128.in | | 64
+I1/I1_3d_slow_N128 | I1/I1_3d_slow_N128.in | | 64
+I1/I1_3d_entropy_N128 | I1/I1_3d_entropy_N128.in | | 64

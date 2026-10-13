@@ -33,6 +33,8 @@
 //                    div B != 0 blob in Bx (Dedner et al. 2002, JCP 175, 645, Sec. 5.1 shape):
 //                    Bx += bamp (r^8 - 2 r^4 + 1) for r = |x - x_c| / rb < 1. Nothing physical heats the gas,
 //                    so the thermal pressure must stay P0 while the cleaning removes the blob.
+//   mode = wave + wave_fast = true (2026-10-12, ideal_mhd I1c): the perpendicular FAST magnetosonic eigenmode in B0y
+//                    (cf^2 = cs^2 + B0y^2/rho0), same amplitude convention; exact solution after one period = IC.
 //   ALL modes: optional uniform field B0x/B0y/B0z (code units, Heaviside-Lorentz: P_mag = B^2/2), default 0.
 //   With mode = compress the eos_homologous ghosts carry the mean edge B (B_perp ~ rho stays uniform).
 //========================================================================================
@@ -91,6 +93,11 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
   const Real B0x = pin->GetOrAddReal(blk, "B0x", 0.0);
   const Real B0y = pin->GetOrAddReal(blk, "B0y", 0.0);
   const Real B0z = pin->GetOrAddReal(blk, "B0z", 0.0);
+  // mode = wave + wave_fast = true (validation/ideal_mhd I1c; default false = the acoustic mode,
+  // bit-identical): PERPENDICULAR fast magnetosonic eigenmode along x in the transverse field B0y (B0x must be 0):
+  // cf^2 = cs^2(table) + B0y^2/rho0 (HL), drho/rho0 = dv/cf = dBy/B0y = d, isentropic d(rho e) = h0 drho.
+  const bool wave_fast = (imode == 0) && pin->GetOrAddBoolean(blk, "wave_fast", false);
+  PARTHENON_REQUIRE_THROWS(!wave_fast || B0x == 0.0, "eos_test wave_fast: B0x must be 0 (perpendicular mode)");
   Real u0 = 0.0, v0y = 0.0, v0z = 0.0, vamp = 0.0, ksin = 0.0, bamp = 0.0, rb = 1.0;
   Real bxc = 0.0, byc = 0.0, bzc = 0.0;
   if (imode == 4 || imode == 5) u0 = pin->GetOrAddReal(blk, "u0", 0.0);
@@ -164,7 +171,7 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
           const Real cs2 = tab.Cs2of(rho0, esp0);
           const Real d = amp * std::sin(kw * (x - x1min));
           rho = rho0 * (1.0 + d);
-          v = std::sqrt(cs2) * d;
+          v = std::sqrt(wave_fast ? cs2 + B0y * B0y / rho0 : cs2) * d;
           // Isentropic perturbation to first order WITHOUT the P->e bisection (EspFromP resolves
           // e only to ~1.6e-5 at the default 20 bisections, far above amp = 1e-6):
           // d(rho esp) = (esp0 + P0/rho0) drho = h0 drho.
@@ -200,6 +207,8 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
           eint = tab.EintFromRhoTk(rho0, T0);
         }
         Real bx = B0x;
+        Real by = B0y;
+        if (wave_fast) by = B0y * (1.0 + amp * std::sin(kw * (x - x1min)));
         if (imode == 5) {
           const Real dy = (ndim > 1) ? coords.Xc<2>(j) - byc : 0.0;
           const Real dz = (ndim > 2) ? coords.Xc<3>(k) - bzc : 0.0;
@@ -211,9 +220,9 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
         u(IM2, k, j, i) = rho * vy;
         u(IM3, k, j, i) = rho * vz;
         u(IEN, k, j, i) = eint + 0.5 * rho * (v * v + vy * vy + vz * vz) +
-                          0.5 * (bx * bx + B0y * B0y + B0z * B0z);
+                          0.5 * (bx * bx + by * by + B0z * B0z);
         u(IB1, k, j, i) = bx;
-        u(IB2, k, j, i) = B0y;
+        u(IB2, k, j, i) = by;
         u(IB3, k, j, i) = B0z;
         u(IPS, k, j, i) = 0.0;
         if (idual >= 0) u(idual, k, j, i) = eint;

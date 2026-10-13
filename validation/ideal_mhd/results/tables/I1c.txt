@@ -1,0 +1,37 @@
+I1c tabulated-EOS waves (production keys), L1 error after one period relative to the wave amplitude
+  ac         N   16  rho 8.309e-02 (-)     vx 8.314e-02
+  ac         N   32  rho 5.863e-02 (0.50)  vx 5.744e-02
+  ac         N   64  rho 5.578e-02 (0.07)  vx 5.435e-02
+  ac         N  128  rho 5.585e-02 (-0.00)  vx 5.434e-02
+  ac         N  256  rho 5.608e-02 (-0.01)  vx 5.454e-02
+  ac         N  512  rho 5.619e-02 (-0.00)  vx 5.464e-02
+  ac_pr      N   64  rho 7.584e-03 (-)     vx 7.588e-03
+  ac_pr      N  128  rho 3.071e-03 (1.30)  vx 3.069e-03
+  ac_pr      N  256  rho 2.634e-03 (0.22)  vx 2.631e-03
+  ac_pr      N  512  rho 2.597e-03 (0.02)  vx 2.593e-03
+  fast       N   16  rho 7.878e-02 (-)     vx 7.943e-02  By 8.032e-02
+  fast       N   32  rho 3.295e-02 (1.26)  vx 3.278e-02  By 3.311e-02
+  fast       N   64  rho 2.818e-02 (0.23)  vx 2.784e-02  By 2.821e-02
+  fast       N  128  rho 2.772e-02 (0.02)  vx 2.736e-02  By 2.773e-02
+  fast       N  256  rho 2.775e-02 (-0.00)  vx 2.737e-02  By 2.775e-02
+  fast       N  512  rho 2.780e-02 (-0.00)  vx 2.742e-02  By 2.780e-02
+  fast_pr    N   64  rho 8.499e-03 (-)     vx 8.506e-03  By 8.509e-03
+  fast_pr    N  128  rho 1.970e-03 (2.11)  vx 1.970e-03  By 1.970e-03
+  fast_pr    N  256  rho 1.387e-03 (0.51)  vx 1.386e-03  By 1.387e-03
+  fast_pr    N  512  rho 1.306e-03 (0.09)  vx 1.305e-03  By 1.306e-03
+  fastlb     N   16  rho 8.381e-02 (-)     vx 8.539e-02  By 8.546e-02
+  fastlb     N   32  rho 3.358e-02 (1.32)  vx 3.372e-02  By 3.374e-02
+  fastlb     N   64  rho 8.589e-03 (1.97)  vx 8.595e-03  By 8.599e-03
+  fastlb     N  128  rho 1.808e-03 (2.25)  vx 1.808e-03  By 1.808e-03
+  fastlb     N  256  rho 1.203e-03 (0.59)  vx 1.203e-03  By 1.204e-03
+  fastlb     N  512  rho 1.114e-03 (0.11)  vx 1.113e-03  By 1.114e-03
+  fastlb_pr  N   64  rho 9.347e-03 (-)     vx 9.357e-03  By 9.358e-03
+  fastlb_pr  N  128  rho 2.354e-03 (1.99)  vx 2.355e-03  By 2.355e-03
+  fastlb_pr  N  256  rho 5.449e-04 (2.11)  vx 5.450e-04  By 5.450e-04
+  fastlb_pr  N  512  rho 9.941e-05 (2.45)  vx 9.941e-05  By 9.941e-05
+  fastlb_nd  N   16  rho 8.421e-02 (-)     vx 8.583e-02  By 8.586e-02
+  fastlb_nd  N   32  rho 3.373e-02 (1.32)  vx 3.388e-02  By 3.389e-02
+  fastlb_nd  N   64  rho 8.639e-03 (1.97)  vx 8.647e-03  By 8.650e-03
+  fastlb_nd  N  128  rho 1.809e-03 (2.26)  vx 1.810e-03  By 1.810e-03
+  fastlb_nd  N  256  rho 1.203e-03 (0.59)  vx 1.203e-03  By 1.203e-03
+  fastlb_nd  N  512  rho 1.114e-03 (0.11)  vx 1.113e-03  By 1.114e-03

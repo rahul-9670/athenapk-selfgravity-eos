@@ -1,0 +1,14 @@
+F/f1v_noh1d_P1e-2 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-2 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_noh1d_P1e-3 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-3 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_noh1d_P1e-4 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-4 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_noh1d_P1e-5 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-5 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_noh1d_P1e-6 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-6 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_noh1d_P1e-6_N2048 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048 | 1
+F/f1v_noh1d_P1e-6_N4096 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096 | 1
+F/f1v_noh1d_P1e-6_dv0.15 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv hydro/dual_energy_shock_dv=0.15 | 1
+F/f1v_noh1d_P1e-6_dv0.5 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv hydro/dual_energy_shock_dv=0.5 | 1
+F/f1v_D3_M3 | I6/D3_M3_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_D3_M10 | I6/D3_M10_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_D3_M30 | I6/D3_M30_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1vreg_D1b_M1000_N256_f1 | ../../dual_energy/inputs/D1b_M1000_N256.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 1
+F/f1v_noh_3d_N64 | I6/noh_3d_prod_N64.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kv | 8

@@ -1,0 +1,62 @@
+F/keyoff_I7_BW_diode | I7/I7_BW_diode.in |  | 1
+F/keyoff_I5_2d_prod_N128 | I5/I5_2d_prod_N128.in |  | 1
+F/keyoff_noh_1d_prod_N1024 | I6/noh_1d_prod_N1024.in |  | 1
+F/keyoff_I1_1d_fast_N64 | I1/I1_1d_fast_N64.in |  | 1
+F/glm_I5_1d_lam10_N512 | I5/I5_1d_lam10_N512.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_1d_lam10_N512_cfl0.15 | I5/I5_1d_lam10_N512_cfl0.15.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_1d_lam10_N512_cfl0.075 | I5/I5_1d_lam10_N512_cfl0.075.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_1d_lam10_N64 | I5/I5_1d_lam10_N64.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_1d_lam10_N128 | I5/I5_1d_lam10_N128.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_1d_lam10_N256 | I5/I5_1d_lam10_N256.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_1d_lam10_N1024 | I5/I5_1d_lam10_N1024.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_lam10_N512 | I5/I5_2d_lam10_N512.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_lam10_N512_cfl0.15 | I5/I5_2d_lam10_N512_cfl0.15.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_lam10_N512_cfl0.075 | I5/I5_2d_lam10_N512_cfl0.075.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_lam10_N64 | I5/I5_2d_lam10_N64.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_lam10_N128 | I5/I5_2d_lam10_N128.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_lam10_N256 | I5/I5_2d_lam10_N256.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_prod_N64 | I5/I5_2d_prod_N64.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_prod_N128 | I5/I5_2d_prod_N128.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_prod_N256 | I5/I5_2d_prod_N256.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5_2d_prod_N512 | I5/I5_2d_prod_N512.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5c_2d_prod_N64_patch0 | I5/I5c_2d_prod_N64_patch0.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5c_2d_prod_N64_patch1 | I5/I5c_2d_prod_N64_patch1.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5c_2d_prod_N64_patch2 | I5/I5c_2d_prod_N64_patch2.in | hydro/glmmhd_damping=midpoint | 1
+F/glm_I5c_2d_prod_N64_patch3 | I5/I5c_2d_prod_N64_patch3.in | hydro/glmmhd_damping=midpoint | 1
+F/f1_noh1d_P1e-2 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-2 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_noh1d_P1e-3 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-3 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_noh1d_P1e-4 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-4 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_noh1d_P1e-5 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-5 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_noh1d_P1e-6 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-6 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_noh1d_P1e-6_N2048 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048 | 1
+F/f1_noh1d_P1e-6_N4096 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096 | 1
+F/f1_noh1d_P1e-6_pj0.5 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=0.5 | 1
+F/f1_noh1d_P1e-6_pj2.0 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=2.0 | 1
+F/f1only_pjump_noh1d_P1e-6 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_D3_M3 | I6/D3_M3_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_D3_M10 | I6/D3_M10_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1_D3_M30 | I6/D3_M30_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f1reg_D1b_M1000_N256_prod | ../../dual_energy/inputs/D1b_M1000_N256.in | hydro/vl2_predictor_recon=same | 1
+F/f1reg_D1b_M1000_N256_f1 | ../../dual_energy/inputs/D1b_M1000_N256.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 1
+F/f2_I7_BW | I7/I7_BW_diode.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/f2_I7_RJ2a_div | I7/I7_RJ2a_div_diode.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/f2_I7_divb_a0 | I7/I7_divb_a0_diode.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/f2_I7_divb_prod | I7/I7_divb_prod_diode.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/wall_u0.0_By0.0_legacy | F/wall_u0.0_By0.0.in |  | 1
+F/wall_u0.0_By0.0_f2 | F/wall_u0.0_By0.0.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/wall_u0.0_By0.0_wallonly | F/wall_u0.0_By0.0.in | hydro/boundary_flux_clamp_wall=true | 1
+F/wall_u0.0_By1.0_legacy | F/wall_u0.0_By1.0.in |  | 1
+F/wall_u0.0_By1.0_f2 | F/wall_u0.0_By1.0.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/wall_u0.0_By1.0_wallonly | F/wall_u0.0_By1.0.in | hydro/boundary_flux_clamp_wall=true | 1
+F/wall_u0.01_By0.0_legacy | F/wall_u0.01_By0.0.in |  | 1
+F/wall_u0.01_By0.0_f2 | F/wall_u0.01_By0.0.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/wall_u0.01_By0.0_wallonly | F/wall_u0.01_By0.0.in | hydro/boundary_flux_clamp_wall=true | 1
+F/wall_u0.01_By1.0_legacy | F/wall_u0.01_By1.0.in |  | 1
+F/wall_u0.01_By1.0_f2 | F/wall_u0.01_By1.0.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/wall_u0.01_By1.0_wallonly | F/wall_u0.01_By1.0.in | hydro/boundary_flux_clamp_wall=true | 1
+F/wall_u0.1_By0.0_legacy | F/wall_u0.1_By0.0.in |  | 1
+F/wall_u0.1_By0.0_f2 | F/wall_u0.1_By0.0.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/wall_u0.1_By0.0_wallonly | F/wall_u0.1_By0.0.in | hydro/boundary_flux_clamp_wall=true | 1
+F/wall_u0.1_By1.0_legacy | F/wall_u0.1_By1.0.in |  | 1
+F/wall_u0.1_By1.0_f2 | F/wall_u0.1_By1.0.in | hydro/boundary_flux_clamp_wall=true hydro/diode_energy_consistent=true | 1
+F/wall_u0.1_By1.0_wallonly | F/wall_u0.1_By1.0.in | hydro/boundary_flux_clamp_wall=true | 1

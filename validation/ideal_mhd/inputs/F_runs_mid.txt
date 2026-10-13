@@ -1,0 +1,3 @@
+F/glm_I4_2d_prod_N128 | I4/I4_2d_prod_N128.in | hydro/glmmhd_damping=midpoint | 8
+F/glm_I4_3d_prod_N64 | I4/I4_3d_prod_N64.in | hydro/glmmhd_damping=midpoint | 16
+F/f1_noh_3d_N64 | I6/noh_3d_prod_N64.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_pjump=1.0 | 8

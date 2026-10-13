@@ -1,0 +1,1 @@
+I1/verify_dualsw_1d_fast_N64_lb | I1/I1_1d_fast_N64_lb.in | parthenon/output2/file_type=hdf5 parthenon/output2/variables=dual_switched,prim parthenon/output2/dt=0.25 | 1

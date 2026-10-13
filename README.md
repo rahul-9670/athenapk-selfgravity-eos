@@ -1,7 +1,7 @@
 # AthenaPK with self-gravity, a tabulated protostellar EOS, dual energy, radiation transport and non-ideal MHD
 
 A modified copy of [AthenaPK](https://github.com/parthenon-hpc-lab/athenapk) (Parthenon + Kokkos, CPU and GPU) that
-contains five validated additions:
+contains six validated additions:
 
 * **Self-gravity** (`src/self_gravity/`): multigrid-preconditioned BiCGSTAB Poisson solver over the AMR hierarchy,
   multipole (monopole + quadrupole) isolated boundary conditions, Jeans swindle for periodic boxes, flux-weighted
@@ -29,10 +29,17 @@ contains five validated additions:
   face average (`eta_face_harmonic`), and the Joule / ambipolar heat handed to the dual energy (`hydro/dual_energy_heat_rkl2`,
   `hydro/dual_energy_heat_exact`). Hall, thermal conduction and viscosity are not included. Report:
   [`validation/nonideal_mhd/NONIDEAL_MHD_VALIDATION.md`](validation/nonideal_mhd/NONIDEAL_MHD_VALIDATION.md).
+* **Ideal-MHD validation and fixes** (HLLD + PLM + VL2, GLM/Dedner cleaning, diode + clamp boundaries): linear waves,
+  circularly polarised Alfven wave, MHD Riemann problems against a new exact solver, field loop, GLM telegraph test, Noh,
+  boundary tests; three fixes as default-off keys: `hydro/dual_energy_shock_eta1` + `hydro/dual_energy_shock_detector =
+  kv` (dual energy under-heated strong shocks), `hydro/boundary_flux_clamp_wall` + `hydro/diode_energy_consistent` (the
+  boundary clamp removed the outside pressure), `hydro/glmmhd_damping = midpoint` (second-order psi damping). Report:
+  [`validation/ideal_mhd/IDEAL_MHD_VALIDATION.md`](validation/ideal_mhd/IDEAL_MHD_VALIDATION.md).
 
 Problem generators: `collapse_be` (magnetized Bonnor-Ebert sphere collapse, barotropic or with radiation) and the
 validation problems `poisson_test`, `grav_analytic`, `jeans_wave`, `grav_slab`, `polytrope`, `profile1d`, `eos_test`,
-`fofc_scalar`, `rad_pulse`, `rad_shock`, `diffusion` (non-ideal MHD tests).
+`fofc_scalar`, `rad_pulse`, `rad_shock`, `diffusion` (non-ideal MHD tests), `linear_wave_mhd`, `cpaw`, `field_loop`,
+`ideal_mhd` (ideal-MHD tests).
 Fluid: `glmmhd` only. With `eos = hydrogen`, `collapse_be`'s barotropic step prescribes the temperature,
 T = T0 sqrt(1 + (rho/rhocrit)^(2(gamma-1))), and takes the internal energy from the table at that temperature
 (with `eos = adiabatic` it is the usual ideal-gas barotropic energy). The dual energy is not wired into that
@@ -58,7 +65,8 @@ the dust and gas opacity).
 The validation reports were produced with a larger private research code from which this tree was extracted. The
 extraction was checked against the validated binary on 47 paired runs: identical up to compiler FMA contraction (every
 rerun leg bitwise identical when both are compiled with `-ffp-contract=off`); details in either report, Sec. 2.2. The
-dual-energy, radiation and non-ideal MHD ports were checked the same way (their reports, Sec. 2.2).
+dual-energy, radiation and non-ideal MHD ports were checked the same way (their reports, Sec. 2.2), the ideal-MHD port
+in its report, Sec. 2.4.
 
 ## Licence
 BSD 3-Clause (`LICENSE`, AthenaPK/Parthenon); the self-gravity package derives from Artemis (`LICENSE-ARTEMIS.md`).

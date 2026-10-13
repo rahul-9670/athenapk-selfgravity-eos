@@ -1,0 +1,9 @@
+I6c/D3_M3_N1024_same_dualon | I6/D3_M3_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy=true | 1
+I6c/D3_M3_N1024_same_dualoff | I6/D3_M3_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy=false | 1
+I6c/D3_M3_N1024_same_shocketa1 | I6/D3_M3_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true | 1
+I6c/D3_M10_N1024_same_dualon | I6/D3_M10_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy=true | 1
+I6c/D3_M10_N1024_same_dualoff | I6/D3_M10_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy=false | 1
+I6c/D3_M10_N1024_same_shocketa1 | I6/D3_M10_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true | 1
+I6c/D3_M30_N1024_same_dualon | I6/D3_M30_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy=true | 1
+I6c/D3_M30_N1024_same_dualoff | I6/D3_M30_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy=false | 1
+I6c/D3_M30_N1024_same_shocketa1 | I6/D3_M30_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true | 1

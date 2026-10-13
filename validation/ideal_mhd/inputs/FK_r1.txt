@@ -1,0 +1,14 @@
+F/f1k_noh1d_P1e-2 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-2 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_noh1d_P1e-3 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-3 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_noh1d_P1e-4 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-4 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_noh1d_P1e-5 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-5 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_noh1d_P1e-6 | I6/noh_1d_prod_N1024.in | problem/ideal_mhd/P0=1e-6 hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_noh1d_P1e-6_N2048 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump parthenon/mesh/nx1=2048 parthenon/meshblock/nx1=2048 | 1
+F/f1k_noh1d_P1e-6_N4096 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump parthenon/mesh/nx1=4096 parthenon/meshblock/nx1=4096 | 1
+F/f1k_noh1d_P1e-6_j0.3 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump hydro/dual_energy_shock_jump=0.3 | 1
+F/f1k_noh1d_P1e-6_j3.0 | I6/noh_1d_prod_N1024.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump hydro/dual_energy_shock_jump=3.0 | 1
+F/f1k_D3_M3 | I6/D3_M3_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_D3_M10 | I6/D3_M10_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_D3_M30 | I6/D3_M30_N1024.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1kreg_D1b_M1000_N256_f1 | ../../dual_energy/inputs/D1b_M1000_N256.in | hydro/vl2_predictor_recon=same hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 1
+F/f1k_noh_3d_N64 | I6/noh_3d_prod_N64.in | hydro/dual_energy_shock_eta1=true hydro/dual_energy_shock_detector=kjump | 8

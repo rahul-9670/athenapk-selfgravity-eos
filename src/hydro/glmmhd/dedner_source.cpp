@@ -50,7 +50,10 @@ void DednerSource(MeshData<Real> *md, const Real beta_dt) {
   // (L0 mean 1.5e-04). The global-mindx choice over-damps psi where the mesh is coarse, which
   // is the safe direction. Mesh-wide the worst cell is 2.5e-02 and the volume mean 1.5e-04 --
   // good for a cell-centred GLM scheme. Undocumented choice, not a defect.
-  const auto coeff = std::exp(-alpha * c_h * beta_dt / mindx);
+  // hydro/glmmhd_damping = midpoint: the damping is done by GLMDampingExponential after the stage update instead
+  // (coeff = 1 here); default "lie" = the per-stage multiply below, unchanged.
+  const bool lie = !hydro_pkg->Param<bool>("glmmhd_damping_midpoint");
+  const auto coeff = lie ? std::exp(-alpha * c_h * beta_dt / mindx) : 1.0;
 
   // EOS E-F3 (fixed 2026-10-07, validation_tests/dual_energy): in 1D the x2-derivatives read j+-1, which do not
   // exist (segfault); j_offset = 0 there makes them exactly zero, as k_offset does for x3 in 2D. 3D: unchanged.
@@ -97,6 +100,40 @@ void DednerSource(MeshData<Real> *md, const Real beta_dt) {
         cons_pack(b, IPS, k, j, i) *= coeff;
       });
 }
+TaskStatus GLMDampingExponential(MeshData<Real> *md0, MeshData<Real> *md1, const int stage, const Real dt) {
+  // Lie (legacy): psi_s = (psi_0 + beta dt f) exp(-lambda beta dt) -- the flux increment f is damped over the whole
+  // stage although it acts at its middle: first order in dt (I5: the error halves with cfl at fixed lambda).
+  // Exponential integrator, with psi_pre = psi after the stage's flux update and psi_0 the step-start value
+  // (so psi_pre - psi_0 = beta dt f):
+  //   stage 1 (h = dt/2, exponential Euler):      psi_1 = psi_0 e^{-lambda h}  + (psi_pre - psi_0) phi1(lambda h)
+  //   stage 2 (dt, f at the midpoint state U_1): psi_2 = psi_0 e^{-lambda dt} + (psi_pre - psi_0) e^{-lambda dt/2}
+  // phi1(z) = (1 - e^{-z})/z. Stage 2 is the exponential midpoint rule: second order, and exact for f = 0.
+  auto hydro_pkg = md0->GetBlockData(0)->GetBlockPointer()->packages.Get("Hydro");
+  const Real lam = hydro_pkg->Param<Real>("glmmhd_alpha") * hydro_pkg->Param<Real>("c_h") /
+                   hydro_pkg->Param<Real>("mindx");
+  Real a0, a1;
+  if (stage == 1) {
+    const Real z = lam * 0.5 * dt;
+    a0 = std::exp(-z);
+    a1 = (z > 1e-8) ? -std::expm1(-z) / z : 1.0 - 0.5 * z;
+  } else {
+    a0 = std::exp(-lam * dt);
+    a1 = std::exp(-0.5 * lam * dt);
+  }
+  auto u0 = md0->PackVariables(std::vector<std::string>{"cons"});
+  auto u1 = md1->PackVariables(std::vector<std::string>{"cons"});
+  IndexRange ib = md0->GetBlockData(0)->GetBoundsI(IndexDomain::interior);
+  IndexRange jb = md0->GetBlockData(0)->GetBoundsJ(IndexDomain::interior);
+  IndexRange kb = md0->GetBlockData(0)->GetBoundsK(IndexDomain::interior);
+  parthenon::par_for(
+      DEFAULT_LOOP_PATTERN, "GLMDampingExponential", parthenon::DevExecSpace(), 0, u0.GetDim(5) - 1, kb.s, kb.e,
+      jb.s, jb.e, ib.s, ib.e, KOKKOS_LAMBDA(const int b, const int k, const int j, const int i) {
+        const Real p0 = u1(b, IPS, k, j, i);
+        u0(b, IPS, k, j, i) = p0 * a0 + (u0(b, IPS, k, j, i) - p0) * a1;
+      });
+  return TaskStatus::complete;
+}
+
 template void DednerSource<true>(MeshData<Real> *md, const Real beta_dt);
 template void DednerSource<false>(MeshData<Real> *md, const Real beta_dt);
 

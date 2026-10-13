@@ -1,0 +1,30 @@
+I7/I7_BW_diodewall | I7/I7_BW_diode.in | hydro/boundary_flux_clamp_wall=true | 1
+I7/I7_RJ2a_div_diodewall | I7/I7_RJ2a_div_diode.in | hydro/boundary_flux_clamp_wall=true | 1
+I7/I7_divb_a0_diodewall | I7/I7_divb_a0_diode.in | hydro/boundary_flux_clamp_wall=true | 1
+I7/I7_divb_prod_diodewall | I7/I7_divb_prod_diode.in | hydro/boundary_flux_clamp_wall=true | 1
+I7/I7_BW_diode_keyoff | I7/I7_BW_diode.in | | 1
+I7/I7_divb_a0_diode_keyoff | I7/I7_divb_a0_diode.in | | 1
+I1c/I1c_ac_N16 | I1c/I1c_ac_N16.in | | 1
+I1c/I1c_ac_N32 | I1c/I1c_ac_N32.in | | 1
+I1c/I1c_ac_N64 | I1c/I1c_ac_N64.in | | 1
+I1c/I1c_ac_N128 | I1c/I1c_ac_N128.in | | 1
+I1c/I1c_ac_N256 | I1c/I1c_ac_N256.in | | 1
+I1c/I1c_ac_N512 | I1c/I1c_ac_N512.in | | 1
+I1c/I1c_fast_N16 | I1c/I1c_fast_N16.in | | 1
+I1c/I1c_fast_N32 | I1c/I1c_fast_N32.in | | 1
+I1c/I1c_fast_N64 | I1c/I1c_fast_N64.in | | 1
+I1c/I1c_fast_N128 | I1c/I1c_fast_N128.in | | 1
+I1c/I1c_fast_N256 | I1c/I1c_fast_N256.in | | 1
+I1c/I1c_fast_N512 | I1c/I1c_fast_N512.in | | 1
+I1c/I1c_fastlb_N16 | I1c/I1c_fastlb_N16.in | | 1
+I1c/I1c_fastlb_N32 | I1c/I1c_fastlb_N32.in | | 1
+I1c/I1c_fastlb_N64 | I1c/I1c_fastlb_N64.in | | 1
+I1c/I1c_fastlb_N128 | I1c/I1c_fastlb_N128.in | | 1
+I1c/I1c_fastlb_N256 | I1c/I1c_fastlb_N256.in | | 1
+I1c/I1c_fastlb_N512 | I1c/I1c_fastlb_N512.in | | 1
+I1c/I1c_fastlb_nd_N16 | I1c/I1c_fastlb_nd_N16.in | | 1
+I1c/I1c_fastlb_nd_N32 | I1c/I1c_fastlb_nd_N32.in | | 1
+I1c/I1c_fastlb_nd_N64 | I1c/I1c_fastlb_nd_N64.in | | 1
+I1c/I1c_fastlb_nd_N128 | I1c/I1c_fastlb_nd_N128.in | | 1
+I1c/I1c_fastlb_nd_N256 | I1c/I1c_fastlb_nd_N256.in | | 1
+I1c/I1c_fastlb_nd_N512 | I1c/I1c_fastlb_nd_N512.in | | 1

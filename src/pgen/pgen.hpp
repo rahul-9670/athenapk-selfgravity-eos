@@ -79,4 +79,28 @@ namespace fofc_scalar {
 void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
 } // namespace fofc_scalar
 
+// Ideal-MHD validation suite (validation/ideal_mhd): linear MHD waves, circularly polarized Alfven wave, field
+// loop advection, and shock tubes / Noh / div B tests (ideal_mhd).
+namespace linear_wave_mhd {
+using namespace parthenon::driver::prelude;
+void InitUserMeshData(Mesh *mesh, ParameterInput *pin);
+void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin);
+void UserWorkAfterLoop(Mesh *mesh, parthenon::ParameterInput *pin, parthenon::SimTime &tm);
+void ProblemInitPackageData(ParameterInput *pin, parthenon::StateDescriptor *pkg);
+} // namespace linear_wave_mhd
+namespace cpaw {
+using namespace parthenon::driver::prelude;
+void InitUserMeshData(Mesh *mesh, ParameterInput *pin);
+void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin);
+void UserWorkAfterLoop(Mesh *mesh, parthenon::ParameterInput *pin, parthenon::SimTime &tm);
+} // namespace cpaw
+namespace field_loop {
+using namespace parthenon::driver::prelude;
+void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin);
+void ProblemInitPackageData(ParameterInput *pin, parthenon::StateDescriptor *pkg);
+} // namespace field_loop
+namespace ideal_mhd {
+void ProblemGenerator(parthenon::MeshBlock *pmb, parthenon::ParameterInput *pin);
+} // namespace ideal_mhd
+
 #endif // PGEN_PGEN_HPP_

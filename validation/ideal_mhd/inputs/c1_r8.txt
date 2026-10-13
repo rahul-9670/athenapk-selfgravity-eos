@@ -1,0 +1,16 @@
+I1/I1_2d_fast_N128 | I1/I1_2d_fast_N128.in | | 8
+I1/I1_2d_alfven_N128 | I1/I1_2d_alfven_N128.in | | 8
+I1/I1_2d_slow_N128 | I1/I1_2d_slow_N128.in | | 8
+I1/I1_2d_entropy_N128 | I1/I1_2d_entropy_N128.in | | 8
+I3/I3_RJ2a_N16384 | I3/I3_RJ2a_N16384.in | | 8
+I3/I3_RJ2a_div_N16384 | I3/I3_RJ2a_div_N16384.in | | 8
+I3/I3_BW_N16384 | I3/I3_BW_N16384.in | | 8
+I4/I4_2d_prod_N128 | I4/I4_2d_prod_N128.in | | 8
+I4/I4_2d_a0_N128 | I4/I4_2d_a0_N128.in | | 8
+I4/I4_2d_a04_N128 | I4/I4_2d_a04_N128.in | | 8
+I4/I4_2d_drat10_N128 | I4/I4_2d_drat10_N128.in | | 8
+I6/noh_2d_prod_N64 | I6/noh_2d_prod_N64.in | | 4
+I6/noh_2d_nd_N64 | I6/noh_2d_nd_N64.in | | 4
+I6/noh_3d_prod_N64 | I6/noh_3d_prod_N64.in | | 8
+I6/noh_3d_nd_N64 | I6/noh_3d_nd_N64.in | | 8
+I6/noh_3d_dc_N64 | I6/noh_3d_dc_N64.in | | 8

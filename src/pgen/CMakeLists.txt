@@ -9,6 +9,7 @@
 #   grav_analytic, jeans_wave, grav_slab, polytrope, profile1d   self-gravity validation suite
 #   eos_test      tabulated-EOS validation suite (waves, Riemann problems, compression, slabs)
 #   diffusion     non-ideal MHD validation suite (Ohmic + ambipolar)
+#   linear_wave_mhd, cpaw, field_loop, ideal_mhd   ideal-MHD validation suite
 target_sources(athenaPK PRIVATE
     collapse_be.cpp
     poisson_test.cpp
@@ -22,4 +23,8 @@ target_sources(athenaPK PRIVATE
     profile1d.cpp
     eos_test.cpp
     diffusion.cpp
+    linear_wave_mhd.cpp
+    cpaw.cpp
+    field_loop.cpp
+    ideal_mhd.cpp
     )

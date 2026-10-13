@@ -711,6 +711,10 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
     // Add non-operator split source terms (cooling, MHD, problem-defined).
     auto source_unsplit = tl.AddTask(after_update, AddUnsplitSources, mu0.get(), tm,
                                      integrator->beta[stage - 1] * integrator->dt);
+    // hydro/glmmhd_damping = midpoint (IM-F3): second-order psi damping from the step-start state in "u1".
+    if (hydro_pkg->AllParams().hasKey("glmmhd_damping_midpoint") && hydro_pkg->Param<bool>("glmmhd_damping_midpoint"))
+      source_unsplit = tl.AddTask(source_unsplit, GLMMHD::GLMDampingExponential, mu0.get(), mu1.get(), stage,
+                                  integrator->dt);
     // BE collapse barotropic cooling (only active if problem_id = collapse_be)
     auto after_cooling = source_unsplit;
     {
