@@ -18,6 +18,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <memory>
 #include <vector>
 
 #include "Kokkos_Core.hpp"
@@ -37,8 +38,14 @@ struct EosTable {
   // exists. Deliberately a plain std::vector and not a Kokkos View: it is touched only by
   // host setup code, and keeping Kokkos out of it means nvcc never has to reason about a
   // HostSpace array inside a __host__ __device__ function.
-  std::vector<Real> espT_h_;
-  std::vector<Real> logT_h_;   // host mirror of the (rho, esp) -> log10 T[K] grid
+  //
+  // SHARED, not owned: every KOKKOS_LAMBDA that captures an EosTable (or the AdiabaticGLMMHDEOS holding one) copies it
+  // by value on the host at EVERY launch. As std::vector members the two mirrors (5.8 MB each for the rho26 table) were
+  // deep-copied each time -- the EosTable copy constructor was the hottest host symbol (CPU: 10-23x slower steps on
+  // tabulated-EOS problems). A shared_ptr makes the copy a reference-count increment; the device never touches these
+  // members. Results are bit-identical.
+  std::shared_ptr<std::vector<Real>> espT_h_;
+  std::shared_ptr<std::vector<Real>> logT_h_;   // host mirror of the (rho, esp) -> log10 T[K] grid
   Real lr0_ = 0.0, dlr_ = 1.0, le0_ = 0.0, dle_ = 1.0, lT0_ = 0.0, dlT_ = 1.0;
   int nr_ = 0, ne_ = 0, nT_ = 0;
   // Fixed bisection count of EspFromP (hydro/eos_bisections, audit P-13). 20 over the v5_cold
@@ -466,9 +473,9 @@ struct EosTable {
   //! Throws rather than returning garbage if the table was never loaded, because both
   //! callers are setup code where a silent zero would poison the initial condition.
   Real EintFromRhoTkHost(Real rho, Real Tk) const {
-    if (espT_h_.empty())
+    if (!espT_h_ || espT_h_->empty())
       throw std::runtime_error("EosTable::EintFromRhoTkHost called before Load()");
-    return bilin_host(espT_h_, nr_, nT_, lr0_, dlr_, lT0_, dlT_, std::log10(rho),
+    return bilin_host(*espT_h_, nr_, nT_, lr0_, dlr_, lT0_, dlT_, std::log10(rho),
                       std::log10(Tk)) *
            rho;
   }
@@ -477,10 +484,10 @@ struct EosTable {
   //! For problem generators, which run on HOST mirrors of the conserved variables and so
   //! cannot call the device lookup.
   Real TemperatureKHost(Real rho, Real eint) const {
-    if (logT_h_.empty())
+    if (!logT_h_ || logT_h_->empty())
       throw std::runtime_error("EosTable::TemperatureKHost called before Load()");
     const Real esp = eint / rho;
-    return std::pow(10.0, bilin_host(logT_h_, nr_, ne_, lr0_, dlr_, le0_, dle_,
+    return std::pow(10.0, bilin_host(*logT_h_, nr_, ne_, lr0_, dlr_, le0_, dle_,
                                      std::log10(rho), std::log10(esp)));
   }
 
@@ -489,10 +496,10 @@ struct EosTable {
   //! Throws rather than returning garbage if the table was never loaded, because both
   //! callers are setup code where a silent zero would poison the initial condition.
   Real EintFromRhoTkHost(Real rho, Real Tk) const {
-    if (espT_h_.empty())
+    if (!espT_h_ || espT_h_->empty())
       throw std::runtime_error("EosTable::EintFromRhoTkHost called before Load()");
     const bool lowT = extrapolate_ && Tk < T_min_; // same continuation as EintFromRhoTk
-    return bilin_host(espT_h_, nr_, nT_, lr0_, dlr_, lT0_, dlT_, std::log10(rho),
+    return bilin_host(*espT_h_, nr_, nT_, lr0_, dlr_, lT0_, dlT_, std::log10(rho),
                       lowT ? lT0_ : std::log10(Tk)) *
            (lowT ? rho * (Tk / T_min_) : rho);
   }
@@ -501,11 +508,11 @@ struct EosTable {
   //! For problem generators, which run on HOST mirrors of the conserved variables and so
   //! cannot call the device lookup.
   Real TemperatureKHost(Real rho, Real eint) const {
-    if (logT_h_.empty())
+    if (!logT_h_ || logT_h_->empty())
       throw std::runtime_error("EosTable::TemperatureKHost called before Load()");
     const Real esp = eint / rho;
     const bool lowe = extrapolate_ && esp < esp_min_; // same continuation as LogTof
-    return std::pow(10.0, bilin_host(logT_h_, nr_, ne_, lr0_, dlr_, le0_, dle_,
+    return std::pow(10.0, bilin_host(*logT_h_, nr_, ne_, lr0_, dlr_, le0_, dle_,
                                      std::log10(rho), lowe ? le0_ : std::log10(esp)) +
                               (lowe ? std::log10(esp / esp_min_) : 0.0));
   }
@@ -581,18 +588,20 @@ struct EosTable {
     {
       auto hm = Kokkos::create_mirror_view(espT_);
       Kokkos::deep_copy(hm, espT_);
-      espT_h_.resize(static_cast<size_t>(nr_) * nT_);
+      auto v = std::make_shared<std::vector<Real>>(static_cast<size_t>(nr_) * nT_);
       for (int i = 0; i < nr_; ++i)
         for (int j = 0; j < nT_; ++j)
-          espT_h_[static_cast<size_t>(i) * nT_ + j] = hm(i, j);
+          (*v)[static_cast<size_t>(i) * nT_ + j] = hm(i, j);
+      espT_h_ = v;
     }
     {
       auto hm = Kokkos::create_mirror_view(logT_);
       Kokkos::deep_copy(hm, logT_);
-      logT_h_.resize(static_cast<size_t>(nr_) * ne_);
+      auto v = std::make_shared<std::vector<Real>>(static_cast<size_t>(nr_) * ne_);
       for (int i = 0; i < nr_; ++i)
         for (int j = 0; j < ne_; ++j)
-          logT_h_[static_cast<size_t>(i) * ne_ + j] = hm(i, j);
+          (*v)[static_cast<size_t>(i) * ne_ + j] = hm(i, j);
+      logT_h_ = v;
     }
     // Out-of-range clamp tally (see the note on bilin). Allocated ONLY here, so every
     // default-constructed EosTable keeps a null View and the kernels skip the atomic.

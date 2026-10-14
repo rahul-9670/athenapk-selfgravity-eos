@@ -642,6 +642,17 @@ regimes, converging at order ~0.6. LimO3 reduces the error 3-9x without fixing t
 validated in 1D/2D/3D, on CPU and GPU and, with the sensor-gated EOS-consistent fill, on statically and adaptively
 refined meshes (Sec. 6.5-6.6).
 
+**E-F11 — every step deep-copied the table's host mirrors (performance; FIXED 2026-10-14, results bit-identical).**
+Found during the port check of the dust module (`../dust/DUST_VALIDATION.md` Sec. 2.3): this repository's builds ran
+tabulated-EOS problems 10-23x slower per step than the research code although every result was bitwise identical.
+Stack samples (gdb) put half of the time in the `EOSTable::EosTable` / `AdiabaticGLMMHDEOS` copy constructors: every
+`KOKKOS_LAMBDA` that captures the EOS object copies it by value on the host at each launch, and the table's two host
+mirrors (`espT_h_`, `logT_h_`, 5.8 MB each for the rho26 table, read only by the setup-time host lookups) were
+`std::vector` members, i.e. deep-copied each time. The research code had made them `std::shared_ptr` on 2026-10-09;
+that change had not reached this repository. Now ported (`src/eos/eos_table.hpp`): one CPU core, `-ffp-contract=off`,
+the dust module's D3a one-zone compression 29.4 s -> 1.34 s (research code 1.27 s), the ideal-MHD module's I1c acoustic
+wave (N 128) 13.6 s -> 1.02 s (research code 1.09 s). Check: results bit-identical -- the 47 regression runs vs the dust commit (as built), and with `-ffp-contract=off` the 422 ideal-MHD and 118 + 4 dust runs of those modules' port checks vs the research code; the host mirrors are read only at setup, so no kernel changes (`results/tables/PORT_check_EF11_2026-10-14.txt`).
+
 ## 11. Defaults in this code
 
 | item | status |
