@@ -1,0 +1,1586 @@
+# Port check of the dust module into this repository (2026-10-13/14); DUST_VALIDATION.md Sec. 2.3.
+# Columns: run | max|new-ref|/max|ref| and sum|new-ref|/sum|ref| over all dumps and float fields (worst field) | dumps | history | rc ref/new
+
+## 1. Dust off: this repository (9e996267, default flags) vs the ideal-MHD commit b07e7bd (d9671240), the 47 regression runs
+D12_jeans_nJ0.5_n32                              maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+D12_jeans_nJ1.5_n32                              maxN 0.0e+00 L1 0.0e+00                  dumps 12 hst 0.0e+00 rc 0/0
+D4_slab_n32                                      maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+D7_freefall_n64                                  maxN 0.0e+00 L1 0.0e+00                  dumps 38 hst 0.0e+00 rc 0/0
+DA1_be_ic_deep_static                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E10_probe_control_fcfalse                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_control_fctrue                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_negative_fcfalse                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_negative_fctrue                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_subedge_fcfalse                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E10_probe_subedge_fctrue                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+E6_wave_S1_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S2_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S3_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S4_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E6_wave_S5_n128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_n400                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_n400_dflux                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_over_rho_n400                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R1_molecular_p_over_rho_n400_dflux           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_n400                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_n400_dflux                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_over_rho_n400              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R2_dissociation_p_over_rho_n400_dflux        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_n400                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_n400_dflux                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_over_rho_n400              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R3_dissoc_shock_p_over_rho_n400_dflux        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_n400                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_n400_dflux                   maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_over_rho_n400                maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7e_R4_ionization_p_over_rho_n400_dflux          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7q_slab111_3d_n64_mb16_dflux                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7q_slab11_2d_n128_mb32_dflux                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E7r_R4_mov_1d_amr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_R4_mov_1d_amr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_R4_mov_1d_smr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_R4_mov_1d_smr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_amr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_amr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_smr_dflux                          maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7r_slab11_2d_smr_std                            maxN 0.0e+00 L1 0.0e+00                  dumps 9  rc 0/0
+E7x_wave_S3_smr_n64_dflux                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+E8_leg2                                          maxN 0.0e+00 L1 0.0e+00                  dumps 61  rc 0/0
+L10_hennebelle_mu5_c300                          maxN 0.0e+00 L1 0.0e+00                  dumps 33 hst 0.0e+00 rc 0/0
+L6_be_xi6.45_f1_c200                             maxN 0.0e+00 L1 0.0e+00                  dumps 15 hst 0.0e+00 rc 0/0
+S1_sinusoid_n64                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+TOTAL 47 BITWISE-fields 47
+
+## 2a. Dust on, this commit's build (838f8489) vs the research code's validation branch (17c5f35b), both -ffp-contract=off: the 58 of 118 sampled runs completed before the check was moved to the next commit's build
+srun: job 3011457 queued and waiting for resources
+srun: job 3011457 has been allocated resources
+runs/D1/D1_r10_T300_one                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_pref05                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_res                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_sub                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_sub025                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_sub05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_one                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_pref05                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_res                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_sub                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_sub025                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_sub05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_one                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_pref05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_res                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_sub                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_sub025                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_sub05                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_one                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_pref05                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_res                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_sub                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_sub025                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_sub05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_one                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_pref05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_res                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_sub                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_sub025                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_sub05                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D10/cpu_D5_M10_N1024_dT+0                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_filt                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_hold1                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_hold2                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_tau                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D3/D3a_frz                                  maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D3/D3a_prod                                 maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D3/D3b_frz                                  maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D3/D3b_prod                                 maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D4/D4a_1d_N1024                             FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4a_1d_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4a_1d_N256                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4a_1d_N512                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4a_1d_N64                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4a_2d_N128                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4afrz_1d_N1024                          FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4afrz_1d_N256                           FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4afrz_1d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4b_1d_N1024                             FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4b_1d_N128                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4b_1d_N256                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4b_1d_N512                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4b_1d_N64                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_1d_N1024                             FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4c_1d_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_1d_N256                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4c_1d_N512                              FILESET                                  dumps 0 0 rc 0/?
+runs/D4/D4c_1d_N64                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_2d_N128                              FILESET                                  dumps 0 0 rc 1/?
+runs/D4/D4cprod_1d_N256                          FILESET                                  dumps 0 0 rc 0/?
+runs/D5/D5_M10_N1024_dT+0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT+100                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT+200                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT-100                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT-200                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N256_dT+0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N4096_dT+0                        FILESET                                  dumps 0 0 rc 0/?
+runs/D5/D5_M30_N1024_dT+0                        FILESET                                  dumps 0 0 rc 0/?
+runs/D5/D5_M30_N1024_dT+100                      FILESET                                  dumps 0 0 rc 0/?
+runs/D5/D5_M30_N1024_dT+200                      FILESET                                  dumps 0 0 rc 0/?
+runs/D5/D5_M30_N1024_dT-100                      FILESET                                  dumps 0 0 rc 0/?
+runs/D5/D5_M30_N1024_dT-200                      FILESET                                  dumps 0 0 rc 0/?
+runs/D5/D5_M30_N256_dT+0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N4096_dT+0                        FILESET                                  dumps 0 0 rc 0/?
+runs/D7/D7_frz                                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D7/D7_noclamp                               maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D7/D7_prod                                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N1024_filt                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N1024_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N1024_hold0                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N1024_hold1                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N1024_hold2                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N1024_tau                          FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N256_filt                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_filthold2                     maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_hold0                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N256_hold1                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N256_hold2                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N256_tau                           FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N256_trace                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N4096_filt                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N4096_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N4096_hold0                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N4096_hold1                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N4096_hold2                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M10_N4096_tau                          FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N1024_filt                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N1024_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N1024_hold0                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N1024_hold1                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N1024_hold2                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N1024_tau                          FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N256_filt                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N256_filthold2                     FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N256_hold0                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N256_hold1                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N256_hold2                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N256_tau                           FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N4096_filt                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N4096_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N4096_hold0                        FILESET                                  dumps 0 0 rc ?/?
+runs/F/F2_M30_N4096_hold1                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N4096_hold2                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F2_M30_N4096_tau                          FILESET                                  dumps 0 0 rc ?/?
+runs/F/F4c_1d_N1024_filt                         FILESET                                  dumps 0 0 rc 0/?
+runs/F/F4c_1d_N256_filt                          FILESET                                  dumps 0 0 rc 0/?
+runs/F/F5_D3a_semenov_frz                        FILESET                                  dumps 0 0 rc 0/?
+runs/F/F5_D3a_semenov_prod                       FILESET                                  dumps 0 0 rc 0/?
+TOTAL 118 BITWISE-fields 58
+
+## 2b. Dust on, all 118 sampled runs (every run-list line with <= 64 ranks and <= 3000 core-s originally), built with the following commit (EOS host-mirror speed fix, a4bc361d; bitwise to this commit on the 47 regression runs) vs 17c5f35b
+runs/D1/D1_r10_T300_one                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_pref05                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_res                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_sub                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_sub025                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r10_T300_sub05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_one                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_pref05                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_res                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_sub                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_sub025                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r11_T150_sub05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_one                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_pref05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_res                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_sub                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_sub025                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r13_T30_sub05                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_one                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_pref05                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_res                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_sub                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_sub025                       maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r8_T1200_sub05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_one                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_pref05                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_res                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_sub                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_sub025                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D1/D1_r9_T600_sub05                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/D10/cpu_D5_M10_N1024_dT+0                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_filt                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_hold1                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_hold2                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D10/cpu_F2_M10_N1024_tau                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D3/D3a_frz                                  maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D3/D3a_prod                                 maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D3/D3b_frz                                  maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D3/D3b_prod                                 maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/D4/D4a_1d_N1024                             maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4a_1d_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4a_1d_N256                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4a_1d_N512                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4a_1d_N64                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4a_2d_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4afrz_1d_N1024                          maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4afrz_1d_N256                           maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4afrz_1d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4b_1d_N1024                             maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4b_1d_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4b_1d_N256                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4b_1d_N512                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4b_1d_N64                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_1d_N1024                             maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_1d_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_1d_N256                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_1d_N512                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_1d_N64                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4c_2d_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D4/D4cprod_1d_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT+0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT+100                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT+200                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT-100                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N1024_dT-200                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N256_dT+0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M10_N4096_dT+0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N1024_dT+0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N1024_dT+100                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N1024_dT+200                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N1024_dT-100                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N1024_dT-200                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N256_dT+0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D5/D5_M30_N4096_dT+0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D7/D7_frz                                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D7/D7_noclamp                               maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/D7/D7_prod                                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N1024_filt                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N1024_filthold2                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N1024_hold0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N1024_hold1                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N1024_hold2                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N1024_tau                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_filt                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_filthold2                     maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_hold0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_hold1                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_hold2                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_tau                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N256_trace                         maxN 0.0e+00 L1 0.0e+00                  dumps 928 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N4096_filt                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N4096_filthold2                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N4096_hold0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N4096_hold1                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N4096_hold2                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M10_N4096_tau                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N1024_filt                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N1024_filthold2                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N1024_hold0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N1024_hold1                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N1024_hold2                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N1024_tau                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N256_filt                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N256_filthold2                     maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N256_hold0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N256_hold1                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N256_hold2                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N256_tau                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N4096_filt                         maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N4096_filthold2                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N4096_hold0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N4096_hold1                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N4096_hold2                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F2_M30_N4096_tau                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/F4c_1d_N1024_filt                         maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/F/F4c_1d_N256_filt                          maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/F/F5_D3a_semenov_frz                        maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/F/F5_D3a_semenov_prod                       maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+TOTAL 118 BITWISE-fields 118
+
+## 2c. Dust on, D6 (2D AMR, 16 ranks; above the sample's cost cut), a4bc361d vs 17c5f35b
+srun: job 3011786 queued and waiting for resources
+srun: job 3011786 has been allocated resources
+runs/D6/D6a_amr                                  maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D6/D6a_uni256                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D6/D6c_amr                                  maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/D6/D6c_uni256                               maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+TOTAL 4 BITWISE-fields 4
+
+## 3. Ideal-MHD runs (422, as in ../ideal_mhd/ Sec. 2.4) with this commit's build (838f8489) vs 17c5f35b
+runs/F/c7_glm_I5_2d_lam10_N512                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/c7_wall_u0.1_By1.0_f2                     maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/dbg_f1k_3d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/F/dbg_prod_3d_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 11 hst 0.0e+00 rc 0/0
+runs/F/f1_D3_M10                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1_D3_M3                                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1_D3_M30                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-2                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-3                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-4                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-5                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_N2048                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_N4096                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_pj0.5                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh1d_P1e-6_pj2.0                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1_noh_3d_N64                             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_D3_M10                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1k_D3_M3                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1k_D3_M30                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-2                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-3                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-4                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-5                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_N2048                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_N4096                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_j0.3                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh1d_P1e-6_j3.0                      maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1k_noh_3d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1kreg_D1b_M1000_N256_f1                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1only_pjump_noh1d_P1e-6                  maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1reg_D1b_M1000_N256_f1                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1reg_D1b_M1000_N256_prod                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_D3_M10                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_D3_M3                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_D3_M30                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-2                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-3                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-4                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-5                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_N2048                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_N4096                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_dv0.15                    maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh1d_P1e-6_dv0.5                     maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1v_noh_3d_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/f1vreg_D1b_M1000_N256_f1                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f2_I7_BW                                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f2_I7_RJ2a_div                            maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/f2_I7_divb_a0                             maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/F/f2_I7_divb_prod                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/F/glm_I4_2d_prod_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N1024                     maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N128                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N256                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N512                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N512_cfl0.075             maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N512_cfl0.15              maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_1d_lam10_N64                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N128                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N256                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N512                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N512_cfl0.15              maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_lam10_N64                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N256                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N512                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5_2d_prod_N64                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch0                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch1                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch2                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/glm_I5c_2d_prod_N64_patch3                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/keyoff_I1_1d_fast_N64                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/F/keyoff_I5_2d_prod_N128                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/F/keyoff_I7_BW_diode                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/F/keyoff_noh_1d_prod_N1024                  maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/F/wall_u0.01_By0.0_f2                       maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By0.0_legacy                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By0.0_wallonly                 maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By1.0_f2                       maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By1.0_legacy                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.01_By1.0_wallonly                 maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By0.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By0.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By0.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By1.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By1.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.0_By1.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By0.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By0.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By0.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By1.0_f2                        maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By1.0_legacy                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/F/wall_u0.1_By1.0_wallonly                  maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/I1/I1_1d_alfven_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N128_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N128_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N16                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N16_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N16_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N256                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N256_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N256_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N32_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N32_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N512                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N512_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N512_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N64                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N64_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_alfven_N64_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N128_lb                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N128_lb_nd                 maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N16                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N16_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N16_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N256                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N256_lb                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N256_lb_nd                 maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N32                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N32_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N32_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N512                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N512_lb                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N512_lb_nd                 maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N64                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N64_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_entropy_N64_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N128_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N256_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N512_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_fast_N64_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N128_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N256_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512_dc                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N512_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64_dc                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_1d_slow_N64_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N16                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N64                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_alfven_N8                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N128                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N16                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N32                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N64                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_entropy_N8                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_fast_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_2d_slow_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N16                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N16_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N16_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N32_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N32_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N8                          maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N8_lb                       maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_alfven_N8_lb_nd                    maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N16                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N16_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N16_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N32                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N32_lb                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N32_lb_nd                  maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N8                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N8_lb                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_entropy_N8_lb_nd                   maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N8_lb                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_fast_N8_lb_nd                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N16_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N16_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N32_lb                        maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N32_lb_nd                     maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N8_lb                         maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/I1_3d_slow_N8_lb_nd                      maxN 0.0e+00 L1 0.0e+00                  dumps 0 hst 0.0e+00 rc 0/0
+runs/I1/verify_dualsw_1d_fast_N64_lb             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I1c/I1c_ac_N128                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N128_pr                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N16                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N256                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N256_pr                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N32                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N512                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N512_pr                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N64                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_ac_N64_pr                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N128_pr                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N16                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N256                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N256_pr                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N32                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N512                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N512_pr                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fast_N64_pr                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N128_pr                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N16                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N256_pr                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N32                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N512_pr                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_N64_pr                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N128                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N16                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N256                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N32                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N512                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I1c/I1c_fastlb_nd_N64                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I2/I2_2d_left_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_long16_N32                         maxN 0.0e+00 L1 0.0e+00                  dumps 17 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N16                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N32                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_stand_N8                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_2d_trav_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_3d_trav_N16                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_3d_trav_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I2/I2_3d_trav_N8                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/I3/I3_BW_N1024                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N128                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N16384                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N2048                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N256                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N4096                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_BW_N512                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N1024                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N128                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N2048                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N256                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N4096                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_N512                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N1024                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N2048                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N4096                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I3/I3_RJ2a_div_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/I4/I4_2d_a04_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_a0_N128                            maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_drat10_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_prod_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_prod_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_2d_prod_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I4/I4_3d_prod_N32                           maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N1024                           maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N128                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N256                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N512                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_a0_N64                             maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N1024                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N512_cfl0.075                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N512_cfl0.15                 maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_lam10_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N1024                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_1d_prod_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N128                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N256                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N512                            maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_a0_N64                             maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N512_cfl0.15                 maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_lam10_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5_2d_prod_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_a0_N128_smr1                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_a0_N128_smr2                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_prod_N128_smr1                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5b_2d_prod_N128_smr2                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch0                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch1                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch2                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I5/I5c_2d_prod_N64_patch3                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_dc_dualfalse                maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_dc_dualtrue                 maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_same_dualfalse              maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N1024_same_dualtrue               maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N4096_dc_dualfalse                maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M10_N4096_same_dualfalse              maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_dc_dualfalse                maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_dc_dualtrue                 maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_same_dualfalse              maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/X2_M30_N1024_same_dualtrue               maxN 0.0e+00 L1 0.0e+00                  dumps 27 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_dc_N1024                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N1024                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N2048                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N256                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_nd_N512                           maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N1024                        maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N2048                        maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_1d_prod_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_2d_nd_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_2d_prod_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_dc_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_nd_N32                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_nd_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_prod_N32                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6/noh_3d_prod_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-2_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-2_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-3_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-3_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-4_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-4_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-5_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-5_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_dualfalse                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_dualtrue                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_eta1_0.01                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_eta1_0.02                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_eta2off                     maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_noresync                    maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_shocketa1                   maxN 0.0e+00 L1 0.0e+00                  dumps 8 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_shocketa1_N2048             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6b/noh1d_P1e-6_shocketa1_N4096             maxN 0.0e+00 L1 0.0e+00                  dumps 4 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M10_N1024_same_dualoff               maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M10_N1024_same_dualon                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M10_N1024_same_shocketa1             maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M30_N1024_same_dualoff               maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M30_N1024_same_dualon                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M30_N1024_same_shocketa1             maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M3_N1024_same_dualoff                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M3_N1024_same_dualon                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I6c/D3_M3_N1024_same_shocketa1              maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_diode                              maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_diode_keyoff                       maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_diodewall                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_outfl                              maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_BW_ref                                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_diode                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_diodewall                    maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_outfl                        maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_RJ2a_div_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/I7/I7_divb_a0_diode                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_diode_keyoff                  maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_diodewall                     maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_outfl                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_a0_ref                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_diode                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_diodewall                   maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_outfl                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/I7/I7_divb_prod_ref                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+TOTAL 422 BITWISE-fields 422
+
+## 4. Diffusion on: the 164 runs of the non-ideal port check with 838f8489 vs 17c5f35b
+A10/A10L_rkl2_N512                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10L_rkl2_N512_nd                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_rkl2_N128                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_rkl2_N128_nd                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_rkl2_N256                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_rkl2_N256_nd                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_unsplit_N128                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_unsplit_N128_nd                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_unsplit_N256                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A10/A10_unsplit_N256_nd                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A1_rkl2_N128                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A1_rkl2_N256                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A1_rkl2_N64                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A1_unsplit_N128                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A1_unsplit_N256                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A1_unsplit_N64                              maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_aligned_rkl2_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_aligned_rkl2_N256                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_aligned_rkl2_N64                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_aligned_unsplit_N128                     maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_aligned_unsplit_N256                     maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_aligned_unsplit_N64                      maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_oblique_rkl2_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_oblique_rkl2_N256                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_oblique_rkl2_N64                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_oblique_unsplit_N128                     maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_oblique_unsplit_N256                     maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A1A3/A3_oblique_unsplit_N64                      maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ad_rkl2_N16                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ad_rkl2_N32                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ad_unsplit_N16                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ad_unsplit_N32                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ohm_rkl2_N16                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ohm_rkl2_N32                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ohm_unsplit_N16                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A4/A4_ohm_unsplit_N32                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000H_N128                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000H_N256                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000H_N512                        maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000H_N64                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl21000_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl2100_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl2100_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl2100_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_rkl2100_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplitH_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplitH_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplitH_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplitH_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplit_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplit_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplit_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c100_unsplit_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000H_N128                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000H_N256                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000H_N512                         maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000H_N64                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl21000_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl2100_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl2100_N256                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl2100_N512                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_rkl2100_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplitH_N128                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplitH_N256                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplitH_N512                          maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplitH_N64                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplit_N128                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplit_N256                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplit_N512                           maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A5/A5_c10_unsplit_N64                            maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl21000H_N128                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl21000H_N256                             maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl21000_N128                              maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl21000_N256                              maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl21000nofreeze_N128                      maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl21000nofreeze_N256                      maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl2100_N128                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_rkl2100_N256                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_unsplit_N128                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A6/A6_unsplit_N256                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1000_m1                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1000_m16                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1000_m24                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1000_m31                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1000_m4                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1000_m8                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r100_m1                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r100_m16                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r100_m24                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r100_m31                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r100_m4                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r100_m8                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r10_m1                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r10_m16                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r10_m24                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r10_m31                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r10_m4                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r10_m8                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1_m1                                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1_m16                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1_m24                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1_m31                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1_m4                                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r1_m8                                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r300_m1                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r300_m16                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r300_m24                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r300_m31                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r300_m4                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r300_m8                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r500_m1                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r500_m16                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r500_m24                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r500_m31                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r500_m4                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ad_r500_m8                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1000_m1                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1000_m16                              maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1000_m24                              maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1000_m31                              maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1000_m4                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1000_m8                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r100_m1                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r100_m16                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r100_m24                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r100_m31                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r100_m4                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r100_m8                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r10_m1                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r10_m16                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r10_m24                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r10_m31                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r10_m4                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r10_m8                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1_m1                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1_m16                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1_m24                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1_m31                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1_m4                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r1_m8                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r300_m1                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r300_m16                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r300_m24                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r300_m31                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r300_m4                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r300_m8                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r500_m1                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r500_m16                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r500_m24                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r500_m31                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r500_m4                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A7/A7_ohm_r500_m8                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A9/A9_rkl2_N128                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A9/A9_rkl2_N256                                  maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A9/A9_rkl2_N64                                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A9/A9_unsplit_N128                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A9/A9_unsplit_N256                               maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+A9/A9_unsplit_N64                                maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+TOTAL 164 BITWISE-fields 164
+
+## 5. Radiation on: the 605 runs of the radiation port check with 838f8489 vs 17c5f35b (the 10 rc 134 legs stop identically on both sides, as in that check)
+srun: job 3011476 queued and waiting for resources
+srun: job 3011476 has been allocated resources
+runs/R0/FLECK/orig/arm_a0.0_N1024                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N128                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N16                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N256                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N32                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N4                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N512                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N64                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.0_N8                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N1                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N1024                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N128                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N16                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N2                   maxN 0.0e+00 L1 0.0e+00                  dumps 3 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N256                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N32                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N4                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N512                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N64                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a0.5_N8                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N1                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N1024                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N128                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N16                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N2                   maxN 0.0e+00 L1 0.0e+00                  dumps 3 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N256                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N32                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N4                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N512                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N64                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/orig/arm_a1.0_N8                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N1024                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N128                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N16                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N256                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N32                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N4                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N512                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N64                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.0_N8                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N1                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N1024                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N128                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N16                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N2                   maxN 0.0e+00 L1 0.0e+00                  dumps 3 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N256                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N32                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N4                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N512                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N64                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a0.5_N8                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N1                   maxN 0.0e+00 L1 0.0e+00                  dumps 2 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N1024                maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N128                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N16                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N2                   maxN 0.0e+00 L1 0.0e+00                  dumps 3 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N256                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N32                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N4                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N512                 maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N64                  maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/FLECK/prod/arm_a1.0_N8                   maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/G10/orig/arm_ks0                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G10/orig/arm_ks2                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G10/prod/arm_ks0                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G10/prod/arm_ks2                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G11/orig/arm_alpha0                      maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R0/G11/orig/arm_alpha1                      maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R0/G11/prod/arm_alpha0                      maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R0/G11/prod/arm_alpha1                      maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R0/G8/orig/arm_noabs                        maxN 0.0e+00 L1 0.0e+00                  dumps 6 hst 0.0e+00 rc 0/0
+runs/R0/G8/orig/arm_planck                       maxN 0.0e+00 L1 0.0e+00                  dumps 6 hst 0.0e+00 rc 0/0
+runs/R0/G8/orig/arm_t2                           maxN 0.0e+00 L1 0.0e+00                  dumps 6 hst 0.0e+00 rc 0/0
+runs/R0/G8/prod/arm_noabs                        maxN 0.0e+00 L1 0.0e+00                  dumps 6 hst 0.0e+00 rc 0/0
+runs/R0/G8/prod/arm_planck                       maxN 0.0e+00 L1 0.0e+00                  dumps 6 hst 0.0e+00 rc 0/0
+runs/R0/G8/prod/arm_t2                           maxN 0.0e+00 L1 0.0e+00                  dumps 6 hst 0.0e+00 rc 0/0
+runs/R0/G9/orig/arm_creduc1                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G9/orig/arm_creduc1_tol12                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G9/orig/arm_creduc4                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G9/prod/arm_creduc1                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G9/prod/arm_creduc1_tol12                maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/G9/prod/arm_creduc4                      maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/K1/prod/arm_kry0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/prod/arm_kry1                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/prod/arm_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/prod/arm_tight                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/sou/arm_kry0                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/sou/arm_kry1                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/sou/arm_ref                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/sou/arm_tight                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/step/arm_kry0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/step/arm_kry1                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/step/arm_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K1/step/arm_tight                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/prod/arm_kry0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/prod/arm_kry1                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/prod/arm_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/prod/arm_tight                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/sou/arm_kry0                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/sou/arm_kry1                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/sou/arm_ref                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/sou/arm_tight                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/step/arm_kry0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/step/arm_kry1                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/step/arm_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K3/step/arm_tight                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K4/orig/f_sou1_tau0p2                    maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/orig/f_sou1_tau0p5                    maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/orig/f_sou1_tau1                      maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/orig/f_step_tau0p2                    maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/orig/f_step_tau0p5                    maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/orig/f_step_tau1                      maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/prod/f_sou1_tau0p2                    maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/prod/f_sou1_tau0p5                    maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K4/prod/f_sou1_tau1                      maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R0/K5/prod/arm_kry0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/prod/arm_kry1                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/prod/arm_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/prod/arm_tight                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/sou/arm_kry0                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/sou/arm_kry1                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/sou/arm_ref                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/sou/arm_tight                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/step/arm_kry0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/step/arm_kry1                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/step/arm_ref                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/K5/step/arm_tight                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R0/RAY/orig/arm_z4p8                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/RAY/orig/arm_z4p8sou                     maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/RAY/orig/arm_z8p16                       maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R0/SEAM/prod/arm_coarse                     maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/SEAM/sou/arm_coarse                      maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/SEAM/step/arm_coarse                     maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R0/SEAM/step/arm_fine                       maxN 0.0e+00 L1 0.0e+00                  dumps 5 hst 0.0e+00 rc 0/0
+runs/R1/g100r30_c0_a1.0_k0                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g100r30_c0_a1.0_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g100r30_c0_a1.0_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c0_a1.0_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c0_a1.0_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c0_a1.0_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c0_a1.0_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c1_a1.0_k0                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g100r30_c1_a1.0_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g100r30_c1_a1.0_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c1_a1.0_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c1_a1.0_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c1_a1.0_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c1_a1.0_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a0.5_k0                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g100r30_c2_a0.5_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g100r30_c2_a0.5_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a0.5_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a0.5_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a0.5_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a0.5_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a1.0_k0                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g100r30_c2_a1.0_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g100r30_c2_a1.0_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a1.0_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a1.0_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a1.0_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_c2_a1.0_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_tab_a1.0_k0                      maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g100r30_tab_a1.0_k1                      maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g100r30_tab_a1.0_k2                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_tab_a1.0_k3                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_tab_a1.0_k4                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_tab_a1.0_k5                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g100r30_tab_a1.0_k6                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c0_a1.0_k0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g15r10_c0_a1.0_k1                        maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g15r10_c0_a1.0_k2                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c0_a1.0_k3                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c0_a1.0_k4                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c0_a1.0_k5                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c0_a1.0_k6                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c1_a1.0_k0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g15r10_c1_a1.0_k1                        maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g15r10_c1_a1.0_k2                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c1_a1.0_k3                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c1_a1.0_k4                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c1_a1.0_k5                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c1_a1.0_k6                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c2_a1.0_k0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g15r10_c2_a1.0_k1                        maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g15r10_c2_a1.0_k2                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c2_a1.0_k3                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c2_a1.0_k4                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c2_a1.0_k5                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_c2_a1.0_k6                        maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_tab_a1.0_k0                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g15r10_tab_a1.0_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g15r10_tab_a1.0_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_tab_a1.0_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_tab_a1.0_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_tab_a1.0_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g15r10_tab_a1.0_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c0_a1.0_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g30r100_c0_a1.0_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c0_a1.0_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c0_a1.0_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c0_a1.0_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c0_a1.0_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c1_a1.0_k0                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g30r100_c1_a1.0_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g30r100_c1_a1.0_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c1_a1.0_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c1_a1.0_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c1_a1.0_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c1_a1.0_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c2_a1.0_k0                       maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g30r100_c2_a1.0_k1                       maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g30r100_c2_a1.0_k2                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c2_a1.0_k3                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c2_a1.0_k4                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c2_a1.0_k5                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_c2_a1.0_k6                       maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_tab_a1.0_k0                      maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1/g30r100_tab_a1.0_k1                      maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/R1/g30r100_tab_a1.0_k2                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_tab_a1.0_k3                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_tab_a1.0_k4                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_tab_a1.0_k5                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R1/g30r100_tab_a1.0_k6                      maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/R13/E4_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E4_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E4_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E5_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E5_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E5_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E6_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E6_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E6_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E8_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E8_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/E8_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/G1_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/G1_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/G1_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/P3_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/P3_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/P3_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/W6_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/W6_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/W6_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X5_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X5_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X5_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X6_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X6_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X6b_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X6b_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X6b_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X7_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X7_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X7_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X8_T1000                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X8_T150                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13/X8_T300                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/E6_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/E6_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/G1_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/G1_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/P3_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/P3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/X6_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/X6_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/X7_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/X7_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/X8_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R13d/X8_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R1A/v12_precond0                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R1A/v13_maxit3                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R1A/v14_maxit4                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R1A/v5_tol1e-10                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R1A/v6_richardson                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R1A/v7_step                                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R1A/v9_8ranks_4blk                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/R2/ang816_m                                 maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/ang816_p                                 maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/base_m                                   maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/base_p                                   maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/dt2_m                                    maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/dt2_p                                    maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/dz2_m                                    maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/dz2_p                                    maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/step_m                                   maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/step_p                                   maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/tol10_m                                  maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R2/tol10_p                                  maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/R3/S4_sou                                   maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/R3/S4_sou_hr                                maxN 0.0e+00 L1 0.0e+00                  dumps 8  rc 0/0
+runs/R3/S4_step                                  maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/R3/S4_step_hr                               maxN 0.0e+00 L1 0.0e+00                  dumps 8  rc 0/0
+runs/R4A/a05_nodual                              maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4A/a05_noross                              maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4A/a05_ref                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4A/a05_tol12                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4A/a075_ref                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4A/a10_ref                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4B/d7_dual                                 maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4B/d7_nocouple                             maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4B/d7_norad                                maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4B/d7_ref                                  maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4B/d7_tol12                                maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4C/d7_dual                                 maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4C/d7_floorevery                           maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4C/d7_ref                                  maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4C/d7_tol12                                maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4D/d7_dthalf                               maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4D/d7_nx16                                 maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4D/d7_tol10                                maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4E/d7_off                                  maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4E/d7_on                                   maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4E/d7_on_dual                              maxN 0.0e+00 L1 0.0e+00                  dumps 21 hst 0.0e+00 rc 0/0
+runs/R4E/r1_a05_on                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4E/r1_a10_off                              maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R4E/r1_a10_on                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_E3_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_E3_T1000_to                            maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_E3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_E4_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_E8_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_G1_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_L3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_L4_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_L6_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/a_P3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_G1_T1000_dt2                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_G1_T1000_prod                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_G1_T1000_prodstep                    maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_G1_T1000_step                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_P3_T1000_dt2                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 134/134
+runs/R5/bis_P3_T1000_nofc                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_P3_T1000_nolim                       maxN 0.0e+00 L1 0.0e+00                  dumps 1  rc 134/134
+runs/R5/bis_P3_T1000_noloc                       maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 134/134
+runs/R5/bis_P3_T1000_prod                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_P3_T1000_prodstep                    maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/bis_P3_T1000_step                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_E3_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_E3_T1000_to                            maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_E3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_E4_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_E4_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_E8_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_G1_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_G1_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_L3_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_L3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_L4_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_L4_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_L6_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_P3_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/c_P3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/eq_g24_P3_T300                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/pc_G1_T1000                              maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/pc_G1_T300                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/pc_P3_T1000                              maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/pc_P3_T1000_nolim                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/pc_P3_T1000_prod                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/pc_P3_T300                               maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R5/pc_P3_T300_off                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R6/cpu/G9                                   maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/R6/cpu/K4                                   maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/R6/cpu/R1                                   maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R6/cpu/R5                                   maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R6/cpu/R8a                                  maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R6/cpu/S1                                   maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/R6/cpu/S3                                   maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/R8/plane_o16x32_dt2e-03_sou                 maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o16x32_dt2e-03_step                maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o16x32_dt5e-04_sou                 maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o16x32_dt5e-04_step                maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o4x8_dt2e-03_sou                   maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o4x8_dt2e-03_step                  maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o4x8_dt5e-04_sou                   maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o4x8_dt5e-04_step                  maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o8x16_dt2e-03_sou                  maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o8x16_dt2e-03_step                 maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o8x16_dt5e-04_sou                  maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/plane_o8x16_dt5e-04_step                 maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/R8/shock_M2                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R8/shock_M2_step                            maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R8/shock_M3                                 maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/R8/shock_M3_step                            maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF10/G9/prod/arm_creduc1                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/RF10/G9/prod/arm_creduc1_tol12              maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/RF10/G9/prod/arm_creduc4                    maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/RF10/K4/prod/f_sou1_tau0p2                  maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/RF10/K4/prod/f_sou1_tau0p5                  maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/RF10/K4/prod/f_sou1_tau1                    maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/RF10/R2/base_m                              maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/RF10/R2/base_p                              maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/RF10/R2/dz2_m                               maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/RF10/R2/dz2_p                               maxN 0.0e+00 L1 0.0e+00                  dumps 101  rc 0/0
+runs/RF10/R3/S1_sou                              maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/RF10/R3/S1_sou_hr                           maxN 0.0e+00 L1 0.0e+00                  dumps 8  rc 0/0
+runs/RF10/R3/S2_sou                              maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/RF10/R3/S3_sou                              maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/RF10/R3/S4_sou                              maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/RF10/R3/S4_sou_hr                           maxN 0.0e+00 L1 0.0e+00                  dumps 8  rc 0/0
+runs/RF10/R3/S4_vop                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF11g/cpu_E6_T150                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF11g/cpu_P3_T300                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF12g/P3_T1000_gd                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF12g/P3_T1000_sou                          maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF12g/P3_T150_gd                            maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF12g/P3_T150_sou                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF12g/P3_T300_gd                            maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF12g/P3_T300_sou                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF12h/P3_T1000_sou                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T1000_w0.0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T1000_w0.3                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T1000_w0.5                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T1000_w1.0                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T300_sou                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T300_w0.0                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T300_w0.3                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T300_w0.5                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12h/P3_T300_w1.0                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_both_w0.0                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_both_w0.0_to                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_both_w1.0                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_lt0_w0.0                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_lt0_w1.0                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_nolim_w0.0                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_nolim_w0.0_to                   maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_nolim_w1.0                      maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_rhsnorm_w0.0                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_rhsnorm_w0.0_to                 maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12i/T1000_rhsnorm_w1.0                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12j/T1000_dump                            maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12j/T1000_dump2                           maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12k/T1000_dbg                             maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12l/T1000_mg12                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12l/T1000_mg8                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12l/T1000_r10                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12l/T1000_r12                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12l/T300_mg12                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12l/T300_mg8                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12l/T300_r10                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12l/T300_r12                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12m/T1000_cmp3                            maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12n/k1                                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12n/k1_nodsa                              maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12n/k2                                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12n/k2_nodsa                              maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12n/k5                                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12n/k5_nodsa                              maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12o/k10                                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12o/k20                                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12o/k34                                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12o/k60                                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12p/k1                                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12p/k10                                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12p/k20                                   maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12q/G1_dsafalse                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12q/G1_dsatrue                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12q/G1noex_dsafalse                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12q/G1noex_dsatrue                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12q/P3noex_dsafalse                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12q/P3noex_dsatrue                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12r/T1000_mg1                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12r/T1000_mg2                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12r/T1000_mg4                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12r/T300_mg1                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12r/T300_mg2                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12r/T300_mg4                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12s/G1                                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12s/P3noex                                maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12t/G1                                    maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T1000_dir                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T1000_dirtau1                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T1000_tau1                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T1000_tau10                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T300_dir                              maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T300_dirtau1                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T300_tau1                             maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12u/T300_tau10                            maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12v/k1                                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12v/k2                                    maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 0/0
+runs/RF12w/G1_T1000_dsa                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12w/G1_T1000_nodsa                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12w/P3_T1000_dsa                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12w/P3_T1000_nodsa                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12w/P3_T150_dsa                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12w/P3_T150_nodsa                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12w/P3_T300_dsa                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12w/P3_T300_nodsa                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/P3_T1000_d6                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/P3_T1000_mgb6                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/P3_T1000_mgb8                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/P3_T1000_v1                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/P3_T1000_v2                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/P3_T1000_v4                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/X8_T1000_dsa                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/X8_T1000_nodsa                        maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/X8_T300_dsa                           maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12x/X8_T300_nodsa                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF12y/P3_T1000_v1q                          maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF15/G1_T1000_outflow_dsa                   maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF15/P3_T1000_outflow                       maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF15/P3_T1000_outflow_dsa                   maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF16/P3_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF16/P3_T150                                maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF16/P3_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF16/X8_T1000                               maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF16/X8_T300                                maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF2/v0_repro                                maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 0/0
+runs/RF3/g100r30_c0_k0                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3/g100r30_c0_k1                           maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/RF3/g100r30_c0_k2                           maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/RF3/g100r30_c2_k0                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3/g100r30_c2_k1                           maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/RF3/g100r30_c2_k2                           maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/RF3/g100r30_tab_k0                          maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3/g100r30_tab_k1                          maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/RF3/g100r30_tab_k2                          maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/RF3/g15r10_tab_k0                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3/g15r10_tab_k1                           maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/RF3/g15r10_tab_k2                           maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/RF3/g30r100_c2_k0                           maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3/g30r100_c2_k1                           maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/RF3/g30r100_c2_k2                           maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/RF3/g30r100_tab_k0                          maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3/g30r100_tab_k1                          maxN 0.0e+00 L1 0.0e+00                  dumps 18  rc 0/0
+runs/RF3/g30r100_tab_k2                          maxN 0.0e+00 L1 0.0e+00                  dumps 17  rc 0/0
+runs/RF3s/g100r30_c0_k0                          maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3s/g100r30_c2_k0                          maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3s/g100r30_tab_k0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3s/g15r10_tab_k0                          maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3s/g30r100_c2_k0                          maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/RF3s/g30r100_tab_k0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF/cpu/G9_ser                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF/cpu/G9_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+runs/SPEED/WF/cpu/G9_wf1                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF/cpu/K4_ser                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF/cpu/K4_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+runs/SPEED/WF/cpu/K4_wf1                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF/cpu/R1_ser                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF/cpu/R1_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+runs/SPEED/WF/cpu/R1_wf1                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF/cpu/R5_ser                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF/cpu/R5_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+runs/SPEED/WF/cpu/R5_wf1                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF/cpu/R8a_ser                        maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/SPEED/WF/cpu/R8a_wf                         maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+runs/SPEED/WF/cpu/R8a_wf1                        maxN 0.0e+00 L1 0.0e+00                  dumps 3  rc 0/0
+runs/SPEED/WF/cpu/S1_ser                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF/cpu/S1_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+runs/SPEED/WF/cpu/S1_wf1                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF/cpu/S3_ser                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF/cpu/S3_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+runs/SPEED/WF/cpu/S3_wf1                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF2/cpu/G9_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF2/cpu/G9_m2                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF2/cpu/G9_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF2/cpu/K4_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF2/cpu/K4_m2                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF2/cpu/K4_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF2/cpu/R1_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF2/cpu/R1_m2                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF2/cpu/R1_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF2/cpu/S1_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF2/cpu/S1_m2                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF2/cpu/S1_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF2/cpu/S3_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF2/cpu/S3_m2                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF2/cpu/S3_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/G9_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/cpu/G9_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/cpu/G9_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/cpu/G9a_m0                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/cpu/G9a_m3                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/cpu/G9a_m4                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/cpu/K4_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF4/cpu/K4_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF4/cpu/K4_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 11  rc 0/0
+runs/SPEED/WF4/cpu/R1_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/cpu/R1_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/cpu/R1_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/cpu/R1a_m0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/cpu/R1a_m3                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/cpu/R1a_m4                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/cpu/S1_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S1_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S1_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S1p_m0                        maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S1p_m3                        maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S1p_m4                        maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S3_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S3_m3                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/cpu/S3_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/fpc/G9_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/fpc/G9_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/fpc/G9a_m0                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/fpc/G9a_m4                        maxN 0.0e+00 L1 0.0e+00                  dumps 7 hst 0.0e+00 rc 0/0
+runs/SPEED/WF4/fpc/R1_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/fpc/R1_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/fpc/R1a_m0                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/fpc/R1a_m4                        maxN 0.0e+00 L1 0.0e+00                  dumps 5  rc 0/0
+runs/SPEED/WF4/fpc/S1_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/fpc/S1_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/fpc/S3_m0                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+runs/SPEED/WF4/fpc/S3_m4                         maxN 0.0e+00 L1 0.0e+00                  dumps 13  rc 0/0
+TOTAL 605 BITWISE-fields 605
+
+## Strict grading (rc 0/0, every dump field and every history file identical, at least one dump or history file)
+dust/keyoff_cmp.txt: 47/47 PASS (strict)
+dust/on_cmp_partial.txt: 58/118 PASS (strict)
+   FAIL runs/D4/D4a_1d_N1024                             FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4a_1d_N256                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4a_1d_N512                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4a_2d_N128                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4afrz_1d_N1024                          FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4afrz_1d_N256                           FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4b_1d_N1024                             FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4b_1d_N128                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4b_1d_N256                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4b_1d_N512                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4c_1d_N1024                             FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4c_1d_N256                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4c_1d_N512                              FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D4/D4c_2d_N128                              FILESET                                  dumps 0 0 rc 1/?
+   FAIL runs/D4/D4cprod_1d_N256                          FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D5/D5_M10_N4096_dT+0                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D5/D5_M30_N1024_dT+0                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D5/D5_M30_N1024_dT+100                      FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D5/D5_M30_N1024_dT+200                      FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D5/D5_M30_N1024_dT-100                      FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D5/D5_M30_N1024_dT-200                      FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/D5/D5_M30_N4096_dT+0                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N1024_filt                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N1024_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N1024_hold0                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N1024_hold1                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N1024_hold2                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N1024_tau                          FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N256_hold0                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N256_hold1                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N256_hold2                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N256_tau                           FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N256_trace                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N4096_filt                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N4096_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N4096_hold0                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N4096_hold1                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N4096_hold2                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M10_N4096_tau                          FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N1024_filt                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N1024_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N1024_hold0                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N1024_hold1                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N1024_hold2                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N1024_tau                          FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N256_filthold2                     FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N256_hold0                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N256_hold1                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N256_hold2                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N256_tau                           FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N4096_filt                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N4096_filthold2                    FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N4096_hold0                        FILESET                                  dumps 0 0 rc ?/?
+   FAIL runs/F/F2_M30_N4096_hold1                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N4096_hold2                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F2_M30_N4096_tau                          FILESET                                  dumps 0 0 rc ?/?
+   FAIL runs/F/F4c_1d_N1024_filt                         FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F4c_1d_N256_filt                          FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F5_D3a_semenov_frz                        FILESET                                  dumps 0 0 rc 0/?
+   FAIL runs/F/F5_D3a_semenov_prod                       FILESET                                  dumps 0 0 rc 0/?
+eosfix/dust_on_cmp.txt: 118/118 PASS (strict)
+eosfix/d6_cmp.txt: 4/4 PASS (strict)
+dust/im_on_cmp.txt: 422/422 PASS (strict)
+dust/ni_cmp.txt: 164/164 PASS (strict)
+dust/rad_cmp.txt: 595/605 PASS (strict)
+   FAIL runs/R5/bis_P3_T1000_dt2                         maxN 0.0e+00 L1 0.0e+00                  dumps 2  rc 134/134
+   FAIL runs/R5/bis_P3_T1000_nolim                       maxN 0.0e+00 L1 0.0e+00                  dumps 1  rc 134/134
+   FAIL runs/R5/bis_P3_T1000_noloc                       maxN 0.0e+00 L1 0.0e+00                  dumps 4  rc 134/134
+   FAIL runs/SPEED/WF/cpu/G9_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+   FAIL runs/SPEED/WF/cpu/K4_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+   FAIL runs/SPEED/WF/cpu/R1_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+   FAIL runs/SPEED/WF/cpu/R5_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+   FAIL runs/SPEED/WF/cpu/R8a_wf                         maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+   FAIL runs/SPEED/WF/cpu/S1_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134
+   FAIL runs/SPEED/WF/cpu/S3_wf                          maxN 0.0e+00 L1 0.0e+00                  dumps 0  rc 134/134

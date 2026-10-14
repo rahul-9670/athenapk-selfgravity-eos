@@ -69,7 +69,10 @@ bit-identical / tolerance-level speed keys `sn_sweep_wavefront = 5`, `sn_sweep_g
 *Dust.* The research code multiplies the opacities by a dust factor from its dust-evolution package (grain growth and
 depletion relative to the reference grains of the table). That package is not part of this repository; here the
 factors are exactly 1, which is what the research code computes with the dust package off. None of the decks of this
-suite turns the dust package on, so every test here ran with factor 1.
+suite turns the dust package on, so every test here ran with factor 1. *Update 2026-10-13:* the dust-evolution package
+is now part of this repository (`src/dust/`, report `../dust/DUST_VALIDATION.md`); with `<physics> dust = true` the
+multipliers are computed as in the research code (`DustOpacityFactors`, including the R-F8 / R-F11 keys
+`dust/opacity_evap`). The tests of this suite are unchanged (dust off, factor 1).
 
 ### 2.2 Source and binaries
 The tests ran with binaries of the private research tree (the hashes quoted below identify them; run directories with

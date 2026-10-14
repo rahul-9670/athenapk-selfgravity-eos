@@ -1,0 +1,117 @@
+<comment>
+problem = dust D1 0-D growth rho 1e-13 g/cm^3 T 30.0 K variant res: dt ~ 0.05 t_grow, tlim = 6 t_grow
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = compress
+alpha = 0.0
+rho0 = 182915.67587342235
+T0 = 30.0
+scalar0 = 0.01
+scalar1 = 1e-05
+
+<parthenon/mesh>
+refinement = none
+nghost = 2
+nx1 = 16
+x1min = 0.0
+x1max = 0.3701062794583693
+ix1_bc = periodic
+ox1_bc = periodic
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 16
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.3757452953238663
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+riemann = hlld
+reconstruction = plm
+divergence_control = glm
+glmmhd_source = dedner_plain   # 1D: dedner_extended segfaults (E-F3)
+glmmhd_alpha = 0.1
+glmmhd_damping = midpoint
+first_order_flux_correct = false
+vl2_predictor_recon = same
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+eos_floor_consistent = true
+lean_registers = true
+ghost_sync_rounds = 1
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold_rho26.bin
+gamma = 1.4             # production deck value; unused by the table
+eos_interp = p
+Tfloor = 0.2726
+double_flux = true
+eos_table_allow_no_radiation = true   # validation-only escape (no radiation in these tests)
+boundary_flux_clamp = false
+dual_energy = true
+dual_energy_eta1 = 5e-2
+dual_energy_eta2 = 0.1
+dual_energy_kappa = 3.0
+dual_energy_shock_comp = 0.02
+dual_energy_shock_eta1 = true
+dual_energy_shock_detector = kv
+dual_energy_sync_step_end = true
+dual_energy_unsigned_prim = true
+dual_energy_exact_resync = true
+dual_energy_shared_select = true
+dual_comp_ghost = true
+dual_energy_heat_rkl2 = true
+dual_energy_heat_exact = true
+dual_energy_flux = density
+boundary_clamp_dual = true
+diode_energy_consistent = true
+nscalars = 2
+
+<physics>
+self_gravity = false
+radiation = false
+dust = true
+
+<dust>
+evolve = true
+scalar_index = 0
+a_ref_cm = 1.0e-5
+f_dg_ref = 0.01
+T_subl_K = 1.5e3
+opacity_size_law = bridged
+opacity_gas_split = true
+rho_grain_cgs = 3
+alpha_turb = 0.01
+omega_ref_cgs = 1e-13
+mu_n = 2.33
+growth_cap = 0.1
+omega_local = true
+subl_irreversible = true
+freeze_growth = false
+dual_energy = true
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, cons
+dt = 0.3757452953238663
+
+<parthenon/output1>
+file_type = hst
+dn = 1

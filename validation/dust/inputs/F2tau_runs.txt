@@ -1,0 +1,6 @@
+F/F2_M10_N256_tau | F/F2_M10_N256_tau.in | | 1
+F/F2_M10_N1024_tau | F/F2_M10_N1024_tau.in | | 1
+F/F2_M10_N4096_tau | F/F2_M10_N4096_tau.in | | 1
+F/F2_M30_N256_tau | F/F2_M30_N256_tau.in | | 1
+F/F2_M30_N1024_tau | F/F2_M30_N1024_tau.in | | 1
+F/F2_M30_N4096_tau | F/F2_M30_N4096_tau.in | | 1

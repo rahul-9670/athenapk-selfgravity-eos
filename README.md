@@ -1,7 +1,7 @@
-# AthenaPK with self-gravity, a tabulated protostellar EOS, dual energy, radiation transport and non-ideal MHD
+# AthenaPK with self-gravity, a tabulated protostellar EOS, dual energy, radiation transport, non-ideal MHD and dust evolution
 
 A modified copy of [AthenaPK](https://github.com/parthenon-hpc-lab/athenapk) (Parthenon + Kokkos, CPU and GPU) that
-contains six validated additions:
+contains seven validated additions:
 
 * **Self-gravity** (`src/self_gravity/`): multigrid-preconditioned BiCGSTAB Poisson solver over the AMR hierarchy,
   multipole (monopole + quadrupole) isolated boundary conditions, Jeans swindle for periodic boxes, flux-weighted
@@ -35,6 +35,13 @@ contains six validated additions:
   kv` (dual energy under-heated strong shocks), `hydro/boundary_flux_clamp_wall` + `hydro/diode_energy_consistent` (the
   boundary clamp removed the outside pressure), `hydro/glmmhd_damping = midpoint` (second-order psi damping). Report:
   [`validation/ideal_mhd/IDEAL_MHD_VALIDATION.md`](validation/ideal_mhd/IDEAL_MHD_VALIDATION.md).
+* **Dust evolution** (`src/dust/`, `<physics> dust = true`, `<dust> evolve = true`): two passive scalars (dust-to-gas
+  ratio, grain radius) with irreversible sublimation at fixed grain number and monodisperse Brownian + turbulent sweep-up
+  growth; the scalars multiply the radiation opacities and, with `diffusion/dust_coupling`, set the grain population of
+  the ionization / conductivity model. Default-off keys from the validation: `dust/subl_tau_s` (finite sublimation time:
+  the shock-recorded dust loss converges), `dust/subl_model = semenov` (sublimate at the opacity table's T5(rho)),
+  `dust/growth_prefactor`, `diffusion/dust_destroyed_zero` (destroyed grains carry no charge). Report:
+  [`validation/dust/DUST_VALIDATION.md`](validation/dust/DUST_VALIDATION.md).
 
 Problem generators: `collapse_be` (magnetized Bonnor-Ebert sphere collapse, barotropic or with radiation) and the
 validation problems `poisson_test`, `grav_analytic`, `jeans_wave`, `grav_slab`, `polytrope`, `profile1d`, `eos_test`,
@@ -57,16 +64,16 @@ make -C build_cpu athenaPK -j
 #             -DKokkos_ARCH_HOPPER90=ON -DKokkos_ENABLE_CUDA_LAMBDA=ON (plus the PARTHENON_* flags above)
 ```
 Needs MPI and parallel HDF5. `-DATHENAPK_EOS_LEGACY_LOOKUPS=ON` builds the pre-fix EOS lookups (see the EOS report, E-F9).
-At most 8 radiation groups by default; add `-DATHENAPK_MAX_GROUP=<n>` to `CMAKE_CXX_FLAGS` for more. The radiation
-package has no dust-evolution coupling here: the dust multipliers of the opacities are 1 (the tables already contain
-the dust and gas opacity).
+At most 8 radiation groups by default; add `-DATHENAPK_MAX_GROUP=<n>` to `CMAKE_CXX_FLAGS` for more. Without the dust
+package the dust multipliers of the opacities are 1 (the tables already contain the dust and gas opacity).
+`-DATHENAPK_DUST_HOST_TESTS=ON` builds the dust host gate and registers it with CTest (`ctest -R dust_host_gate`).
 
 ## Relation to the validated code
 The validation reports were produced with a larger private research code from which this tree was extracted. The
 extraction was checked against the validated binary on 47 paired runs: identical up to compiler FMA contraction (every
 rerun leg bitwise identical when both are compiled with `-ffp-contract=off`); details in either report, Sec. 2.2. The
 dual-energy, radiation and non-ideal MHD ports were checked the same way (their reports, Sec. 2.2), the ideal-MHD port
-in its report, Sec. 2.4.
+in its report, Sec. 2.4, the dust port in its report, Sec. 2.3.
 
 ## Licence
 BSD 3-Clause (`LICENSE`, AthenaPK/Parthenon); the self-gravity package derives from Artemis (`LICENSE-ARTEMIS.md`).

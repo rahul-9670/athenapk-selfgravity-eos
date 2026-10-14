@@ -71,7 +71,8 @@ shipped). Every code change there is a key, default off. The non-ideal code ship
 2026-10-11 restricted to Ohmic + ambipolar diffusion: the Hall term, thermal conduction, viscosity and the per-cell
 dust-package coupling of the ionization model are removed and refused at startup (`diffusion/hall`, `conduction`,
 `viscosity`, `dust_coupling`); the eta_H slot of the cache and the tensor solve are kept unchanged (inert), so the
-evaluator is the research code's line for line.
+evaluator is the research code's line for line. (Since 2026-10-13 the dust package and `diffusion/dust_coupling` are
+part of this repository: `../dust/`, report Sec. 10 and 2.3.)
 
 **Port check (2026-10-12, `results/tables/PORT_check_2026-10-12.txt`).** This repository's build: `cd69c066` (default
 flags), `2d66e869` (`-ffp-contract=off`).

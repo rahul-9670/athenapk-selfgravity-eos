@@ -14,6 +14,9 @@ add_executable(
         diagnostics/cons_diag.hpp
         diagnostics/grav_diag.cpp
         diagnostics/grav_diag.hpp
+        dust/dust.cpp
+        dust/dust.hpp
+        dust/dust_pkg.hpp
         hydro/diffusion/ambipolar.cpp
         hydro/diffusion/diffusion.cpp
         hydro/diffusion/diffusion.hpp

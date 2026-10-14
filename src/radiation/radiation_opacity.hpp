@@ -27,6 +27,7 @@
 #include <parthenon_arrays.hpp> // parthenon::ParArray2D (tabulated opacity, device)
 
 #include "opacity_table_format.hpp" // shared table header parser (audit N13)
+#include "../dust/dust.hpp" // AUDIT F-06/F-07: dust multipliers for the opacities
 
 namespace Radiation {
 
@@ -314,13 +315,20 @@ struct OpacityParams {
   // fixed walk, so `opacity_model = tabulated` (the collapse run) never used the plain one.
   // Set <radiation> bell_lin_fix_regime_skip = false to reproduce the historical behaviour.
   bool bell_lin_fix_regime_skip = true;
-  //! The two flags below select the dust/gas split of the research code's dust package (not part of
-  //! this repository; they stay false here). R-F8: <dust> opacity_evap = pollack -> the split uses the table's Pollack evaporation
+  //! R-F8: <dust> opacity_evap = pollack -> the dust/gas split (F-07) uses the table's Pollack evaporation
   //! coefficients (gen_opacity_table.py --evap pollack). Default false = Bell & Lin 1994 (historical).
   bool dust_evap_pollack = false;
   //! R-F11: <dust> opacity_evap = table -> the split uses the grain share stored in a format-v4 table
   //! (gen_opacity_table.py --model semenov), separately for kappa_P and kappa_R. Default false.
   bool dust_evap_table = false;
+  //! validation/dust DD5 / DU-F2: <dust> subl_model = semenov AND opacity_evap = table. The v4 table's
+  //! gray means ALREADY contain the equilibrium evaporation of the grains (its grain share falls across T5(rho)
+  //! +- 100 K), and the dust package now destroys grains across the SAME T5(rho). Measuring f_dg against f_ref
+  //! would then remove the evaporating grains twice. With this flag the dust multiplier carries only the
+  //! departure from the table's equilibrium: f_dg / (f_ref s(T, rho)) (capped at 1), s = the dust package's
+  //! survival at the cell. false (default) = the historical expression, untouched.
+  bool dust_subl_eq = false;
+  Real dust_subl_width = 100.0; //!< K, = DustModel::subl_width
   // model == tabulated: gray kappa_P/kappa_R/kappa_s come from this device table (frequency-
   // resolved dust+gas physics precomputed offline). Inactive for the other models (View handles
   // default-constructed, never dereferenced). This gives a SELF-CONSISTENT Planck mean (not the
@@ -378,6 +386,82 @@ Real BellLinKappaFixed(const Real rho, const Real T) {
   return k0[7] * std::pow(rho, aa[7]) * std::pow(T, bb[7]);
 }
 
+//----------------------------------------------------------------------------------------
+//! AUDIT F-07 (2026-09-16). The dust/gas split of the Bell & Lin magnitude lives in
+//! `Dust::DustOpacityWeight` (dust/dust.hpp) so the standalone host gate can exercise it;
+//! see the duplication note there. Regimes 0-3 are grains, 4-7 are gas.
+//!
+//! Scope, stated: this is the split of the BELL & LIN magnitude. The tabulated model's gray
+//! Rosseland IS Bell & Lin by construction (gen_opacity_table.py:174 `kR_gray = kBL`), so the
+//! weight is exact for kappa_R; kappa_P = kBL * psiP/psiR carries the same magnitude with a
+//! shape ratio, so w is a very good but not exact weight there (INFERRED).
+
+//----------------------------------------------------------------------------------------
+//! AUDIT F-06/F-07 (2026-09-16). The two per-channel dust multipliers the radiation consumers
+//! apply, in ONE place so the six call sites cannot drift apart.
+//!   bridged == false && gas_split == false  -> the HISTORICAL expression, evaluated by the
+//!   identical code path (Dust::DustFactor), so a default run is BIT-IDENTICAL to the pre-fix
+//!   binary. Both channels then carry the same number, exactly as before.
+//! Otherwise kdP (Planck/emission) and kdR (Rosseland/flux + scattering) differ, because the
+//! bridged size law uses the channel's own spectral weight mean <u>.
+//! Per-cell dust state carried into the implicit matter-coupling residuals, so the dust
+//! factors can be re-evaluated at the root finder's TRIAL temperature (they are T-dependent
+//! once `bridged`/`gas_split` are on; with the defaults they are not, and the value is the
+//! historical one at every Tt => bit-identical).
+struct DustCoupling {
+  bool on = false;
+  bool bridged = false;
+  bool gas_split = false;
+  Real f_dg = 0.01, a_c = 1.0e-5, f_ref = 0.01, a_ref = 1.0e-5;
+};
+
+KOKKOS_INLINE_FUNCTION
+void DustOpacityFactors(const OpacityParams &op, const Real rho_code, const Real T_code,
+                        const Real f_dg, const Real a_c, const Real f_ref, const Real a_ref,
+                        const bool bridged, const bool gas_split, Real &kdP, Real &kdR) {
+  if (!bridged && !gas_split) {
+    kdP = Dust::DustFactor(f_dg, a_c, f_ref, a_ref);
+    kdR = kdP;
+    return;
+  }
+  const Real T_K = op.T_unit * T_code;
+  if (op.dust_subl_eq) {
+    // DD5: reference = the local equilibrium dust content the table assumes (see OpacityParams::dust_subl_eq).
+    const double rc = static_cast<double>(op.rho_unit * rho_code);
+    const double s = Dust::SublSemenov(static_cast<double>(T_K), rc, static_cast<double>(op.dust_subl_width));
+    const Real f_eq = f_ref * static_cast<Real>(s);
+    const Real f_use = (f_dg < f_eq) ? f_dg : f_eq;
+    kdP = Dust::DustFactorOpacity(f_use, a_c, f_eq, a_ref, T_K, Dust::dopac::kUPlanck, bridged);
+    kdR = Dust::DustFactorOpacity(f_use, a_c, f_eq, a_ref, T_K, Dust::dopac::kURoss, bridged);
+  } else {
+    kdP = Dust::DustFactorOpacity(f_dg, a_c, f_ref, a_ref, T_K, Dust::dopac::kUPlanck, bridged);
+    kdR = Dust::DustFactorOpacity(f_dg, a_c, f_ref, a_ref, T_K, Dust::dopac::kURoss, bridged);
+  }
+  if (gas_split && op.dust_evap_table) {
+    // R-F11: the grain share exactly as the (v4) table built the gray means, P and R separately.
+    kdP = Dust::DustGasSplit(kdP, op.table.DustWeightP(rho_code, T_code));
+    kdR = Dust::DustGasSplit(kdR, op.table.DustWeightR(rho_code, T_code));
+  } else if (gas_split) {
+    const Real w = op.dust_evap_pollack   // R-F8: the split follows the table's evaporation model
+                       ? Dust::DustOpacityWeightEvap(op.rho_unit * rho_code, T_K, true)
+                       : Dust::DustOpacityWeight(op.rho_unit * rho_code, T_K);
+    kdP = Dust::DustGasSplit(kdP, w);
+    kdR = Dust::DustGasSplit(kdR, w);
+  }
+}
+
+//! DustCoupling form of the above (kdP = kdR = 1 when dust is off).
+KOKKOS_INLINE_FUNCTION
+void DustFactorsAt(const OpacityParams &op, const DustCoupling &dc, const Real rho_code,
+                   const Real T_code, Real &kdP, Real &kdR) {
+  if (!dc.on) {
+    kdP = 1.0;
+    kdR = 1.0;
+    return;
+  }
+  DustOpacityFactors(op, rho_code, T_code, dc.f_dg, dc.a_c, dc.f_ref, dc.a_ref, dc.bridged,
+                     dc.gas_split, kdP, kdR);
+}
 
 //----------------------------------------------------------------------------------------
 //! ROSSELAND-mean absorption opacity in CODE units (per unit mass), kappa_R(rho,T). Used

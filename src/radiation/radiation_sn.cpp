@@ -15,6 +15,7 @@
 #include <parthenon/package.hpp>
 #include <parthenon/parthenon.hpp>
 
+#include "../dust/dust.hpp"      // DustFactor: dust multiplies every radiation opacity
 #include "../eos/adiabatic_glmmhd.hpp" // DualSelectEint (hydro/dual_energy_shared_select)
 #include "../eos/eos_table.hpp"   // tabulated protostellar EOS -> T(rho, e_int)
 #include "../main.hpp"
@@ -852,9 +853,21 @@ TaskStatus SnSeedSource(MeshData<Real> *md, const Real dt) {
   const bool mhd = (nhydro > NHYDRO);
 
   auto &pkgs = pmb->pmy_mesh->packages;
-  // This repository does not include a dust-evolution package: the dust multipliers of the opacities are exactly 1 (the
-  // opacity table already contains the dust and gas opacity), which is what the research code computes when its dust
-  // package is off.
+  const bool dust_on =
+      pkgs.AllPackages().count("dust") > 0 && pkgs.Get("dust")->Param<bool>("evolve");
+  int dust_sidx = 0;
+  Real dust_fref = 0.01, dust_aref = 1.0e-5;
+  bool dust_bridged = false, dust_gassplit = false;
+  if (dust_on) {
+    auto dpkg = pkgs.Get("dust");
+    dust_sidx = dpkg->Param<int>("scalar_index");
+    const Dust::DustModel dm = dpkg->Param<Dust::DustModel>("model");
+    dust_fref = dm.f_dg_ref;
+    dust_aref = dm.a_ref;
+    dust_bridged = dm.opac_size_bridged;   // AUDIT F-06
+    dust_gassplit = dm.opac_gas_split;     // AUDIT F-07
+  }
+  const int idust = ic + nhydro + dust_sidx;
 
   // The emissivity is n_group values per cell, so the angle index is irrelevant here and the
   // cell loop is the parallel one.
@@ -910,9 +923,14 @@ TaskStatus SnSeedSource(MeshData<Real> *md, const Real dt) {
         Real T = use_h2 ? eos_tab.TemperatureK(rho, std::max(e0, Real(1.0e-100))) / T_unit
                         : gm1 * e0 * irho;
         T = std::max(tmin, std::min(tmax, T));
-        // Dust factors (two channels). Exactly 1 here: no dust-evolution package in this
-        // repository (the opacity table already contains the dust and gas opacity).
+        // AUDIT F-06/F-07: two channels. With the defaults both equal the historical
+        // DustFactor and this is bit-identical to the pre-fix binary.
         Real kdustP = 1.0, kdustR = 1.0;
+        if (dust_on) {
+          DustOpacityFactors(op, rho, T, pack(b, idust, k, j, i) * irho,
+                             pack(b, idust + 1, k, j, i) * irho, dust_fref, dust_aref,
+                             dust_bridged, dust_gassplit, kdustP, kdustR);
+        }
         // probe = false: this is the gas's ACTUAL temperature, not a root-finder trial, so
         // its table edge-clamps belong in the real tally that the per-cycle clamp report
         // reads. ThermalM1 passes true only because it evaluates inside a Newton iteration.

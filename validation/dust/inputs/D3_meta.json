@@ -1,0 +1,30 @@
+{
+ "D3a_frz": {
+  "rho_cgs": 1e-09,
+  "T0": 1250.0,
+  "alpha": 1.0,
+  "tlim": 0.875,
+  "freeze": true
+ },
+ "D3a_prod": {
+  "rho_cgs": 1e-09,
+  "T0": 1250.0,
+  "alpha": 1.0,
+  "tlim": 0.875,
+  "freeze": false
+ },
+ "D3b_frz": {
+  "rho_cgs": 1e-09,
+  "T0": 1900.0,
+  "alpha": -1.0,
+  "tlim": 7.0,
+  "freeze": true
+ },
+ "D3b_prod": {
+  "rho_cgs": 1e-09,
+  "T0": 1900.0,
+  "alpha": -1.0,
+  "tlim": 7.0,
+  "freeze": false
+ }
+}

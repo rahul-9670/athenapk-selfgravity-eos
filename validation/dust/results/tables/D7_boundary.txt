@@ -1,0 +1,4 @@
+# D7 production box boundary (diode + clamp + wall), uniform oblique flow, 2 crossings
+D7_frz       max |sum(rho f)/(f_ref sum rho) - 1| 4.44e-16 | max |f/f_ref - 1| 4.00e-15 | max |a/a_ref - 1| 4.22e-15 | gas mass / initial 0.0071
+D7_noclamp   max |sum(rho f)/(f_ref sum rho) - 1| 4.44e-16 | max |f/f_ref - 1| 4.66e-15 | max |a/a_ref - 1| 4.21e+00 | gas mass / initial 0.0075
+D7_prod      max |sum(rho f)/(f_ref sum rho) - 1| 4.44e-16 | max |f/f_ref - 1| 4.00e-15 | max |a/a_ref - 1| 4.21e+00 | gas mass / initial 0.0071

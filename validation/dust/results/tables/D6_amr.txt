@@ -1,0 +1,5 @@
+# D6 structured dust field through AMR regridding (5 crossings)
+D6a_amr      dM_dust final -2.998e-14 (min -2.998e-14) | max f/f_ref - 1 +2.22e-15 | min a / min a0 - 1 -9.85e-12 | blocks [184, 208, 208, 208, 208, 208, 208, 208, 208, 208, 184] | levels [1, 2] .. [1, 2]
+D6a_uni256   dM_dust final -2.276e-14 (min -2.276e-14) | max f/f_ref - 1 +3.55e-15 | min a / min a0 - 1 -5.11e-15 | blocks [64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64] | levels [0] .. [0]
+D6c_amr      dM_dust final -3.374e-02 (min -3.374e-02) | max f/f_ref - 1 -1.13e-07 | min a / min a0 - 1 -8.74e-01 | blocks [184, 208, 208, 208, 208, 208, 208, 208, 208, 208, 208] | levels [1, 2] .. [1, 2]
+D6c_uni256   dM_dust final -3.341e-02 (min -3.341e-02) | max f/f_ref - 1 -1.13e-07 | min a / min a0 - 1 -7.95e-01 | blocks [64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64] | levels [0] .. [0]

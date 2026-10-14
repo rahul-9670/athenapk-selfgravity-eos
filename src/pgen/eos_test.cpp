@@ -129,6 +129,17 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
   Real sc[4] = {0.0, 0.0, 0.0, 0.0};
   for (int n = 0; n < nsc; ++n) sc[n] = pin->GetOrAddReal(blk, "scalar" + std::to_string(n), 0.0);
   const Real sc0 = sc[0], sc1 = sc[1], sc2 = sc[2], sc3 = sc[3];
+  // per-side scalars (validation/dust D4): modes riemann / slab read problem/eos_test/scalarL<n> and
+  // scalarR<n> (default = scalar<n>, so every older deck is unchanged); the other modes never read them.
+  Real scl[4] = {sc0, sc1, sc2, sc3}, scr[4] = {sc0, sc1, sc2, sc3};
+  if (imode == 1 || imode == 3) {
+    for (int n = 0; n < nsc; ++n) {
+      scl[n] = pin->GetOrAddReal(blk, "scalarL" + std::to_string(n), sc[n]);
+      scr[n] = pin->GetOrAddReal(blk, "scalarR" + std::to_string(n), sc[n]);
+    }
+  }
+  const Real sl0 = scl[0], sl1 = scl[1], sl2 = scl[2], sl3 = scl[3];
+  const Real sr0 = scr[0], sr1 = scr[1], sr2 = scr[2], sr3 = scr[3];
   // slab mode only (the other modes never read these keys, so their decks/params are unchanged)
   Real kx = 0.0, ky = 0.0, kz = 0.0, uslab = 0.0;
   if (imode == 3) {
@@ -154,9 +165,11 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
         const Real x = coords.Xc<1>(i);
         Real rho, v = 0.0, eint;
         Real vy = 0.0, vz = 0.0;
+        int side = 0; // 0 = uniform scalar<n>, 1 = scalarL<n>, 2 = scalarR<n>
         if (imode == 3) {
           const Real ph = kx * x + ky * coords.Xc<2>(j) + kz * coords.Xc<3>(k);
           const bool left = (std::sin(ph) >= 0.0);
+          side = left ? 1 : 2;
           rho = left ? rhoL : rhoR;
           if (left ? setL : setR)
             eint = rho * (left ? espL : espR);
@@ -178,6 +191,7 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
           eint = rho0 * esp0 + (esp0 + P0 / rho0) * rho0 * d;
         } else if (imode == 1) {
           const bool left = (x < x0);
+          side = left ? 1 : 2;
           rho = left ? rhoL : rhoR;
           v = left ? uL : uR;
           if (left ? setL : setR)
@@ -227,7 +241,10 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
         u(IPS, k, j, i) = 0.0;
         if (idual >= 0) u(idual, k, j, i) = eint;
         const Real scv[4] = {sc0, sc1, sc2, sc3};
-        for (int n = 0; n < nsc; ++n) u(nhyd + n, k, j, i) = rho * scv[n];
+        const Real slv[4] = {sl0, sl1, sl2, sl3};
+        const Real srv[4] = {sr0, sr1, sr2, sr3};
+        for (int n = 0; n < nsc; ++n)
+          u(nhyd + n, k, j, i) = rho * (side == 1 ? slv[n] : (side == 2 ? srv[n] : scv[n]));
       });
 }
 
@@ -250,6 +267,8 @@ void HomologousX1(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
   const auto &coords = pmb->coords;
   const Real xc = homologous_xc;
   const int idual = pmb->packages.Get("Hydro")->Param<int>("dual_idx");
+  const int nhyd = pmb->packages.Get("Hydro")->Param<int>("nhydro");
+  const int nsc = pmb->packages.Get("Hydro")->Param<int>("nscalars");
   constexpr auto dom = INNER ? parthenon::IndexDomain::inner_x1 : parthenon::IndexDomain::outer_x1;
   pmb->par_for_bndry(
       "eos_test::HomologousX1", IndexRange{0, 0}, dom, parthenon::TopologicalElement::CC,
@@ -278,6 +297,11 @@ void HomologousX1(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {
         if (idual >= 0)
           cons(idual, k, j, i) =
               rho * 0.5 * (cons(idual, k, j, is) / rs + cons(idual, k, j, ie) / re);
+        // passive scalars (validation/dust D3): rho times the mean edge SPECIFIC value, like the
+        // dual energy. Before, the ghosts kept the t = 0 rho0 * s, i.e. a specific value diluted as rho0/rho(t), which
+        // flowed in at both faces. nscalars = 0 (all E8/D4 decks): empty loop, bit-identical.
+        for (int n = nhyd; n < nhyd + nsc; ++n)
+          cons(n, k, j, i) = rho * 0.5 * (cons(n, k, j, is) / rs + cons(n, k, j, ie) / re);
       });
 }
 void HomologousInnerX1(std::shared_ptr<MeshBlockData<Real>> &mbd, bool coarse) {

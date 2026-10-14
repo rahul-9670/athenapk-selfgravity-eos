@@ -1,0 +1,14 @@
+F/F2_M10_N256_hold1 | F/F2_M10_N256_hold1.in | | 1
+F/F2_M10_N256_hold2 | F/F2_M10_N256_hold2.in | | 1
+F/F2_M10_N1024_hold1 | F/F2_M10_N1024_hold1.in | | 1
+F/F2_M10_N1024_hold2 | F/F2_M10_N1024_hold2.in | | 1
+F/F2_M10_N4096_hold1 | F/F2_M10_N4096_hold1.in | | 1
+F/F2_M10_N4096_hold2 | F/F2_M10_N4096_hold2.in | | 1
+F/F2_M30_N256_hold1 | F/F2_M30_N256_hold1.in | | 1
+F/F2_M30_N256_hold2 | F/F2_M30_N256_hold2.in | | 1
+F/F2_M30_N1024_hold1 | F/F2_M30_N1024_hold1.in | | 1
+F/F2_M30_N1024_hold2 | F/F2_M30_N1024_hold2.in | | 1
+F/F2_M30_N4096_hold1 | F/F2_M30_N4096_hold1.in | | 1
+F/F2_M30_N4096_hold2 | F/F2_M30_N4096_hold2.in | | 1
+D10/cpu_F2_M10_N1024_hold1 | F/F2_M10_N1024_hold1.in | parthenon/meshblock/nx1=64 | 1
+D10/cpu_F2_M10_N1024_hold2 | F/F2_M10_N1024_hold2.in | parthenon/meshblock/nx1=64 | 1

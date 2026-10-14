@@ -202,6 +202,49 @@ struct FusedNonidealEval {
   // low-density single-fluid/tensor eta_A runaway that otherwise sets the parabolic dt.
   Real ad_cap = std::numeric_limits<Real>::max();
 
+  // --- WS-4 DUST COUPLING (audit item 5) ---------------------------------------
+  // prim-pack indices of the evolved dust scalars (f_dg, a_c) and the reference grain
+  // radius the STATIC MRN bins correspond to. dust_on=false (default) => the ionization
+  // model keeps its frozen ISM MRN population and every result is bit-identical.
+  int i_fdg = -1;      // prim index of the dust-to-gas mass ratio
+  int i_ac = -1;       // prim index of the characteristic grain radius a_c [cm]
+  Real dust_a_ref = 1.0e-5; // [cm] a_c the static bins represent (DustModel::a_ref)
+  Real dust_fdg_ref = 0.01; // dust-to-gas ratio the static bins represent
+  bool dust_on = false;
+  //! diffusion/dust_destroyed_zero (validation/dust DU-F4; default false = bit-identical): a cell whose
+  //! grains were DESTROYED (f_dg <= 0 with a_c > 0 -- the dust package's own 'destroyed, not unseeded' test,
+  //! dust.hpp apply_sublimation F7a) gets NO grains (f_dg_scale = 0) instead of the reference population. Without
+  //! it, f_dg == 0 exactly (tanh underflow above ~3400 K, or a sublimated cell whose advected rho f undershot to
+  //! <= 0) falls into the 'uninitialised' guard below and the charge solve sees the full ISM dust mass -- in grains of
+  //! a_floor = a_ref/100 on the growth path, i.e. ~100x the reference grain area. Grains drop out of the charge
+  //! balance anyway above diffusion/ion_T_subl (step, 1500 K), so this matters for destroyed gas BELOW 1500 K.
+  bool dust_destroyed_zero = false;
+
+  //! Per-cell ionization model: the static one, or a copy rescaled to the evolved grain
+  //! population. The copy is only made when dust coupling is ON, so uncoupled runs pay
+  //! nothing (the model is a ~40-Real POD; copying it per cell is not free on GPU).
+  KOKKOS_INLINE_FUNCTION
+  Ionization::IonizationModel CellIon(const Real f_dg, const Real a_c) const {
+    Ionization::IonizationModel mc = ion;
+    // Guard degenerate/uninitialized scalars: fall back to the static population rather
+    // than divide by zero or hand the charge solve a zero-radius grain.
+    //
+    // HISTORY (2026-07-30): collapse_be used to leave these scalars at 0.0 even with
+    // <dust> evolve=true (its species zero-fill ran past the since-removed chemistry block), so both
+    // guards fired and this coupling was a silent no-op. FIXED in collapse_be.cpp, which
+    // now seeds f_dg = <dust> f_dg_ref and a_c = <dust> a_ref_cm. The guards stay as a
+    // backstop for other pgens: falling back to the static population is always safer than
+    // handing the charge solve a zero-radius grain. NOTE that a_scale == 1 at t=0 BY
+    // DESIGN (the static MRN bins represent exactly the reference population), so this
+    // coupling only bites once the dust package moves (f_dg, a_c) away from the reference
+    // -- changing <dust> a_ref_cm alone moves the IC and the reference together and does
+    // nothing.
+    mc.f_dg_scale = (f_dg > 0.0 && dust_fdg_ref > 0.0) ? f_dg / dust_fdg_ref : 1.0;
+    if (dust_destroyed_zero && !(f_dg > 0.0) && a_c > 0.0) mc.f_dg_scale = 0.0;   // destroyed, not unseeded
+    mc.a_scale = (a_c > 0.0 && dust_a_ref > 0.0) ? a_c / dust_a_ref : 1.0;
+    return mc;
+  }
+
   //! UNCAPPED diffusivities: everything Eta() does except the three ceiling clamps.
   //! Eta() == EtaRaw() + clamps, so the physics path is unchanged by construction; this
   //! exists so the cap diagnostic (FillNonidealCapDiag) can report how much diffusivity
@@ -209,9 +252,16 @@ struct FusedNonidealEval {
   KOKKOS_INLINE_FUNCTION
   void EtaRaw(const Real rho, const Real temp, const Real bmag, Real &eta_O, Real &eta_H,
               Real &eta_A, const Real f_dg = -1.0, const Real a_c = -1.0) const {
-    // (f_dg, a_c: the per-cell grain population of the dust package in the full code; not part
-    // of this tree, the static MRN population of the ionization model is used.)
-    const Ionization::IonizationModel &im = ion;
+    // Dust coupling: rescale the grain population to the evolved (f_dg, a_c) for THIS cell.
+    // Pointer (not a ternary) on purpose: `dust_on ? CellIon(...) : ion` is a PRVALUE, so it
+    // would copy the model even in the OFF branch -- the exact cost this is avoiding.
+    Ionization::IonizationModel mcell;
+    const Ionization::IonizationModel *pim = &ion;
+    if (dust_on) {
+      mcell = CellIon(f_dg, a_c);
+      pim = &mcell;
+    }
+    const Ionization::IonizationModel &im = *pim;
     Real eO_eq = 0.0, eH_eq = 0.0, eA_eq = 0.0;
     if (ohm_on || hall_on || ad_on) {
       Ionization::Diffusivities(im, rho, temp, bmag, eO_eq, eH_eq, eA_eq);

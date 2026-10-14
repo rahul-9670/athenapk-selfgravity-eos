@@ -101,3 +101,14 @@ if (AthenaPK_ENABLE_TESTING)
   endif()
 endif()
 
+
+# Dust-package host gate (validation/dust D0): src/dust/tests/test_dust.cpp, plain C++17 without Kokkos.
+#   cmake -DATHENAPK_DUST_HOST_TESTS=ON ... && make test_dust && ctest -R dust_host_gate
+# OFF (default): nothing is added, the athenaPK target and its flags are unchanged.
+option(ATHENAPK_DUST_HOST_TESTS "Build the standalone dust host gate and register it with CTest" OFF)
+if (ATHENAPK_DUST_HOST_TESTS)
+  enable_testing()
+  add_executable(test_dust ${CMAKE_CURRENT_SOURCE_DIR}/src/dust/tests/test_dust.cpp)
+  set_target_properties(test_dust PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+  add_test(NAME dust_host_gate COMMAND test_dust)
+endif()

@@ -55,6 +55,17 @@ bool MakeFusedNonidealEval(parthenon::StateDescriptor *pkg, FusedNonidealEval &f
       fe.ad_cap = d.EtaCap();
     }
   }
+  // WS-4 dust -> conductivity coupling (audit item 5). Params only exist when the
+  // diffusion block ran, which is guaranteed here (we already read resistivity/ambipolar).
+  if (pkg->AllParams().hasKey("nonideal_dust_on") &&
+      pkg->Param<bool>("nonideal_dust_on")) {
+    fe.dust_on = true;
+    fe.i_fdg = pkg->Param<int>("nonideal_dust_i_fdg");
+    fe.i_ac = pkg->Param<int>("nonideal_dust_i_ac");
+    fe.dust_a_ref = pkg->Param<Real>("nonideal_dust_a_ref");
+    fe.dust_fdg_ref = pkg->Param<Real>("nonideal_dust_fdg_ref");
+    fe.dust_destroyed_zero = pkg->Param<bool>("nonideal_dust_destroyed_zero");
+  }
   return fusable;
 }
 
@@ -117,7 +128,9 @@ Real EstimateNonidealTimestepIonizationFused(MeshData<Real> *md) {
 
         // Minimum tensor solves -> all three diffusivities (matches per-term Get()).
         Real eta_O, eta_H, eta_A;
-        feval.Eta(rho, temp, bmag, eta_O, eta_H, eta_A);
+        feval.Eta(rho, temp, bmag, eta_O, eta_H, eta_A,
+                  feval.dust_on ? prim(feval.i_fdg, k, j, i) : -1.0,
+                  feval.dust_on ? prim(feval.i_ac, k, j, i) : -1.0);
 
         // eta is a scalar per cell, so min_d(dx_d^2/eta) = (min_d dx_d^2)/eta exactly.
         Real mindx2 = SQR(coords.Dxc<1>(k, j, i));
@@ -212,13 +225,13 @@ TaskStatus PrecomputeNonidealEta(StateDescriptor *hydro_pkg, MeshData<Real> *md)
              "T_subl %.17e x_K %.17e chi_K %.17e x_H %.17e xe_floor %.17e closure %d gamma_AD %.17e cr_model %d "
              "cr_zeta_rn %.17e cr_N0 %.17e cr_index %.17e cr_Nc %.17e cr_mu_col %.17e cr_sigma0 %.17e cr_column_fac %.17e "
              "cr_column_ext %.17e cr_cal %d cr_cal_A %.17e cr_cal_B %.17e cr_cal_x0 %.17e cr_cal_w %.17e cr_gamma %.17e "
-             "dust_on %d a_ref %.17e fdg_ref %.17e ohm_cap %.17e ad_cap %.17e\n",   // dust_on: always 0 in this tree
+             "dust_on %d a_ref %.17e fdg_ref %.17e ohm_cap %.17e ad_cap %.17e\n",
              m.rho_unit, m.T_unit, m.B_unit, m.eta_unit, m.zeta, m.mu_n, m.m_ion, m.alpha0, m.alpha_Texp, m.sigma_en,
              m.sigv_in, m.grain_drag, m.f_dg, m.rho_grain, m.T_subl, m.x_K, m.chi_K, m.x_H, m.xe_floor,
              static_cast<int>(m.ad_closure), m.gamma_AD, static_cast<int>(m.cr_model), m.cr_zeta_rn, m.cr_N0,
              m.cr_index, m.cr_Nc, m.cr_mu_col, m.cr_sigma0, m.cr_column_fac, m.cr_column_ext,
              static_cast<int>(m.cr_column_calibrated), m.cr_cal_A, m.cr_cal_B, m.cr_cal_x0, m.cr_cal_w, m.cr_gamma,
-             0, 1.0e-5, 0.01, feval.ohm_cap, feval.ad_cap);
+             static_cast<int>(feval.dust_on), feval.dust_a_ref, feval.dust_fdg_ref, feval.ohm_cap, feval.ad_cap);
       for (int kb = 0; kb < Ionization::N_BIN; kb++) printf("[ETABIN] %d a_k %.17e mw_k %.17e\n", kb, m.a_k[kb], m.mw_k[kb]);
       etadump_gid = -2; // once
     }
@@ -239,7 +252,9 @@ TaskStatus PrecomputeNonidealEta(StateDescriptor *hydro_pkg, MeshData<Real> *md)
                                     SQR(prim(IB3, k, j, i)));
         if (fused) {
           Real eO, eH, eA;
-          feval.EtaRaw(rho, temp, bmag, eO, eH, eA);
+          feval.EtaRaw(rho, temp, bmag, eO, eH, eA,
+                       feval.dust_on ? prim(feval.i_fdg, k, j, i) : -1.0,
+                       feval.dust_on ? prim(feval.i_ac, k, j, i) : -1.0);
           if (cap_diag) {
             // raw (pre-ceiling) magnitudes; |.| because eta_H is signed
             const Real rO = eO, rH = std::abs(eH), rA = eA;
@@ -267,7 +282,8 @@ TaskStatus PrecomputeNonidealEta(StateDescriptor *hydro_pkg, MeshData<Real> *md)
           // host-execution builds only: no device printf (stack/register cost) in GPU production builds
           if (b == etadump_bk)
             printf("[ETACELL] %d %d %d rho %.17e temp %.17e bmag %.17e fdg %.17e ac %.17e raw %.17e %.17e %.17e eta %.17e %.17e %.17e\n",
-                   k, j, i, rho, temp, bmag, -1.0, -1.0, rawO, rawH, rawA, eO, eH, eA);
+                   k, j, i, rho, temp, bmag, feval.dust_on ? prim(feval.i_fdg, k, j, i) : -1.0,
+                   feval.dust_on ? prim(feval.i_ac, k, j, i) : -1.0, rawO, rawH, rawA, eO, eH, eA);
 #else
           (void)rawO; (void)rawH; (void)rawA; (void)etadump_bk;
 #endif

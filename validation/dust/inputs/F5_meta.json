@@ -1,0 +1,16 @@
+{
+ "F5_D3a_semenov_frz": {
+  "rho_cgs": 1e-09,
+  "T0": 1250.0,
+  "alpha": 1.0,
+  "tlim": 0.875,
+  "freeze": true
+ },
+ "F5_D3a_semenov_prod": {
+  "rho_cgs": 1e-09,
+  "T0": 1250.0,
+  "alpha": 1.0,
+  "tlim": 0.875,
+  "freeze": false
+ }
+}

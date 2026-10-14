@@ -36,6 +36,7 @@
 #include "../diagnostics/cons_diag.hpp"
 #include "../self_gravity/self_gravity.hpp"
 #include "../pgen/pgen.hpp"
+#include "../dust/dust_pkg.hpp"
 #include "../radiation/radiation.hpp"
 
 using namespace parthenon::driver::prelude;
@@ -777,6 +778,15 @@ TaskCollection HydroDriver::MakeTaskCollection(BlockList_t &blocks, int stage) {
   if (stage == integrator->nstages && radiation_pkg != nullptr) {
     // Adds its own TaskRegion.
     Radiation::AddRadiationTasks(tc, pmesh, integrator->dt);
+  }
+
+  // Dust evolution (growth + sublimation of the grain scalars f_dg, a_c): once per cycle on the final stage, after
+  // radiation, so the second RKL2 half below sees the new grain population.
+  auto dust_pkg = pmesh->packages.AllPackages().count("dust") > 0
+                      ? pmesh->packages.Get("dust")
+                      : nullptr;
+  if (stage == integrator->nstages && dust_pkg != nullptr) {
+    Dust::AddDustTasks(tc, pmesh, integrator->dt);
   }
 
   TaskRegion &single_tasklist_per_pack_region_3 = tc.AddRegion(num_partitions);

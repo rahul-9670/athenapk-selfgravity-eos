@@ -15,6 +15,7 @@
 #include <parthenon/driver.hpp>
 #include <parthenon/package.hpp>
 
+#include "../dust/dust.hpp" // DustModel / DustOpacityFactors (opacity consumer)
 #include "../eos/eos_table.hpp"
 #include "../main.hpp" // IDN, IM1..IM3, IEN, NHYDRO, IB1..IB3
 #include "radiation.hpp"
@@ -62,9 +63,21 @@ TaskStatus ComputeRadExtinction(MeshData<Real> *md) {
   for (int g = 0; g < n_group; ++g) ichi[g] = imap[GroupChiName(g)].first;
 
   auto &pkgs = pmb->pmy_mesh->packages;
-  // This repository does not include a dust-evolution package: the dust multipliers of the opacities are exactly 1 (the
-  // opacity table already contains the dust and gas opacity), which is what the research code computes when its dust
-  // package is off.
+  const bool dust_on =
+      pkgs.AllPackages().count("dust") > 0 && pkgs.Get("dust")->Param<bool>("evolve");
+  int dust_sidx = 0;
+  Real dust_fref = 0.01, dust_aref = 1.0e-5;
+  bool dust_bridged = false, dust_gassplit = false; // AUDIT F-06 / F-07 (default = historical)
+  if (dust_on) {
+    auto dpkg = pkgs.Get("dust");
+    dust_sidx = dpkg->Param<int>("scalar_index");
+    const Dust::DustModel dm = dpkg->Param<Dust::DustModel>("model");
+    dust_fref = dm.f_dg_ref;
+    dust_aref = dm.a_ref;
+    dust_bridged = dm.opac_size_bridged;
+    dust_gassplit = dm.opac_gas_split;
+  }
+  const int idust = ic + nhydro + dust_sidx;
 
   parthenon::par_for(
       DEFAULT_LOOP_PATTERN, "Rad::Extinction", parthenon::DevExecSpace(), 0,
@@ -101,10 +114,15 @@ TaskStatus ComputeRadExtinction(MeshData<Real> *md) {
         // ("Flux attenuation uses the ROSSELAND mean + scattering"), because the whole point
         // is to make the NUMERICAL diffusion consistent with the PHYSICAL one this very
         // coefficient sets.
-        // Dust factors of the opacities (Planck / Rosseland channel). The research code takes them
-        // from its dust-evolution package; this repository has none, so both are exactly 1
-        // (the opacity table already contains the dust and gas opacity).
+        // AUDIT F-06/F-07: the dust factors are T-dependent once the corrections are on, so
+        // they are evaluated HERE, below T, not above it. With the defaults kdustR is the
+        // historical DustFactor and this block is bit-identical.
         Real kdustP = 1.0, kdustR = 1.0;
+        if (dust_on) {
+          DustOpacityFactors(op, rho, T, pack(b, idust, k, j, i) * irho,
+                             pack(b, idust + 1, k, j, i) * irho, dust_fref, dust_aref,
+                             dust_bridged, dust_gassplit, kdustP, kdustR);
+        }
         const Real kR = RosselandOpacity(op, rho, T) * kdustR;
         const Real ks = ScatteringOpacity(op, rho, T) * kdustR;
         for (int g = 0; g < n_group; ++g) {

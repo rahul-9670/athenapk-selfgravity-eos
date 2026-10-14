@@ -1,0 +1,122 @@
+<comment>
+problem = dust F2_M30_N1024_hold2: planar Noh M 30 N 1024, T_subl 1171.5941729651327 K (T2 = 1171.5941729651327 K)
+
+<job>
+problem_id = eos_test
+
+<problem/eos_test>
+mode = riemann
+x0 = 0.5
+rhoL = 1.0
+espL_code = 1.4714108718138108
+uL = 38.38464102453582
+rhoR = 1.0
+espR_code = 1.4714108718138108
+uR = -38.38464102453582
+scalar0 = 0.01
+scalar1 = 1.0e-5
+
+<parthenon/mesh>
+refinement = none
+nghost = 2
+nx1 = 1024
+x1min = 0.0
+x1max = 1.0
+ix1_bc = outflow
+ox1_bc = outflow
+nx2 = 1
+x2min = -0.5
+x2max = 0.5
+ix2_bc = periodic
+ox2_bc = periodic
+nx3 = 1
+x3min = -0.5
+x3max = 0.5
+ix3_bc = periodic
+ox3_bc = periodic
+
+<parthenon/meshblock>
+nx1 = 1024
+nx2 = 1
+nx3 = 1
+
+<parthenon/time>
+integrator = vl2
+cfl = 0.3
+tlim = 0.09157351227941628
+nlim = -1
+
+<hydro>
+fluid = glmmhd
+riemann = hlld
+reconstruction = plm
+divergence_control = glm
+glmmhd_source = dedner_plain   # 1D: dedner_extended segfaults (E-F3)
+glmmhd_alpha = 0.1
+glmmhd_damping = midpoint
+first_order_flux_correct = false
+vl2_predictor_recon = same
+dfloor = 1.0e-6
+pfloor = 1.0e-8
+eos_floor_consistent = true
+lean_registers = true
+ghost_sync_rounds = 1
+eos = hydrogen
+eos_table_file = $REPO/src/eos/eos_table_hires_v5_cold_rho26.bin
+gamma = 1.4             # production deck value; unused by the table
+eos_interp = p
+Tfloor = 0.2726
+double_flux = true
+eos_table_allow_no_radiation = true   # validation-only escape (no radiation in these tests)
+boundary_flux_clamp = false
+dual_energy = true
+dual_energy_eta1 = 5e-2
+dual_energy_eta2 = 0.1
+dual_energy_kappa = 3.0
+dual_energy_shock_comp = 0.02
+dual_energy_shock_eta1 = true
+dual_energy_shock_detector = kv
+dual_energy_sync_step_end = true
+dual_energy_unsigned_prim = true
+dual_energy_exact_resync = true
+dual_energy_shared_select = true
+dual_comp_ghost = true
+dual_energy_heat_rkl2 = true
+dual_energy_heat_exact = true
+dual_energy_flux = density
+boundary_clamp_dual = true
+diode_energy_consistent = true
+nscalars = 2
+
+<physics>
+self_gravity = false
+radiation = false
+dust = true
+
+<dust>
+evolve = true
+scalar_index = 0
+a_ref_cm = 1.0e-5
+f_dg_ref = 0.01
+T_subl_K = 1171.5941729651327   # test value (production: 1.5e3)
+opacity_size_law = bridged
+opacity_gas_split = true
+rho_grain_cgs = 3
+alpha_turb = 0.01
+omega_ref_cgs = 1e-13
+mu_n = 2.33
+growth_cap = 0.1
+omega_local = true
+subl_irreversible = true
+freeze_growth = true   # test value (production: false)
+dual_energy = true
+subl_shock_hold = 2   # test key (production: absent = default)
+
+<parthenon/output0>
+file_type = hdf5
+variables = prim, cons, dual_switched
+dt = 0.02289337806985407
+
+<parthenon/output1>
+file_type = hst
+dt = 0.00045786756139708137

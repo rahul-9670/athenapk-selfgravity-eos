@@ -1,0 +1,14 @@
+F/F2_M10_N256_filt | F/F2_M10_N256_filt.in | | 1
+F/F2_M10_N256_filthold2 | F/F2_M10_N256_filthold2.in | | 1
+F/F2_M10_N1024_filt | F/F2_M10_N1024_filt.in | | 1
+F/F2_M10_N1024_filthold2 | F/F2_M10_N1024_filthold2.in | | 1
+F/F2_M10_N4096_filt | F/F2_M10_N4096_filt.in | | 1
+F/F2_M10_N4096_filthold2 | F/F2_M10_N4096_filthold2.in | | 1
+F/F2_M30_N256_filt | F/F2_M30_N256_filt.in | | 1
+F/F2_M30_N256_filthold2 | F/F2_M30_N256_filthold2.in | | 1
+F/F2_M30_N1024_filt | F/F2_M30_N1024_filt.in | | 1
+F/F2_M30_N1024_filthold2 | F/F2_M30_N1024_filthold2.in | | 1
+F/F2_M30_N4096_filt | F/F2_M30_N4096_filt.in | | 1
+F/F2_M30_N4096_filthold2 | F/F2_M30_N4096_filthold2.in | | 1
+F/F4c_1d_N256_filt | D4/D4c_1d_N256.in | dust/subl_T_filter=true | 1
+F/F4c_1d_N1024_filt | D4/D4c_1d_N1024.in | dust/subl_T_filter=true | 1

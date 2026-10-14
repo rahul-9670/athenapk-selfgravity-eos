@@ -1,0 +1,17 @@
+# D2: a_c/a_ref along a collapse track (d ln rho/dt = 1/t_ff, barotropic T), f = f_ref
+      rho    T[K] |   C=0.25    C=0.5      C=1 |  r(0.5)    r(1) |  gR(.25)    gR(1) |  area.25    area1
+    1e-13    14.1 |    1.085    1.161    1.294 |   1.070   1.193 |   0.9988   0.9959 |    0.922    0.773
+    1e-11    63.9 |    1.885    2.382    3.071 |   1.264   1.629 |   0.9496   0.8896 |    0.530    0.326
+    1e-10   158.8 |    3.302    4.313    5.662 |   1.306   1.714 |   0.7605   0.6106 |    0.303    0.177
+    1e-09   398.2 |    6.169    8.123   10.708 |   1.317   1.736 |   0.4048   0.2659 |    0.162    0.093
+    1e-08  1000.0 |   11.707   15.441   20.370 |   1.319   1.740 |   0.1575   0.0937 |    0.085    0.049
+# area = f/a in units of f_ref/a_ref (the grain-area factor of the ionization model, CellIon); gR = bridged Rosseland size factor
+# turbulent closure at a = a_ref and at the C = 0.25 a_c: v_B, code v_t, OC07 Eq. 27 (St2 = St1/2, Re 1e8)
+  rho   1e-19 T   10.0 a_ref: St 2.89e-03  v_B 7.480e-01  v_t(code) 5.444e+00  v_t(OC07) 2.722e+02 cm/s  -> v_t(OC07)/v_B 3.64e+02
+  rho   1e-17 T   10.0 a_ref: St 2.89e-04  v_B 7.482e-01  v_t(code) 5.444e-01  v_t(OC07) 2.722e+01 cm/s  -> v_t(OC07)/v_B 3.64e+01
+  rho   1e-15 T   10.1 a_ref: St 2.87e-05  v_B 7.527e-01  v_t(code) 5.444e-02  v_t(OC07) 2.722e+00 cm/s  -> v_t(OC07)/v_B 3.62e+00
+  rho   1e-13 T   14.1 a_ref: St 2.43e-06  v_B 8.896e-01  v_t(code) 5.444e-03  v_t(OC07) 2.722e-01 cm/s  -> v_t(OC07)/v_B 3.06e-01
+  rho   1e-11 T   63.9 a_ref: St 1.14e-07  v_B 1.891e+00  v_t(code) 5.444e-04  v_t(OC07) 2.722e-02 cm/s  -> v_t(OC07)/v_B 1.44e-02
+  rho   1e-10 T  158.8 a_ref: St 2.30e-08  v_B 2.981e+00  v_t(code) 1.722e-04  v_t(OC07) 8.608e-03 cm/s  -> v_t(OC07)/v_B 2.89e-03
+  rho   1e-09 T  398.2 a_ref: St 4.58e-09  v_B 4.721e+00  v_t(code) 5.444e-05  v_t(OC07) 2.722e-03 cm/s  -> v_t(OC07)/v_B 5.77e-04
+  rho   1e-08 T 1000.0 a_ref: St 9.15e-10  v_B 7.481e+00  v_t(code) 1.722e-05  v_t(OC07) 8.608e-04 cm/s  -> v_t(OC07)/v_B 1.15e-04

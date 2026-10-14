@@ -344,10 +344,24 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
   InitBEProfile(pin);
   const Real rho_amb = f * BEProfileHost(g_rc);
 
-  // Passive scalars: zero-filled. The first scalar_density component sits just past the hydro
-  // vars in the cons pack.
+  // Passive scalars: zero-filled, then the dust pair is seeded below. The first scalar_density
+  // component sits just past the hydro vars in the cons pack.
   const int nscalars_ic = pin->GetOrAddInteger("hydro", "nscalars", 0);
   const int iscal0 = mhd ? (IPS + 1) : NHYDRO;
+
+  // Dust ICs (WS-4). The scalar zero-fill below used to leave f_dg = a_c = 0: the dust package then "evolved" an
+  // empty grain population, and the `diffusion/dust_coupling` ionization feedback
+  // read zeros and no-op'd (measured 2026-07-30 on an FHC run: prim[14]/prim[15]
+  // identically 0.0 with <dust> evolve=true). Seed the reference MRN state so the
+  // dust scalars start from the same grains the ionization model assumes, keeping
+  // <dust> evolve=true consistent with the a_ref_cm/f_dg_ref the package uses.
+  // The dust package REQUIREs nscalars >= scalar_index+2 when evolve=true; the
+  // index guard below keeps this a no-op for any other configuration.
+  const bool dust_ic_on = pin->GetOrAddBoolean("dust", "evolve", false);
+  const int dust_si = pin->GetOrAddInteger("dust", "scalar_index", 0);
+  const Real dust_fdg_ic = pin->GetOrAddReal("dust", "f_dg_ref", 0.01);
+  const Real dust_ac_ic = pin->GetOrAddReal("dust", "a_ref_cm", 1.0e-5);
+  const bool seed_dust = dust_ic_on && (dust_si + 1 < nscalars_ic);
 
 
   for (int k = kb.s; k <= kb.e; ++k) {
@@ -394,6 +408,12 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
           u(IEN, k, j, i) += 0.5 * B0z * B0z;
         }
         for (int s = 0; s < nscalars_ic; ++s) u(iscal0 + s, k, j, i) = 0.0;
+        // Dust pair, written AFTER the zero-fill above (which would otherwise clear it):
+        // scalar_density = rho * f_dg, rho * a_c [cm].
+        if (seed_dust) {
+          u(iscal0 + dust_si + 0, k, j, i) = rho * dust_fdg_ic;
+          u(iscal0 + dust_si + 1, k, j, i) = rho * dust_ac_ic;
+        }
       }
     }
   }

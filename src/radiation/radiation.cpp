@@ -126,6 +126,28 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
   // Planck/Rosseland split: kappa_P = planck_ross_ratio * kappa_R for the emission term.
   // Default 1.0 => bit-identical to the single-opacity behavior.
   op.planck_ross_ratio = pin->GetOrAddReal(bn, "planck_ross_ratio", 1.0);
+  {
+    // R-F8 (validation/radiation_sn, 2026-10-08): the evaporation model of the dust/gas opacity split must be
+    // the one the opacity table was generated with (v9 = pollack). Read from <dust> so it sits with the other
+    // dust->opacity keys. Default "bl94" = historical.
+    const std::string ev = pin->GetOrAddString("dust", "opacity_evap", "bl94");
+    // R-F11 (2026-10-09): "table" = the grain share stored in a format-v4 table (--model semenov); checked
+    // after the table is loaded, below.
+    PARTHENON_REQUIRE(ev == "bl94" || ev == "pollack" || ev == "table",
+                      "dust/opacity_evap must be 'bl94', 'pollack' or 'table'");
+    op.dust_evap_pollack = (ev == "pollack");
+    op.dust_evap_table = (ev == "table");
+    // validation/dust DD5 / DU-F2: equilibrium-relative dust multiplier when the dust package sublimates at the
+    // table's own T5(rho). Only meaningful with the table's grain share; any other combination is refused rather
+    // than silently half-applied.
+    const std::string sm = pin->GetOrAddString("dust", "subl_model", "fixed");
+    op.dust_subl_eq = (sm == "semenov");
+    op.dust_subl_width = pin->GetOrAddReal("dust", "subl_width_K", 100.0);
+    PARTHENON_REQUIRE(!op.dust_subl_eq || op.dust_evap_table,
+                      "dust/subl_model = semenov needs dust/opacity_evap = table (the v4 table's grain share is "
+                      "built with the same Semenov T5(rho); with bl94/pollack the split uses another evaporation "
+                      "model and the two would disagree again)");
+  }
   PARTHENON_REQUIRE(op.planck_ross_ratio > 0.0,
                     "radiation/planck_ross_ratio must be > 0.");
   // Regime-skip-robust Bell&Lin walk (default false = bit-identical; fixes the off-track
@@ -157,6 +179,9 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     // Warn in that case, quantifying it, so an old table can never be mistaken for a fixed one.
     op.table.Load(opac_table_file, rho_unit, T_unit, kappa_conv);
     if (opacity_interp_log) op.table.EnableLogInterp();   // R-F5
+    PARTHENON_REQUIRE(!op.dust_evap_table || op.table.has_dust_weight_,
+                      "dust/opacity_evap = table needs a format-v4 opacity table with dust weights "
+                      "(gen_opacity_table.py --model semenov); " + opac_table_file + " has none");
     if (parthenon::Globals::my_rank == 0 && op.table.used_legacy_code_units) {
       constexpr Real kGenRhoUnit = 5.467e-19; // gen_opacity_table.py RHO_UNIT, format v1
       constexpr Real kGenLenUnit = 2.81e16;   // gen_opacity_table.py LEN_UNIT, format v1
@@ -171,6 +196,8 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
                 << std::endl;
     }
   }
+  PARTHENON_REQUIRE(!op.dust_evap_table || op.model == OpacityModel::tabulated,
+                    "dust/opacity_evap = table needs radiation/opacity_model = tabulated");
   pkg->AddParam("opacity", op);
   // Back-compat scalar params (constant model still reads these directly).
   pkg->AddParam("kappa_a", op.kappa_a0);

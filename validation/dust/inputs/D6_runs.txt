@@ -1,0 +1,4 @@
+D6/D6a_amr | D6/D6a_amr.in | | 16
+D6/D6a_uni256 | D6/D6a_uni256.in | | 16
+D6/D6c_amr | D6/D6c_amr.in | | 16
+D6/D6c_uni256 | D6/D6c_uni256.in | | 16

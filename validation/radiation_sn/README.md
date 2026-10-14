@@ -42,7 +42,8 @@ check of the code shipped here against the research code it was taken from, Sec.
 * Tests of physics that is not part of this repository (the dust-evolution factor of the opacities, R7-O6 / R-F8, and
   the 3-D collapse-restart gates of the research code). In this repository the dust multipliers of the opacities are
   exactly 1: the opacity table already contains the dust and gas opacity, which is what the research code computes
-  with its dust package off. Decks keep the `dust/...` keys of the research runs; they are ignored here.
+  with its dust package off. Decks keep the `dust/...` keys of the research runs. (Since 2026-10-13 the dust package is
+  part of this repository, `../dust/`; these decks leave it off, so the factors stay 1.)
 * Literature (copyrighted text).
 
 Paths: as in `../eos_tabulated/README.md` (`$REPO` = repository root, `export REPO=/path/to/clone`; in decks

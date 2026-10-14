@@ -1,0 +1,5 @@
+# D3 one-zone sublimation (dump by dump; T from the table at the cell state)
+D3a_frz    T 1250.0 -> 1927.9 K | f/f_ref final 1.9195e-04 | max |f/(f_ref subl(T)) - 1| 2.89e-13 | max |a/(a_ref (f/f_ref)^1/3) - 1| 1.37e-06 | cell spread 8.1e-04
+D3a_prod   T 1250.0 -> 1927.9 K | f/f_ref final 1.9195e-04 | max |f/(f_ref subl(T)) - 1| 2.89e-13 | cell spread 8.1e-04
+D3b_frz    T 1900.2 -> 1423.9 K | f/f_ref after 1st React 3.3528e-04 (subl(T0) 3.3535e-04) | f within its first-React [min,max] at dumps 1..19: YES while f_eq(T_final)/f_ref = 0.821 | cell spread 5.3e-08
+D3b_prod   T 1900.2 -> 1423.9 K | f/f_ref after 1st React 3.3528e-04 (subl(T0) 3.3535e-04) | f within its first-React [min,max] at dumps 1..19: YES while f_eq(T_final)/f_ref = 0.821 | cell spread 5.3e-08

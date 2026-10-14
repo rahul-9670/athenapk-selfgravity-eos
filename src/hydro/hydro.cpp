@@ -33,6 +33,7 @@
 #include "../units/physical_units.hpp"
 #include "defs.hpp"
 #include "../diagnostics/cons_diag.hpp"
+#include "../dust/dust_pkg.hpp"
 #include <solvers/bicgstab_solver.hpp>
 #include <solvers/mg_solver.hpp>
 #include "glmmhd/glmmhd.hpp"
@@ -75,11 +76,12 @@ parthenon::Packages_t ProcessPackages(std::unique_ptr<ParameterInput> &pin) {
   if (pin->GetOrAddBoolean("physics", "radiation", false)) {
     packages.Add(Radiation::Initialize(pin.get()));
   }
-  // This tree carries hydro/MHD + self-gravity + the tabulated EOS + radiation (Sn) only. Refuse
-  // switches for packages that are not part of it rather than silently running without them.
-  for (const char *phys : {"chemistry", "dust"}) {
-    PARTHENON_REQUIRE_THROWS(!pin->GetOrAddBoolean("physics", phys, false),
-                             "<physics> " + std::string(phys) + " is not part of this build.");
+  // This tree carries hydro/MHD + self-gravity + the tabulated EOS + radiation (Sn) + non-ideal MHD + dust
+  // evolution. Refuse switches for packages that are not part of it rather than silently running without them.
+  PARTHENON_REQUIRE_THROWS(!pin->GetOrAddBoolean("physics", "chemistry", false),
+                           "<physics> chemistry is not part of this build.");
+  if (pin->GetOrAddBoolean("physics", "dust", false)) {
+    packages.Add(Dust::Initialize(pin.get()));
   }
   PARTHENON_REQUIRE_THROWS(!pin->GetOrAddBoolean("sinks", "enabled", false),
                            "<sinks> enabled: sink particles are not part of this build.");
@@ -1521,11 +1523,49 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
         }
       }
 
-      // The per-cell dust -> conductivity coupling of the full code (diffusion/dust_coupling) needs the
-      // dust-evolution package, which is not part of this tree: the ionization model uses its static
-      // MRN grain population.
-      PARTHENON_REQUIRE_THROWS(!pin->GetOrAddBoolean("diffusion", "dust_coupling", false),
-                               "diffusion/dust_coupling is not part of this tree (no dust package).");
+      // AUDIT ITEM 5 -- WS-4 DUST -> CONDUCTIVITY COUPLING.
+      // Grains dominate recombination over most of the collapse, so they set x_e and hence
+      // all three non-ideal diffusivities. Without the coupling the ionization model uses a FROZEN ISM
+      // MRN population while the dust package evolves (f_dg, a_c) for the OPACITY only --
+      // i.e. the run's own grain evolution never reaches its own magnetic microphysics.
+      // With this on, the conductivity grain population is rescaled per cell to the evolved
+      // scalars (see IonizationModel::FDG/Ak and FusedNonidealEval::CellIon).
+      // OFF by default; when off nothing is copied and results are bit-identical.
+      const bool dust_couple =
+          pin->GetOrAddBoolean("diffusion", "dust_coupling", false);
+      pkg->AddParam<>("nonideal_dust_on", dust_couple);
+      if (dust_couple) {
+        PARTHENON_REQUIRE(pin->GetOrAddBoolean("dust", "evolve", false),
+                          "diffusion/dust_coupling=true requires the dust package to be "
+                          "evolving (<dust> evolve=true) -- otherwise the grain population "
+                          "is static and the coupling is a no-op with extra cost.");
+        PARTHENON_REQUIRE(any_ionization,
+                          "diffusion/dust_coupling=true only affects ionization-family "
+                          "coefficients (resistivity/ambipolar _coeff = ionization).");
+        // Dust stores f_dg at scalar_index and a_c at scalar_index+1 (see dust.cpp);
+        // prim component = nhydro + scalar index, the same convention as x_e.
+        const int dsi = pin->GetOrAddInteger("dust", "scalar_index", 0);
+        pkg->AddParam<>("nonideal_dust_i_fdg", nhydro + dsi);
+        pkg->AddParam<>("nonideal_dust_i_ac", nhydro + dsi + 1);
+        // Reference population the STATIC MRN bins represent. a_ref/f_dg_ref must be the
+        // values the bins were built from, or the scaling is biased at t=0.
+        // NOTE the key is "a_ref_cm", not "a_ref" (see dust.cpp). Reading the wrong key
+        // would silently fall back to 1e-5 and bias a_scale for any deck that sets it.
+        pkg->AddParam<>("nonideal_dust_a_ref",
+                        pin->GetOrAddReal("dust", "a_ref_cm", 1.0e-5));
+        pkg->AddParam<>("nonideal_dust_fdg_ref",
+                        pin->GetOrAddReal("dust", "f_dg_ref", 0.01));
+        // validation/dust (DU-F4): destroyed grains (f_dg <= 0, a_c > 0) -> no grains in the charge solve
+        // (FusedNonidealEval::dust_destroyed_zero). Default false = the historical 'reference population' fallback.
+        pkg->AddParam<>("nonideal_dust_destroyed_zero",
+                        pin->GetOrAddBoolean("diffusion", "dust_destroyed_zero", false));
+        if (parthenon::Globals::my_rank == 0) {
+          std::cout << "## Dust->conductivity coupling ON (diffusion/dust_coupling): the "
+                       "ionization grain population is rescaled per cell from the evolved "
+                       "(f_dg, a_c) at prim indices " << nhydro + dsi << ", "
+                    << nhydro + dsi + 1 << "." << std::endl;
+        }
+      }
       // AUDIT ITEM 1 -- non-ideal cap-activation diagnostic.
       // eta_ohm_cap_code / eta_ad_cap_code are numerical stabilizers
       // that MODIFY the induction equation, so a flux-retention number is uninterpretable
