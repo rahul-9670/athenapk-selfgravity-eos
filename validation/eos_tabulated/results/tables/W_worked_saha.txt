@@ -1,0 +1,52 @@
+# generator $REPO/src/eos/gen_eos_table.py; X = 0.716, Y = 0.284; temperature_unit = 10.015144 K
+
+== W1 reference state (rho_code = 1, T = temperature_unit): rho = 5.467000e-19 g/cm^3 (rho_code 1.000000e+00), T = 10.0151 K
+  nuclei: n_H = 2.340261e+05, n_He = 2.320650e+04 cm^-3
+  species [cm^-3]: H2 1.1701e+05, HI 0.0000e+00, HII 0.0000e+00, e 1.0000e-40, HeI 2.3206e+04, HeII 0.0000e+00, HeIII 0.0000e+00
+  fractions: 2 n_H2/n_H = 1.000000, n_HI/n_H = 0.000000e+00, n_HII/n_H = 0.000000e+00, n_e/n_H = 4.273027e-46
+  checks: |charge residual|/n_H 4.27e-46, H-nucleus conservation 0.00e+00
+  n_tot = 1.402196e+05 cm^-3, mu = rho/(m_H n_tot) = 2.331002
+  P = n_tot k T = 1.938872e-10 erg/cm^3 = 9.824100e-01 code
+    e term translational 3/2 n_tot k T            2.908307e-10 erg/cm^3 (100.000 %)
+    e term H2 rotation n_H2 e_rot(T)              6.240738e-31 erg/cm^3 (  0.000 %)
+    e term H2 vibration n_H2 e_vib(T)             2.325824e-267 erg/cm^3 (  0.000 %)
+    e term dissociation chi_d (n_HI + n_HII)/2    0.000000e+00 erg/cm^3 (  0.000 %)
+    e term H ionization chi_H n_HII               0.000000e+00 erg/cm^3 (  0.000 %)
+    e term He ionization                          0.000000e+00 erg/cm^3 (  0.000 %)
+  e_int = 2.908307e-10 erg/cm^3; esp = e_int/rho = 5.319750e+08 erg/g = 1.473615e+00 code
+  e_int/P = 1.500000; 1 + P/e_int = 1.666667; c_v = (du/dT)_rho = 5.311706e+07 erg/g/K
+  cs^2 (exact Saha, finite diff.) = 5.910833e+08 cm^2/s^2 = 1.637350e+00 code; Gamma1 = rho cs^2/P = 1.666667
+
+== W2 H2 dissociation: rho = 1.000000e-09 g/cm^3 (rho_code 1.829157e+09), T = 2000 K
+  nuclei: n_H = 4.280704e+14, n_He = 4.244833e+13 cm^-3
+  species [cm^-3]: H2 1.9213e+14, HI 4.3803e+13, HII 7.1652e-01, e 7.1652e-01, HeI 4.2448e+13, HeII 5.6570e-28, HeIII 1.2718e-144
+  fractions: 2 n_H2/n_H = 0.897673, n_HI/n_H = 1.023270e-01, n_HII/n_H = 1.673841e-15, n_e/n_H = 1.673841e-15
+  checks: |charge residual|/n_H 2.59e-31, H-nucleus conservation 0.00e+00
+  n_tot = 2.783851e+14 cm^-3, mu = rho/(m_H n_tot) = 2.147614
+  P = n_tot k T = 7.687043e+01 erg/cm^3 = 3.894960e+11 code
+    e term translational 3/2 n_tot k T            1.153056e+02 erg/cm^3 ( 34.971 %)
+    e term H2 rotation n_H2 e_rot(T)              4.889841e+01 erg/cm^3 ( 14.830 %)
+    e term H2 vibration n_H2 e_vib(T)             8.378434e+00 erg/cm^3 (  2.541 %)
+    e term dissociation chi_d (n_HI + n_HII)/2    1.571375e+02 erg/cm^3 ( 47.658 %)
+    e term H ionization chi_H n_HII               1.561043e-11 erg/cm^3 (  0.000 %)
+    e term He ionization                          2.228430e-38 erg/cm^3 (  0.000 %)
+  e_int = 3.297200e+02 erg/cm^3; esp = e_int/rho = 3.297200e+11 erg/g = 9.133518e+02 code
+  e_int/P = 4.289295; 1 + P/e_int = 1.233139; c_v = (du/dT)_rho = 1.092156e+09 erg/g/K
+  cs^2 (exact Saha, finite diff.) = 8.463058e+10 cm^2/s^2 = 2.344338e+02 code; Gamma1 = rho cs^2/P = 1.100951
+
+== W2b deeper in dissociation: rho = 1.000000e-08 g/cm^3 (rho_code 1.829157e+10), T = 3000 K
+  nuclei: n_H = 4.280704e+15, n_He = 4.244833e+14 cm^-3
+  species [cm^-3]: H2 2.2691e+14, HI 3.8269e+15, HII 4.6653e+06, e 4.6653e+06, HeI 4.2448e+14, HeII 7.1655e-13, HeIII 2.3264e-90
+  fractions: 2 n_H2/n_H = 0.106015, n_HI/n_H = 8.939848e-01, n_HII/n_H = 1.089836e-09, n_e/n_H = 1.089836e-09
+  checks: |charge residual|/n_H 2.39e-24, H-nucleus conservation 0.00e+00
+  n_tot = 4.478278e+15 cm^-3, mu = rho/(m_H n_tot) = 1.335030
+  P = n_tot k T = 1.854879e+03 erg/cm^3 = 9.398516e+12 code
+    e term translational 3/2 n_tot k T            2.782318e+03 erg/cm^3 ( 16.731 %)
+    e term H2 rotation n_H2 e_rot(T)              8.907818e+01 erg/cm^3 (  0.536 %)
+    e term H2 vibration n_H2 e_vib(T)             2.950437e+01 erg/cm^3 (  0.177 %)
+    e term dissociation chi_d (n_HI + n_HII)/2    1.372839e+04 erg/cm^3 ( 82.555 %)
+    e term H ionization chi_H n_HII               1.016393e-04 erg/cm^3 (  0.000 %)
+    e term He ionization                          2.822669e-23 erg/cm^3 (  0.000 %)
+  e_int = 1.662929e+04 erg/cm^3; esp = e_int/rho = 1.662929e+12 erg/g = 4.606451e+03 code
+  e_int/P = 8.965162; 1 + P/e_int = 1.111543; c_v = (du/dT)_rho = 8.771072e+08 erg/g/K
+  cs^2 (exact Saha, finite diff.) = 2.164979e+11 cm^2/s^2 = 5.997173e+02 code; Gamma1 = rho cs^2/P = 1.167181

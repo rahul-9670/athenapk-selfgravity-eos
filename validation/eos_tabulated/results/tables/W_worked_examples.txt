@@ -1,0 +1,98 @@
+# eos_table.hpp md5 59d20077  table md5 cb68bd0f
+# Worked examples, table $REPO/src/eos/eos_table_hires_v5_cold_rho26.bin
+# units: rho_unit 5.4670e-19 g/cm^3, v_unit 1.9000e+04 cm/s, esp_unit = v^2 = 3.610000e+08 erg/g, P_unit = rho v^2 = 1.973587e-10 erg/cm^3, temperature_unit = mu_th m_H v^2/k_B = 10.015144 K
+# grid (code units after Load): nr 520 ne 1399 nT 1370
+#   log10 rho_code [-7.752787, 18.262251] step 0.050125  (cgs: [-26.0150, -0.0000])
+#   log10 esp_code [-2.030833, 5.331320] step 0.005266  (cgs: [6.5267, 13.8888])
+#   log10 T[K]     [-1.336642, 5.477121] step 0.004977
+#   rho_min 1.766906e-08  esp_min 9.314658e-03  T_min 4.606357e-02 K
+#   bisection bound 0.5 ln10 (log-esp range) 2^-20 = 8.0833e-06
+
+== W1 reference state (rho_code = 1, T = temperature_unit): rho = 1.000000e+00 code (5.467000e-19 g/cm^3), T = 10.0151 K
+    (rho,T) grid espT stencil: fi = 154.668094 -> i = 154, ti = 0.668094;  fj = 469.602894 -> j = 469, tj = 0.602894
+      A(i,j) = 1.4634682980e+00  A(i+1,j) = 1.4634682980e+00
+      A(i,j+1) = 1.4803366865e+00  A(i+1,j+1) = 1.4803366865e+00
+    EintFromRhoTk -> e_int = 1.4736381505e+00 code;  esp = e_int/rho = 1.4736381505e+00 code = 5.319834e+08 erg/g
+    (rho,esp) grid P/rho_node stencil: fi = 154.668094 -> i = 154, ti = 0.668094;  fj = 417.610849 -> j = 417, tj = 0.610849
+      A(i,j) = 9.7517798055e-01  A(i+1,j) = 9.7517798055e-01
+      A(i,j+1) = 9.8707328162e-01  A(i+1,j+1) = 9.8707328162e-01
+    Pof   -> P = 9.8244421418e-01 code = 1.938939e-10 erg/cm^3;  P/rho = 0.9824442142 code
+    Cs2of -> cs^2 = 1.6395885825e+00 code (cs = 2.432882e+04 cm/s);  Gamma1 = rho cs^2 / P = 1.668887
+    e_int / P = 1.499971  (ideal gas: 1/(gamma-1));  1 + P/e_int = 1.666679
+    LogTof (T -> e -> T round trip) -> T = 10.01530093 K, rel. diff 1.571e-05
+    mu implied by P = rho k T / (mu m_H): mu = 2.330921
+    EspFromP(rho, P) with 20 bisections -> esp = 1.473630061338e+00, rel. error -5.489e-06
+    EspFromP(rho, P) with 30 bisections -> esp = 1.473638146061e+00, rel. error -2.992e-09
+    EspFromP(rho, P) with 60 bisections -> esp = 1.473638150469e+00, rel. error -1.110e-16
+    AsqFromRhoPres(rho, P) = 1.6395795135e+00 (= Cs2of at the bisected esp)
+    clamp counters after this state: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+
+== W2 H2 dissociation (1e-9 g/cm^3, 2000 K): rho = 1.829157e+09 code (1.000000e-09 g/cm^3), T = 2000 K
+    (rho,T) grid espT stencil: fi = 339.450000 -> i = 339, ti = 0.450000;  fj = 931.786577 -> j = 931, tj = 0.786577
+      A(i,j) = 8.7105751963e+02  A(i+1,j) = 8.4940875977e+02
+      A(i,j+1) = 9.3964247509e+02  A(i+1,j+1) = 9.1485442684e+02
+    EintFromRhoTk -> e_int = 1.6721268532e+12 code;  esp = e_int/rho = 9.1415175066e+02 code = 3.300088e+11 erg/g
+    (rho,esp) grid P/rho_node stencil: fi = 339.450000 -> i = 339, ti = 0.450000;  fj = 947.903150 -> j = 947, tj = 0.903150
+      A(i,j) = 2.1197854371e+02  A(i+1,j) = 2.1273038901e+02
+      A(i,j+1) = 2.1274429522e+02  A(i+1,j+1) = 2.1349236322e+02
+    Pof   -> P = 3.8962306148e+11 code = 7.689550e+01 erg/cm^3;  P/rho = 213.0069277119 code
+    Cs2of -> cs^2 = 2.3494378803e+02 code (cs = 2.912296e+05 cm/s);  Gamma1 = rho cs^2 / P = 1.102987
+    e_int / P = 4.291653  (ideal gas: 1/(gamma-1));  1 + P/e_int = 1.233010
+    LogTof (T -> e -> T round trip) -> T = 2000.208641 K, rel. diff 1.043e-04
+    mu implied by P = rho k T / (mu m_H): mu = 2.146914
+    EspFromP(rho, P) with 20 bisections -> esp = 9.141459276045e+02, rel. error -6.370e-06
+    EspFromP(rho, P) with 30 bisections -> esp = 9.141517510648e+02, rel. error 4.430e-10
+    EspFromP(rho, P) with 60 bisections -> esp = 9.141517506598e+02, rel. error -2.887e-15
+    AsqFromRhoPres(rho, P) = 2.3494336754e+02 (= Cs2of at the bisected esp)
+    clamp counters after this state: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+
+== W2b deeper in dissociation (1e-8 g/cm^3, 3000 K): rho = 1.829157e+10 code (1.000000e-08 g/cm^3), T = 3000 K
+    (rho,T) grid espT stencil: fi = 359.400000 -> i = 359, ti = 0.400000;  fj = 967.166280 -> j = 967, tj = 0.166280
+      A(i,j) = 4.6095922734e+03  A(i+1,j) = 4.5657136533e+03
+      A(i,j+1) = 4.6876756217e+03  A(i+1,j+1) = 4.6491385252e+03
+    EintFromRhoTk -> e_int = 8.4239615782e+13 code;  esp = e_int/rho = 4.6053797948e+03 code = 1.662542e+12 erg/g
+    (rho,esp) grid P/rho_node stencil: fi = 359.400000 -> i = 359, ti = 0.400000;  fj = 1081.252932 -> j = 1081, tj = 0.252932
+      A(i,j) = 5.1098809503e+02  A(i+1,j) = 5.1373894139e+02
+      A(i,j+1) = 5.1788844111e+02  A(i+1,j+1) = 5.2053113280e+02
+    Pof   -> P = 9.3986247102e+12 code = 1.854900e+03 erg/cm^3;  P/rho = 513.8228129041 code
+    Cs2of -> cs^2 = 6.0114183965e+02 code (cs = 4.658457e+05 cm/s);  Gamma1 = rho cs^2 / P = 1.169940
+    e_int / P = 8.962973  (ideal gas: 1/(gamma-1));  1 + P/e_int = 1.111570
+    LogTof (T -> e -> T round trip) -> T = 3000.210886 K, rel. diff 7.030e-05
+    mu implied by P = rho k T / (mu m_H): mu = 1.335015
+    EspFromP(rho, P) with 20 bisections -> esp = 4.605381289716e+03, rel. error 3.246e-07
+    EspFromP(rho, P) with 30 bisections -> esp = 4.605379799188e+03, rel. error 9.523e-10
+    EspFromP(rho, P) with 60 bisections -> esp = 4.605379794802e+03, rel. error -1.332e-15
+    AsqFromRhoPres(rho, P) = 6.0114214733e+02 (= Cs2of at the bisected esp)
+    clamp counters after this state: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+
+== W3 edges and floors (rho_code = 1)
+    P(rho, esp_min) = 6.2098499649e-03 code;  esp_min = 9.3146583894e-03 code (T = 6.330530e-02 K)
+    clamp counters after edge-node lookups: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+  (a) esp = 0.5 esp_min: Pof legacy clamp = 6.2098499649e-03, extrapolating = 3.1049249825e-03 (ratio 0.500000)
+      TemperatureK extrapolating = 3.165265e-02 K (half of T(esp_min))
+    clamp counters after (a): rho< 0 rho> 0 esp< 5 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+  (b) pressure floor pfloor = 1e-8: EintFromRhoPres -> e_fl = 1.4999812301e-08 code (esp/esp_min = 1.610345e-06)
+      P(e_fl) = 1.0000000000e-08 (= pfloor x 1.000000000000);  T = 1.019434e-07 K
+      legacy clamp: e_fl = 9.3147336832e-03 (esp/esp_min = 1.00000808), P(e_fl) = 6.209900e-03 = pfloor x 6.2099e+05
+    clamp counters after (b): rho< 0 rho> 0 esp< 4 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+  (c) hydro/Tfloor = 0.2726 code = 2.730128 K: e_floor = EintFromRhoTkHost(1, T)/1 = 4.0171152707e-01 code
+      rho = 1e-06: floor pressure P(rho, rho e_floor) = 2.678156e-07, P/rho = 0.26781559, T = 2.730156 K
+      rho = 1e+00: floor pressure P(rho, rho e_floor) = 2.678156e-01, P/rho = 0.26781559, T = 2.730156 K
+      rho = 1e+06: floor pressure P(rho, rho e_floor) = 2.678156e+05, P/rho = 0.26781559, T = 2.730156 K
+    clamp counters after (c): rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+  (d) rho = 0.5 rho_min (4.8298e-27 g/cm^3), esp of 10 K:
+      p_over_rho: P/rho = 0.9809604182;  p + extrapolate: 0.9809604182;  p legacy clamp: 1.9619208365
+      (at rho_min itself, P/rho = 0.9809604182)
+    clamp counters after (d) p_over_rho: rho< 1 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+    clamp counters after (d) p: rho< 2 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+  (e) E-F1: midway between rho nodes 300 and 301 (rho 1.1159e-11 g/cm^3), esp of 10 K: P(p) / P(p_over_rho) = 1.00166562;  predicted (1 + 10^dlr)/(2 10^(dlr/2)) = 1.00166562
+    clamp counters after (e): rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+    clamp counters after (f) setup: rho< 0 rho> 0 esp< 0 esp> 1 T< 0 T> 0 | probe 0 0 0 0 0 0
+  (f) esp_max = 2.144471e+05 code; P(rho, esp_max) = 1.128406e+05; T(rho, esp_max) = 3.000000e+05 K
+    clamp counters after (f) edge-node lookups: rho< 0 rho> 0 esp< 0 esp> 1 T< 0 T> 0 | probe 0 0 0 0 0 0
+      Pof(rho, 2 esp_max) = 1.128406e+05 (ratio to P(esp_max) 1.000000)
+    clamp counters after Pof above the esp axis: rho< 0 rho> 0 esp< 0 esp> 2 T< 0 T> 0 | probe 0 0 0 0 0 0
+      EintFromRhoTk(rho, 1e6 K) / rho = 2.142328e+05 (esp(T_max) = 2.142328e+05)
+    clamp counters after EintFromRhoTk above the T axis: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 2 | probe 0 0 0 0 0 0
+      EspFromP(rho, 10 P(esp_max)) = 2.144453e+05 = esp_max x 0.999992;  P of that esp = 1.128396e+05 (target 1.128406e+06)
+    clamp counters after EspFromP above the P range (the Pof check above it is the esp> count): rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0

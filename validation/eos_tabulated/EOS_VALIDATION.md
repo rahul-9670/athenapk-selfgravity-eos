@@ -1,6 +1,6 @@
-# Tabulated equation of state in AthenaPK: validation report (paper I)
+# Tabulated equation of state in AthenaPK: implementation guide and validation report (paper I)
 
-Version 2026-10-06 (public edition). Folder `validation/eos_tabulated/`. This document is the authoritative report for
+Version 2026-10-16 (public edition). Folder `validation/eos_tabulated/`. This document is the authoritative report for
 the EOS module; `README.md` is the index of decks, scripts and results.
 
 *Public edition.* The validation was carried out in a larger private research code from which this repository was
@@ -8,6 +8,22 @@ extracted (self-gravity + tabulated EOS only). Passages about the private develo
 hashes, the adoption into the production runs), about physics modules that are not part of this repository, and
 about compute systems have been removed or generalised; every test result, table and figure of the EOS tests is
 unchanged. Hashes that remain identify the binaries recorded in each run's `cmd.txt`.
+
+**How this document is organised.** It reads from the physics to the evidence:
+
+* **Part A — the EOS from physics to code** (added 2026-10-16): why the solver needs an EOS (A1), the chain from the
+  offline generator to the device lookups (A2), the Saha microphysics with derivations (A3), how the table is built
+  and stored (A4), units (A5), the runtime execution path (A6), every lookup function (A7), how the answers enter
+  ConsToPrim, the floors and the Riemann solver (A8), the numerical error budget (A9), all configuration keys (A10),
+  three worked examples computed by the real code (A11) and a one-paragraph summary (A12).
+* **Part B — validation** (Sec. 1–14, unchanged in substance; the section numbers and finding IDs E-F1 … E-F11 that
+  other documents cite are kept): the tests E1–E10, their results, the findings and the reproduction map.
+* **Part C — reading the validation** (added 2026-10-16): what each test establishes and what it does not (C1),
+  limitations and untested regimes (C2), implementation observations O-1 … O-7 found while writing Part A, not fixed
+  (C3), proposed tests that have not been run (C4), and the source reference index with permalinks (C5).
+
+Readers who want the results first can read Sec. 0 and then Part B; Part A explains what those results are results
+*of*.
 
 ---
 
@@ -38,6 +54,885 @@ table; fixed WITH PLM by an opt-in double-flux energy update (`hydro/double_flux
 Test-infrastructure traps in Sec. 12.
 
 ---
+
+# Part A — The EOS from physics to code
+
+Part A is a self-contained guide to the equation of state as it is implemented in this repository: the physics
+that the table encodes, how the table is built, how the running code reads it, and how its answers enter the MHD
+solver. Every implementation statement links to the source at commit `a40eff5` (the code this document describes;
+the documentation commit does not change any source file). Statements are labelled as follows when the label
+matters: **[code]** read directly from the source; **[measured]** a number produced by a program, with the file
+that holds it; **[derived]** a hand derivation; **[theory]** standard textbook physics that the code does not
+itself establish; **[inferred]** a conclusion drawn from the code that no test isolates.
+
+Notation used throughout (all symbols are re-defined where they first matter):
+
+| symbol | meaning | unit (code / cgs) |
+|---|---|---|
+| $\rho$ | mass density | $\rho_u$ / g cm$^{-3}$ |
+| $\mathbf v$, $\mathbf m=\rho\mathbf v$ | velocity, momentum density | $v_u$, $\rho_u v_u$ |
+| $\mathbf B$ | magnetic field, Heaviside-Lorentz ($P_{\rm mag}=B^2/2$) | $\sqrt{\rho_u}\,v_u$ (HL) / $\sqrt{4\pi\rho_u}\,v_u$ G |
+| $E$ | total energy density $=\rho\varepsilon+\tfrac12\rho v^2+\tfrac12B^2$ | $\rho_u v_u^2$ / erg cm$^{-3}$ |
+| $\varepsilon$ (`esp` in the code) | **specific** internal energy | $v_u^2$ / erg g$^{-1}$ |
+| $e_{\rm int}=\rho\varepsilon$ (`eint`) | internal-energy **density** | $\rho_u v_u^2$ |
+| $P$ | gas pressure | $\rho_u v_u^2$ / erg cm$^{-3}$ |
+| $T$ | temperature | **kelvin** in the table; $T_{\rm code}=T/T_u$ elsewhere |
+| $c_s^2=(\partial P/\partial\rho)_s$ (`cs2`) | adiabatic sound speed squared | $v_u^2$ |
+| $\Gamma_1=\rho c_s^2/P$ | first adiabatic index | — |
+| $\mu$ | mean mass per free particle in units of $m_H$: $\rho=\mu m_H n_{\rm tot}$ | — |
+| $\rho_u, v_u, T_u$ | code units: $5.467\times10^{-19}$ g cm$^{-3}$, $1.9\times10^4$ cm s$^{-1}$, 10.015 K (Sec. A5) | |
+
+## A1. Why the simulation needs an equation of state
+
+AthenaPK evolves the conserved variables of ideal (or non-ideal) MHD in each cell,
+$U=(\rho,\ \mathbf m,\ E,\ \mathbf B,\ \psi)$, with $\psi$ the GLM divergence-cleaning scalar. These equations are
+not closed: the flux of momentum contains the gas pressure $P$, the flux of energy contains $(E+P+B^2/2)\mathbf v$,
+and the speed at which information travels — which sets both the Riemann-solver wave speeds and the time step —
+contains the sound speed. The conserved variables only provide the internal energy, as the difference
+
+```math
+e_{\rm int} \;=\; E-\tfrac12\frac{|\mathbf m|^2}{\rho}-\tfrac12|\mathbf B|^2 ,\qquad \varepsilon=e_{\rm int}/\rho .
+```
+
+The equation of state (EOS) is the closure that turns $(\rho,\varepsilon)$ into $P$ and $c_s$, and — because the
+solver reconstructs **primitive** variables $(\rho,\mathbf v,P,\mathbf B)$ at cell faces — also the inverse map
+$(\rho,P)\mapsto\varepsilon$. Other physics needs the temperature: the radiation, dust and non-ideal-MHD packages,
+the Jeans refinement criterion and the problem generators that set initial conditions from a temperature.
+
+So the EOS must answer five questions, each of which appears as a function in the code:
+
+| question | function ([code]) | main consumers |
+|---|---|---|
+| $P(\rho,e_{\rm int})$ | [`EosTable::PresFromRhoEint`][tab-iface] → [`Pof`][tab-pof] | [ConsToPrim][c2p-p] (every cell, every stage) |
+| $e_{\rm int}(\rho,P)$ | [`EintFromRhoPres`][tab-iface] → [`EspFromP`][tab-espfromp] | [HLLD face energies][hlld-e], [pressure floor][c2p-pfl], double flux |
+| $c_s^2(\rho,P)$ | [`AsqFromRhoPres`][tab-iface] → `EspFromP` + [`Cs2of`][tab-pof] | [fast magnetosonic speed][eos-cf] → HLLD wave speeds, [time step][dt-hyp], [Jeans refinement][jeans] |
+| $T(\rho,e_{\rm int})$, $T(\rho,P)$ | [`TemperatureK`][tab-iface], [`TemperatureKFromPres`][tab-tfromp] | radiation, dust, non-ideal MHD coefficients |
+| $e_{\rm int}(\rho,T)$ | [`EintFromRhoTk`][tab-eintT] (+ host twin) | initial conditions, `hydro/Tfloor`, the `collapse_be` barotropic step, radiation matter coupling |
+
+Two EOS are implemented behind one interface, selected by `<hydro> eos` ([code][hydro-eos]):
+
+* `eos = adiabatic` — the ideal gas $P=(\gamma-1)\rho\varepsilon$ with constant $\gamma$ (`hydro/gamma`);
+* `eos = hydrogen` — the **tabulated protostellar EOS**: a hydrogen–helium mixture in local thermodynamic and
+  chemical equilibrium (Saha) with H$_2$ rotation/vibration, H$_2$ dissociation, H and He ionization. This is the EOS
+  this document is about.
+
+Why a table? A collapsing protostellar core passes from cold molecular gas ($\Gamma_1=5/3$ below ~50 K, where
+H$_2$ rotation is frozen; ~7/5 when it is excited) through H$_2$ dissociation near 2000 K, where most of the
+compressional work goes into breaking molecules ($\Gamma_1$ falls to ~1.1, which is what triggers the second
+collapse), and through H ionization near $10^4$ K. Solving the coupled Saha equations in every cell at every stage
+would be far too expensive, so the equilibrium state is computed once, offline, on a grid, and the running code
+interpolates.
+
+## A2. The chain of computations
+
+The EOS is not one function but a chain that starts long before the simulation does:
+
+```
+ OFFLINE (python)                         LOAD (host, once)                   RUN (device kernels, every stage)
+ src/eos/gen_eos_table.py                 src/eos/eos_table.hpp: Load()       src/eos/eos_table.hpp lookups
+ ───────────────────────                  ──────────────────────────          ───────────────────────────────
+ Saha at (rho,T) grid ──► P, e(rho,T)     read header (v1 / v2 cgs)           Pof, Cs2of, LogTof   (rho,esp) grid
+ invert e(T) per rho ──► T, P on           convert cgs → code units            EspFromP (bisection)
+   a (rho, esp) grid                        with THIS run's units              EintFromRhoTk        (rho,T) grid
+ cs2 = P_rho|e + P/rho^2 P_e|rho           optional P → P/rho_node             ideal-gas continuation outside
+ write .bin (cgs) ───────────────────────► allocate Views + host mirrors       clamp counters
+                                                     │                                │
+ src/hydro/hydro.cpp Initialize(): read keys ────────┘                                ▼
+   → AdiabaticGLMMHDEOS(floors, gamma, use_h2diss, EosTable, ...)   ConsToPrim · HLLD · time step · floors ·
+     stored as the Hydro package Param "eos"                         collapse_be · radiation · dust · diffusion
+```
+
+Each box is one of the sections below: A3 the physics of the generator, A4 how the table is built and stored, A5
+the units, A6 the runtime execution path, A7 the lookups function by function, A8 how the answers are used by
+the solver, A9 the numerics and their error budget, A10 the configuration keys, A11 worked examples computed by
+the real code.
+
+## A3. The microphysics model (what the table contains)
+
+All of this section is implemented in [`src/eos/gen_eos_table.py`][gen] and runs only when a table is built.
+
+### A3.1 Assumptions
+
+The generator models the gas as follows ([code][gen-head]; the limits of validity are discussed in A3.7):
+
+1. **Composition.** Hydrogen mass fraction $X=0.716$, helium $Y=1-X=0.284$, no metals ([code][gen-const]). For fully
+   molecular gas $1/\mu = X/2+Y/4$, i.e. $\mu=2.331$.
+2. **Species.** H$_2$, H, H$^+$, e$^-$, He, He$^+$, He$^{2+}$. No H$^-$, H$_2^+$, H$_3^+$, molecules other than H$_2$, or
+   dust.
+3. **Equilibrium.** Chemical (Saha) equilibrium at the local $(\rho,T)$ — no reaction rates, no memory.
+4. **Ideal, non-degenerate particles.** Each species is a classical ideal gas; no Coulomb (plasma) corrections, no
+   electron degeneracy, no pressure ionization, no radiation pressure.
+5. **Internal structure.** H$_2$: rigid-rotor rotation ($\theta_{\rm rot}=85.4$ K, levels $J<60$) and harmonic
+   vibration ($\theta_{\rm vib}=5987$ K). Atoms: ground state only (statistical weights, no excited levels).
+6. **Ortho/para H$_2$.** For the *energy*, a frozen 3:1 ortho:para mixture (ortho–para conversion is slow in the
+   ISM); for the *dissociation equilibrium*, the nuclear-spin-weighted equilibrium partition function (A3.3, A3.5).
+
+### A3.2 Pressure
+
+For a mixture of ideal gases the partial pressures add (Dalton), and each species contributes $n_ik_BT$:
+
+```math
+P = n_{\rm tot}\,k_B T,\qquad n_{\rm tot}=n_{\rm H_2}+n_{\rm H}+n_{\rm H^+}+n_e+n_{\rm He}+n_{\rm He^+}+n_{\rm He^{2+}} .
+```
+
+Defining $\mu$ by $\rho=\mu m_H n_{\rm tot}$, this is $P=\rho k_BT/(\mu m_H)$: the familiar ideal-gas law, except that
+$\mu$ depends on $(\rho,T)$ through the composition — 2.331 molecular, ~1.27 atomic, ~0.6 ionized. That is why the
+code never uses $T_{\rm code}=P/\rho$ under `eos = hydrogen` (it calls [`TemperatureKFromPres`][tab-tfromp]
+instead; see the comment there). Implemented in [`P_e_of_rho_T`][gen-pe].
+
+### A3.3 Chemical equilibrium: the Saha equations
+
+**Derivation [theory].** For a reaction $A\rightleftharpoons B+C$ among ideal gases in equilibrium, the chemical
+potentials balance, $\mu_A=\mu_B+\mu_C$. For a classical ideal gas
+$\mu_i = -k_BT\ln\!\big[(z_i/n_i)\,(2\pi m_ik_BT/h^2)^{3/2}\big]+E_{0,i}$, where $z_i$ is the internal partition
+function and $E_{0,i}$ the energy of the internal ground state. Exponentiating the balance gives the law of mass action
+
+```math
+\frac{n_Bn_C}{n_A}=\Big(\frac{2\pi\,m_Bm_C}{m_A}\,\frac{k_BT}{h^2}\Big)^{3/2}\,\frac{z_Bz_C}{z_A}\,
+\exp\!\Big(-\frac{\chi}{k_BT}\Big),\qquad \chi=E_{0,B}+E_{0,C}-E_{0,A}.
+```
+
+The generator uses four such laws ([code][gen-saha]; constants $\chi_d=4.4781$ eV, $\chi_{\rm H}=13.598$ eV,
+$\chi_{\rm He}=24.587$ eV, $\chi_{\rm He^+}=54.418$ eV [code][gen-const]):
+
+* **H$_2$ dissociation**, H$_2\rightleftharpoons$ 2H. The reduced mass factor is $m_H m_H/(2m_H)=m_H/2$, so the
+  translational factor is $(\pi m_Hk_BT/h^2)^{3/2}$. Each H atom has $z_{\rm H}=4$ (electron spin 2 × nuclear spin 2);
+  the molecule has electronic weight 1 and its nuclear-spin statistics inside the rotational sum:
+
+```math
+K_d \equiv \frac{n_{\rm H}^2}{n_{\rm H_2}} = \Big(\frac{\pi m_Hk_BT}{h^2}\Big)^{3/2}
+\frac{16}{Z_{\rm rot}^{\rm ns}(T)\,Z_{\rm vib}(T)}\,e^{-\chi_d/k_BT},
+\quad Z_{\rm rot}^{\rm ns}=\sum_{J}w_J(2J+1)e^{-J(J+1)\theta_{\rm rot}/T},\ w_J=\begin{cases}1&J\ \text{even}\\3&J\ \text{odd}\end{cases},
+\quad Z_{\rm vib}=\frac{1}{1-e^{-\theta_{\rm vib}/T}} .
+```
+
+$\chi_d=D_0$ is measured from the $v=0$, $J=0$ level, consistent with both sums starting at zero energy
+([`Zrot_ns`][gen-zrot], [`Zvib`][gen-zvib]). The code comment records a check against the textbook ~8 %
+dissociation of H$_2$ at 3000 K and 1 atm.
+
+* **H ionization**, H$\rightleftharpoons$ H$^+$ + e$^-$: $m_Hm_e/m_H\to m_e$, weights $z_{\rm H^+}z_e/z_{\rm H}=1\cdot2/2=1$:
+  $K_{\rm H}=n_{\rm H^+}n_e/n_{\rm H}=(2\pi m_ek_BT/h^2)^{3/2}e^{-\chi_{\rm H}/k_BT}$.
+* **He ionization**: $K_1=4\,(2\pi m_ek_BT/h^2)^{3/2}e^{-\chi_{\rm He}/k_BT}$ (weights $2\cdot2/1$) and
+  $K_2=(2\pi m_ek_BT/h^2)^{3/2}e^{-\chi_{\rm He^+}/k_BT}$ (weights $1\cdot2/2$).
+
+**Closure.** Two conservation laws and charge neutrality close the system:
+
+```math
+2n_{\rm H_2}+n_{\rm H}+n_{\rm H^+}=n_{\rm H,tot}=\frac{X\rho}{m_H},\qquad
+n_{\rm He}+n_{\rm He^+}+n_{\rm He^{2+}}=\frac{Y\rho}{4m_H},\qquad
+n_e=n_{\rm H^+}+n_{\rm He^+}+2n_{\rm He^{2+}} .
+```
+
+### A3.4 How the generator solves the equilibrium
+
+For a trial electron density $n_e$, every other density follows in closed form ([`neutrality`][gen-neut]):
+
+* Hydrogen. With $n_{\rm H_2}=n_{\rm H}^2/K_d$ and $n_{\rm H^+}=n_{\rm H}K_{\rm H}/n_e$, H conservation becomes the
+  quadratic $2n_{\rm H}^2/K_d+n_{\rm H}(1+K_{\rm H}/n_e)-n_{\rm H,tot}=0$. Its positive root is evaluated in the
+  rationalised form
+
+```math
+n_{\rm H}=\frac{2\,n_{\rm H,tot}}{b+\sqrt{b^2+8n_{\rm H,tot}/K_d}},\qquad b=1+K_{\rm H}/n_e ,
+```
+
+which is the textbook root multiplied by $(b+\sqrt{\cdot})/(b+\sqrt{\cdot})$. It avoids the cancellation of
+$-b+\sqrt{b^2+\dots}$ and has the right cold limit: as $K_d\to0$ the square root diverges and $n_{\rm H}\to0$
+(all H in H$_2$) instead of overflowing $2/K_d$. $n_{\rm H_2}$ is then taken from nucleus conservation,
+$n_{\rm H_2}=\max\big((n_{\rm H,tot}-n_{\rm H}-n_{\rm H^+})/2,0\big)$ ([code][gen-nh2]).
+
+* Helium. $n_{\rm He}=n_{\rm He,tot}/(1+r_1+r_1r_2)$ with $r_{1,2}=K_{1,2}/n_e$.
+
+These give a new electron density $n_e'=n_{\rm H^+}+n_{\rm He^+}+2n_{\rm He^{2+}}$. The equilibrium is the fixed
+point $n_e'=n_e$; because $n_e'(n_e)$ decreases as $n_e$ grows, the residual $n_e'-n_e$ changes sign once and the
+generator brackets it by **bisection in $\log_{10}n_e$** over $[-40,\ \log_{10}(n_{\rm H,tot}+2n_{\rm He,tot})+1]$
+with a fixed 200 halvings ([code][gen-bisect]). 200 halvings of a bracket of a few tens of decades are far below double
+precision, so the result is converged to round-off. One consequence of the bracket: a fully neutral state returns
+$n_e=10^{-40}$ cm$^{-3}$ with zero ions — an absolute residual of $10^{-40}$, harmless ([measured]: W1 in
+`results/tables/W_worked_saha.txt`, $|n_e-\sum Z n_{\rm ion}|/n_{\rm H}=4\times10^{-46}$).
+
+### A3.5 Internal energy
+
+The internal energy is measured from a **reference state** of cold, ground-state H$_2$ and neutral He. Every free
+particle carries $\tfrac32k_BT$ of translational energy; each H$_2$ carries its rotational and vibrational energy;
+each H nucleus that is no longer in a molecule has paid half the dissociation energy; each ion has paid its
+ionization energy. Hence ([code][gen-pe])
+
+```math
+e_{\rm int}=\tfrac32 n_{\rm tot}k_BT+n_{\rm H_2}\big[\epsilon_{\rm rot}(T)+\epsilon_{\rm vib}(T)\big]
++\tfrac12\chi_d\,(n_{\rm H}+n_{\rm H^+})+\chi_{\rm H}\,n_{\rm H^+}
++\chi_{\rm He}\,(n_{\rm He^+}+n_{\rm He^{2+}})+\chi_{\rm He^+}\,n_{\rm He^{2+}} .
+```
+
+* Vibration: the harmonic-oscillator mean energy above the ground level,
+  $\epsilon_{\rm vib}=k_B\theta_{\rm vib}/(e^{\theta_{\rm vib}/T}-1)$ ([code][gen-evib]). Below ~4 K the exponential
+  overflows to $+\infty$ and the expression returns exactly 0, the correct frozen limit (the overflow warning is
+  suppressed rather than the formula rewritten, to keep shipped tables bit-reproducible; comment in the code).
+* Rotation: $\epsilon_{\rm rot}=\tfrac14\langle E\rangle_{\rm para}+\tfrac34\langle E\rangle_{\rm ortho}$, each species'
+  Boltzmann average over its own levels (even / odd $J$) and **measured from its own ground state** (para $J=0$,
+  ortho $J=1$), so $\epsilon_{\rm rot}\to0$ as $T\to0$ ([code][gen-erot]).
+
+**A modelling inconsistency to be aware of [inferred].** The rotational energy uses a *frozen* 3:1 mixture with
+ortho measured from $J=1$, while the dissociation constant $K_d$ uses the *equilibrium* spin-weighted sum measured
+from para $J=0$. The energy is therefore not $-\partial\ln Z/\partial\beta$ of the partition function that sets the
+chemical equilibrium, i.e. the table is not derived from one Helmholtz free energy where H$_2$ dissociates. Where the
+composition does not change with density (no dissociation), $P=n_{\rm tot}k_BT$ does not depend on the internal
+levels and the Maxwell identity of E2 holds regardless. Where H$_2$ dissociates, this choice is one possible
+contributor to the E2 Maxwell residual (2.46e-3, which E2 attributes to its finite differencing); the two have not
+been separated. The choice itself is physical (slow ortho–para conversion) and deliberate (code comment).
+
+### A3.6 Derived thermodynamic quantities
+
+* **Adiabatic sound speed.** With $\varepsilon$ the specific internal energy, the first law reads
+  $d\varepsilon=T\,ds+(P/\rho^2)\,d\rho$. Along an adiabat ($ds=0$) $d\varepsilon=(P/\rho^2)\,d\rho$, and with
+  $P=P(\rho,\varepsilon)$:
+
+```math
+c_s^2\equiv\Big(\frac{\partial P}{\partial\rho}\Big)_s=\Big(\frac{\partial P}{\partial\rho}\Big)_\varepsilon
++\frac{P}{\rho^2}\Big(\frac{\partial P}{\partial\varepsilon}\Big)_\rho .
+```
+
+Ideal-gas check: $P=(\gamma-1)\rho\varepsilon$ gives $c_s^2=(\gamma-1)\varepsilon+(\gamma-1)^2\varepsilon=\gamma P/\rho$.
+This identity — not a fit — is what the generator tabulates ([code][gen-cs2]; the comment there records an
+earlier version that divided by an extra $\rho$).
+
+* **First adiabatic index** $\Gamma_1=\rho c_s^2/P$, the logarithmic stiffness of the gas. Collapse is resisted
+  only while $\Gamma_1>4/3$; the dissociation minimum $\Gamma_1\approx1.1$ (E3, W2) is the physical trigger of
+  second collapse.
+* **$\gamma_{\rm eff}=1+P/e_{\rm int}$** is a different quantity (the ratio of pressure to energy density, printed
+  by the generator's self-check). It equals $\Gamma_1$ only for a constant-$\gamma$ gas: at 2000 K and
+  $10^{-9}$ g cm$^{-3}$, $1+P/e_{\rm int}=1.233$ but $\Gamma_1=1.101$ ([measured], W2).
+* **Heat capacity** $c_v=(\partial\varepsilon/\partial T)_\rho$ is not tabulated. The one consumer that needs it
+  (radiation's Fleck factor) differentiates $\varepsilon(\rho,T)$ numerically with a relative step $10^{-3}T$
+  ([code][rad-dtde]).
+
+### A3.7 Range of validity of the model
+
+* **Covered by the physics:** cold molecular gas, rotational excitation, H$_2$ dissociation, H and He
+  ionization in the dilute limit.
+* **Not in the model [theory, with numbers from the generator's own composition]:** non-ideal effects grow towards
+  the dense, hot corner of the table. At $\rho=1$ g cm$^{-3}$ and $3\times10^5$ K the Saha solution is only 42 %
+  ionized, the electron degeneracy parameter $n_e\lambda_e^3/2$ is 0.27 and the ion Coulomb coupling
+  $\Gamma=e^2/(ak_BT)$ is 0.53; at $10^{-1}$ g cm$^{-3}$, $3\times10^4$ K, $\Gamma\approx1$. Pressure ionization
+  and Coulomb corrections, which a dense-plasma EOS includes, are absent, so table values above ~$10^{-2}$ g cm$^{-3}$
+  in the ionization band are model-limited, not interpolation-limited. (Estimates computed with
+  `gen_eos_table.solve_saha`; they are not a validation test.) The production footprint measured in E10
+  ($\rho\le1.5\times10^{-11}$ g cm$^{-3}$, $T\le133$ K) is far from this corner.
+* **Above $3\times10^5$ K** the table ends (A4.3).
+
+## A4. From the physics to the table file
+
+### A4.1 Two grids
+
+`build_table` ([code][gen-build]) computes two 2D tables, both on evenly spaced $\log_{10}$ axes:
+
+1. the **$(\rho,T)$ grid**: $\varepsilon(\rho,T)$ and $P(\rho,T)$ from A3, evaluated at every node ([code][gen-rhoT]);
+   only $\varepsilon(\rho,T)$ is written (as `espT`);
+2. the **$(\rho,\varepsilon)$ grid**: $P$, $c_s^2$ and $\log_{10}T$ as functions of the variables the hydro solver
+   holds. It is obtained by inverting, row by row, the monotone map $T\mapsto\varepsilon$ at fixed $\rho$
+   ([code][gen-invert]): $\log_{10}T(\varepsilon)$ is the piecewise-linear interpolant of the pairs
+   $(\log_{10}\varepsilon_{ij},\log_{10}T_j)$ (`np.interp`, clamped at the ends), and $P$ is then interpolated
+   linearly in $\log_{10}T$ along the row. $c_s^2$ is formed from the identity of A3.6 with `np.gradient`
+   derivatives of this $P$ on the $(\log\rho,\log\varepsilon)$ grid (second-order central differences inside,
+   one-sided at the edges) and floored at $10^{-12}$ ([code][gen-cs2]).
+
+Consequence: the table's $c_s^2$ is the derivative **of the tabulated $P$**, not an independent physical value, and it
+inherits a finite-difference bias that is computed exactly in A9.2.
+
+### A4.2 Axes of the shipped tables
+
+`gen_eos_table.py build 400 1000 920 <out.h5> 399 450` (and `... 3.0e5 0 0 120` for rho26;
+[provenance][prov]) builds:
+
+| axis | base | pads (prepended, same spacing) | final ([measured], `W_worked_examples.txt` header) |
+|---|---|---|---|
+| $\log_{10}\rho$ [g cm$^{-3}$] | 400 nodes over $[-20,0]$ | rho26: 120 rows below | 520 nodes, $[-26.015,\,0]$, step 0.050125 |
+| $\log_{10}T$ [K] | 920 nodes over $[\log 8,\ \log3\times10^5]$ | 450 below | 1370 nodes, $[-1.3366,\,5.4771]$ (0.046 K–$3\times10^5$ K), step 0.004977 |
+| $\log_{10}\varepsilon$ [erg g$^{-1}$] | 1000 nodes over the base $(\rho,T)$ range ×[0.999, 1.001] | 399 below | 1399 nodes, $[6.5267,\,13.8888]$, step 0.005266 |
+
+Padding (prepending nodes at the existing spacing) rather than re-spanning the axes keeps every validated node
+**bit-identical** when an axis is extended; the generator refuses a pad that would leave the lowest $\varepsilon$ nodes
+outside the $(\rho,T)$ coverage ([code][gen-pad]). The $\varepsilon$ axis is derived from the original rows and
+columns only, so the rho26 extension did not move it (AUDIT F-19 comment, [code][gen-eaxis]).
+
+### A4.3 Why the top of the table is flat at high density
+
+At fixed $\rho$, $\varepsilon$ rises monotonically with $T$, so $\varepsilon_{\max}(\rho)=\varepsilon(\rho,T_{\max})$,
+and the global $\varepsilon$ axis must reach the largest value, which occurs at the **lowest** density (most
+dissociated and ionized per gram). Every denser row therefore has top $\varepsilon$ nodes above its own
+$\varepsilon(T_{\max})$; `np.interp` clamps $T$ there and $P$ is flat in $\varepsilon$. This cannot be removed by any
+rectangular grid, only pushed to higher $T$; the generator reports it as a warning ([code][gen-sat]). E5 measured
+529 of 559 200 node pairs with equal (not decreasing) $P$, all at the $3\times10^5$ K cap for
+$\rho>6\times10^{-3}$ g cm$^{-3}$.
+
+### A4.4 The file format
+
+[`eos_table_format.hpp`][fmt] (header parser) and the writer at the end of `build_table` ([code][gen-write]) agree
+on version 2: `int64 [MAGIC "EOSTABL1", VERSION 2, FLAGS (bit 0 = cgs), nr, ne, nT]`,
+`double [lr0, dlr, le0, dle, lT0, dlT, gen_rho0, gen_v0]`, then four row-major float64 arrays
+$P[n_r,n_e]$ (erg cm$^{-3}$), $c_s^2[n_r,n_e]$ (cm$^2$ s$^{-2}$), $\log_{10}T[n_r,n_e]$ (K), $\varepsilon[n_r,n_T]$ (erg g$^{-1}$).
+All in **cgs**; the generator computes in its own code units internally and converts only when writing, so its
+rounded $\rho_0,v_0$ never reach the file (AUDIT N14). Legacy v1 files (headerless, code units) still load
+unchanged and trigger a warning that quantifies their unit bias ([code][hydro-n14]). Shipped tables and their md5
+are listed in [`TABLE_PROVENANCE.md`][prov]; E1 verified a byte-identical rebuild.
+
+## A5. Units and dimensional consistency
+
+### A5.1 Code units
+
+The repository runs in the normalisation of the Bonnor–Ebert collapse problem ([`physical_units.hpp`][units]): base
+scales $\rho_u$, $v_u$, $l_u$ with $4\pi G=1$; derived $t_u=l_u/v_u$, pressure / energy-density unit $\rho_uv_u^2$,
+specific-energy unit $v_u^2$, magnetic unit $\sqrt{4\pi\rho_u}\,v_u$ (Heaviside–Lorentz), and the temperature unit
+([code][units-T])
+
+```math
+T_u=\frac{\mu_{\rm th}\,m_H\,v_u^2}{k_B},\qquad \mu_{\rm th}=2.29 .
+```
+
+($\mu_{\rm th}$ is the key `units/mu_thermal`.)
+
+With the defaults ($\rho_u=5.467\times10^{-19}$ g cm$^{-3}$, $v_u=1.9\times10^4$ cm s$^{-1}$) $T_u=10.015144$ K,
+$v_u^2=3.61\times10^8$ erg g$^{-1}$, $\rho_uv_u^2=1.973587\times10^{-10}$ erg cm$^{-3}$ ([measured], W header). For a
+`collapse_be` run the base scales are derived from the Bonnor–Ebert IC (mass, temperature, `f`) and a `<units>`
+override is refused ([code][units-build]).
+
+### A5.2 Where units change
+
+| interface | unit convention | conversion ([code]) |
+|---|---|---|
+| table file | cgs, $T$ in K | — |
+| `EosTable::Load` | file → code | $\log\rho_{\rm code}=\log\rho_{\rm cgs}-\log\rho_u$ and $\log\varepsilon_{\rm code}=\log\varepsilon_{\rm cgs}-\log v_u^2$ (shift of the axis **origin**; the spacing is invariant), $P/(\rho_uv_u^2)$, $c_s^2/v_u^2$, $\varepsilon/v_u^2$; $\log T$ untouched ([Load][tab-load]) |
+| all lookups | $\rho$, $\varepsilon$, $e_{\rm int}$, $P$, $c_s^2$ in **code** units; $T$ in **kelvin** | — |
+| callers wanting code temperature | $T_{\rm code}=T/T_u$ | radiation, non-ideal MHD (`T_unit`), `collapse_be` (`collapse_be_T0K` = $T_u$) |
+| `hydro/Tfloor` under `eos = hydrogen` | **code** temperature | $T=T_{\rm floor}\,T_u$ ([code][hydro-tfloor]) |
+| `hydro/Tfloor`, `hydro/Tceil` under `eos = adiabatic`; `Tceil` always | **kelvin**, via $\bar m/k_B$ of the `Units` class | $\varepsilon=T/(\bar m/k_B)/(\gamma-1)$ ([code][hydro-tceil]) — see observation O-3 |
+
+The load conversion is exact because the axes are logarithmic: a change of unit multiplies $\rho$ by a constant,
+which shifts $\log\rho$ by a constant. Check with the rho26 table: the file's lowest density
+$\log\rho_{\rm cgs}=-26.0150$ becomes $-26.0150-\log_{10}(5.467\times10^{-19})=-7.7528$ in code units, as printed by
+the harness ($-7.752787$).
+
+### A5.3 Dimensional checks of the implemented formulas
+
+| expression (where) | dimensions | check |
+|---|---|---|
+| $P=n_{\rm tot}k_BT$ (generator) | cm$^{-3}$ · erg K$^{-1}$ · K = erg cm$^{-3}$ | pressure |
+| $c_s^2=(\partial P/\partial\rho)_\varepsilon+(P/\rho^2)(\partial P/\partial\varepsilon)_\rho$ | (erg cm$^{-3}$)/(g cm$^{-3}$) = cm$^2$ s$^{-2}$; (erg cm$^{-3}$)/(g$^2$cm$^{-6}$) · (erg cm$^{-3}$)/(erg g$^{-1}$) = cm$^2$ s$^{-2}$ | both terms are velocity$^2$ |
+| `Pof`: $P=\rho\cdot\widehat{(P/\rho)}$ (p_over_rho) | $\rho_u\cdot v_u^2$ | the stored array is $P/\rho_{\rm node}$ in $v_u^2$ |
+| `EintFromRhoTk`: $e_{\rm int}=\rho\cdot\hat\varepsilon(\rho,T)$ | $\rho_u\cdot v_u^2=\rho_uv_u^2$ | energy density |
+| fast speed $c_f^2=\frac{1}{2\rho}\big[B^2+\rho c_s^2+\sqrt{(B^2-\rho c_s^2)^2+4\rho c_s^2B_t^2}\big]$ ([code][eos-cf]) | $B^2$ is an energy density in Heaviside–Lorentz units, as is $\rho c_s^2$ | velocity$^2$ |
+| $T_u=\mu_{\rm th}m_Hv_u^2/k_B$ | g · cm$^2$s$^{-2}$ / (erg K$^{-1}$) = K | temperature |
+
+### A5.4 Two "molecular weights" — a consequence worth knowing
+
+$\mu_{\rm th}=2.29$ is a **calibration** that makes the isothermal sound speed exactly $v_u$ at $T_u$ for an
+ideal gas; the table's composition gives $\mu=2.331$ for molecular gas ([measured]: W1, $\mu=2.330921$ from the
+table, 2.331002 from the generator). Under `eos = hydrogen` the code fixes the **temperature** (the IC and the
+`collapse_be` barotropic step both evaluate $\varepsilon(\rho,T_u)$), so the pressure of that gas is
+$P/\rho=\mu_{\rm th}/\mu=0.98244$ in code units, not 1 ([measured], W1). Concretely, `collapse_be` sets
+$e_{\rm int}=p\cdot\varepsilon(\rho,T_u)$ with $p=\rho$ ([code][be-ic], [code][be-p]); the table then returns
+$P=0.9824\,\rho$, i.e. the Bonnor–Ebert sphere starts 1.76 % below the pressure of the isothermal equilibrium it
+was built for, and the barotropic step keeps the isothermal phase at that pressure. The alternative —
+keeping $P=\rho$ — would put the gas at 10.19 K (the comment in `collapse_be.cpp` quotes this for the old constant).
+This is observation O-4 (Part C); it is not a defect of the EOS but of the calibration interface between the
+problem and the table.
+
+## A6. Execution path at runtime
+
+### A6.1 Initialization (once per run, host)
+
+1. **Keys and table** — `Hydro::Initialize` ([code][hydro-eos]):
+   1. `hydro/eos` is read with `GetString` (required); `adiabatic` or `hydrogen`, otherwise the run aborts.
+   2. `hydro/gamma` is read with `GetReal` (required for **both** EOS; uses under `hydrogen` in A10).
+   3. If `hydrogen`: the table path `hydro/eos_table_file` must be given unless `hydro/eos_table_allow_default` is
+      true; `PhysUnits::BuildPhysicalUnits` provides $\rho_u,v_u$; `eos_interp` and `eos_extrapolate` are set
+      **before** `Load` (both change what `Load` stores or how lookups branch); `Load` runs; then `eos_bisections`
+      is read and range-checked ([10, 60]); a legacy table prints the N14 warning; `hydro/riemann` must be `hlld`
+      ("HLLE's Roe average bakes in a constant gamma", [code][hydro-hlld]).
+2. **Floors and ceilings** ([code][hydro-tfloor]): `dfloor`, `pfloor` (code units, default −1 = off); `Tfloor`
+   (default −1) is converted to a specific-energy floor $\varepsilon_{\rm fl}$ — under `hydrogen` by the host lookup
+   `EintFromRhoTkHost(1.0, Tfloor·T_u)/1.0`, i.e. **at $\rho_{\rm code}=1$**; `Tceil` (default $\infty$) by the
+   ideal-gas formula ([code][hydro-tceil]).
+3. **The EOS object** — `AdiabaticGLMMHDEOS eos(pfloor, dfloor, efloor, vceil, eceil, gamma, use_h2diss, eos_tab,
+   dual-energy keys…)` is constructed and stored as the Hydro package Param `"eos"` ([code][hydro-ctor]); the
+   `EosTable` is held **by value** inside it ([code][eos-class]). `FillDerivedMesh` is set to `ConsToPrim`
+   (or `ConsToPrimDoubleFlux` with the double-flux fill) and `EstimateTimestepMesh` to the hyperbolic estimate.
+4. The **radiation** package, when enabled, loads its **own** copy of the same table with the same keys
+   ([code][rad-load]); the clamp report sums both copies' counters.
+
+`EosTable` is small: Kokkos View handles plus grid scalars. Kernels capture it by value, so the handles travel to
+the device. The two host mirrors are `std::shared_ptr` so that this per-launch copy is a reference-count increment
+(E-F11: as `std::vector` they were deep-copied at every kernel launch, 10–23× slower steps, identical results).
+
+### A6.2 Every stage (device)
+
+The order below is the order in which the EOS is called within one stage of the VL2 integrator for an
+`eos = hydrogen` MHD run (functions in Sec. A7/A8):
+
+1. **Time step** (once per cycle): `EstimateHyperbolicTimestep` computes $|v|+c_f$ per cell and direction with
+   `FastMagnetosonicSpeed` → `AsqFromRhoPres` → `EspFromP` + `Cs2of` ([code][dt-hyp]).
+2. **Reconstruction**: PLM (or another scheme) reconstructs **primitive** variables, including $P$, to the faces.
+   No EOS call.
+3. **Riemann solver** (HLLD): per face, two `InternalEnergyFromPres` (one bisection each) to build $E_L,E_R$ and
+   two `FastMagnetosonicSpeed` (one bisection + `Cs2of` each) for the outer wave speeds ([code][hlld-e]).
+4. **Conservative update** of $U$ with the fluxes. No EOS call.
+5. **Source terms** that set the energy from a temperature: `collapse_be`'s barotropic step calls
+   `EintFromRhoTk` per cell ([code][be-baro]); radiation matter coupling calls `TemperatureK` and `EintFromRhoTk`.
+6. **Boundary exchange**, then **`ConservedToPrimitive`** over the entire block including ghosts ([code][c2p-mesh]):
+   one `Pof` per cell, plus a table lookup for the floor pressure when `Tfloor` is set, plus the floor inversion
+   when a cell is floored ([code][c2p]).
+7. Consumers of the new primitives: Jeans refinement (`SoundSpeed`), non-ideal coefficients
+   (`TemperatureKFromPres`), dust (`TemperatureK`), diagnostics.
+
+Once per cycle, on the host, `PreStepMeshUserWorkInLoop` drains the out-of-table counters, sums them over MPI ranks
+and prints them ([code][clamp-report]).
+
+## A7. The table lookups, function by function
+
+All functions in this section are in [`src/eos/eos_table.hpp`][tab]. The code exists in two compile-time variants:
+the default build, and a verbatim copy of the pre-2026-10-05 lookups selected by the CMake option
+`ATHENAPK_EOS_LEGACY_LOOKUPS` ([code][tab-legacy]; E-F9 explains why this is a compile-time switch). This section
+describes the default build.
+
+### A7.1 `bilin`: the interpolation kernel
+
+**Purpose.** Every lookup is a bilinear interpolation on an evenly spaced grid in two logarithmic coordinates
+([code][tab-bilin]). For an array $A$ with axes $x_0+i\,\Delta x$, $y_0+j\,\Delta y$ and a query $(x,y)$:
+
+```math
+f_i=\frac{x-x_0}{\Delta x},\quad i=\mathrm{clamp}(\lfloor f_i\rfloor_{\to0},\,0,\,n_1-2),\quad t_i=\mathrm{clamp}(f_i-i,\,0,\,1),
+\qquad (\text{same for } j,\,t_j)
+```
+```math
+\hat A(x,y)=(1-t_i)(1-t_j)A_{i,j}+t_i(1-t_j)A_{i+1,j}+(1-t_i)t_jA_{i,j+1}+t_it_jA_{i+1,j+1}.
+```
+
+**Numerical interpretation.** The index is found by arithmetic, not search: $O(1)$, branch-light, identical cost
+for every cell — the right shape for GPUs. `static_cast<int>` truncates toward zero, so for $f_i\in(-1,0)$ the index
+is 0 and only the clamp of $t_i$ to 0 keeps the result at the edge node; outside the grid **both** the index and the
+weight are clamped, so the result is the nearest edge value (nearest-neighbour extrapolation), never a linear
+extrapolation.
+
+**Safeguard (observability).** Each excursion is counted in a 12-slot device View `clamp_ctr_`
+([code][tab-ctr]): slots 0–5 count real cell states (ρ below/above, second axis below/above for the ε grid, T
+below/above for the T grid), slots 6–11 the same for root-finder **probe** evaluations (radiation's Newton
+iterations), so benign probes do not mask a genuine clamp. The low-side test uses $f_i<0$, not the truncated index,
+so excursions of less than one cell are counted (code-review fix noted in the source). The counter is write-only
+from the kernels: it cannot change a result. A query on the top node itself can be counted as an upper clamp although
+its value is exact ([measured], W3(f): $P(\rho,\varepsilon_{\max})$ with $\varepsilon_{\max}$ computed from the axis
+incremented `esp>`), because the upper test is $i>n-2$.
+
+### A7.2 `Pof`, `Cs2of`, `LogTof`: the $(\rho,\varepsilon)$ grid
+
+```math
+P(\rho,\varepsilon)=\phi(\rho)\;\widehat{A_P}(\log_{10}\rho,\log_{10}\varepsilon),\qquad
+c_s^2=\widehat{A_{c^2}}(\cdot,\cdot),\qquad T=10^{\widehat{A_{\log T}}(\cdot,\cdot)}
+```
+
+([code][tab-pof]; $T$ is returned by `TemperatureK` as $10^{\rm LogTof}$). The factor $\phi$ and the stored array
+depend on `hydro/eos_interp`:
+
+* `p_over_rho` (default since E-F1): at load the stored array is divided by the node density,
+  $A_P(i,j)=P_{ij}/\rho_i$ ([code][tab-prho]), and $\phi(\rho)=\rho$ (the *actual* density).
+* `p` (legacy): $A_P=P_{ij}$, $\phi=1$.
+
+**Why `p_over_rho` [derived].** At fixed $\varepsilon$ and fixed composition the gas obeys $P\propto\rho$ exactly
+(A3.2 with $\mu$ and $T(\varepsilon)$ independent of $\rho$). Interpolating $P$ linearly in $\log\rho$ between nodes
+$\rho_i$ and $\rho_i10^{\Delta}$ ($\Delta=0.050125$) returns, at fractional position $t$,
+$[(1-t)+t\,10^{\Delta}]/10^{t\Delta}$ times the true value: at mid-cell $\cosh(\tfrac12\Delta\ln10)=1.0016656$, i.e.
++0.167 %, and the slope $\partial P/\partial\rho|_\varepsilon$ seen by the interpolant varies across each cell by the
+factor $(10^\Delta-1)/(\Delta\ln10)\cdot\rho_i/\rho$, from +5.9 % at the lower node to −5.6 % at the upper node. That
+slope enters the effective sound speed of the scheme and produces the sawtooth of E-F1 (E6 measured phase-speed
+errors of −1.40 % … +0.55 % with `p`). Storing $P/\rho_i$ makes the interpolated quantity **constant** along $\rho$
+where $P\propto\rho$, so the interpolation is exact there; the remaining error comes only from the composition's
+density dependence. Verified on the real code: the mid-cell ratio of the `p` to the `p_over_rho` pressure is 1.00166562, equal to
+the prediction to all printed digits ([measured], W3(e)).
+
+**Below the energy axis** ($\varepsilon<\varepsilon_{\min}$, i.e. $T<0.063$ K; default `eos_extrapolate = true`)
+the gas is continued as the ideal gas it is there ([code][tab-x]):
+
+```math
+P(\rho,\varepsilon)=P(\rho,\varepsilon_{\min})\,\frac{\varepsilon}{\varepsilon_{\min}},\qquad
+c_s^2=c_s^2(\rho,\varepsilon_{\min})\,\frac{\varepsilon}{\varepsilon_{\min}},\qquad
+T=T(\rho,\varepsilon_{\min})\,\frac{\varepsilon}{\varepsilon_{\min}} .
+```
+
+Derivation: with constant composition and frozen internal degrees of freedom, $P=(\gamma-1)\rho\varepsilon$,
+$c_s^2=\gamma(\gamma-1)\varepsilon$ and $T\propto\varepsilon$ with $\gamma=5/3$, so all three are linear in
+$\varepsilon$ at fixed $\rho$. It is exact here because the table's own bottom row is ideal: $P/(\rho\varepsilon)$ on
+that row is 0.666675 at all densities (§9.4). Below the density axis with `eos_interp = p` the pressure is continued
+as $P=(\rho/\rho_{\min})P(\rho_{\min},\varepsilon)$ (E-F6), which is what `p_over_rho` does by construction. $c_s^2$
+and $T$ are intensive and stay clamped in $\rho$. All these lookups are still counted (they are outside the table).
+
+### A7.3 `EspFromP`: the inverse $\varepsilon(\rho,P)$
+
+**Purpose.** The face states of the Riemann solver carry $P$; the solver needs $E=\rho\varepsilon+\dots$. The
+inverse of `Pof` at fixed $\rho$ is computed by **bisection on $\log_{10}\varepsilon$** over the whole axis
+$[\ell_0,\ \ell_0+(n_e-1)\Delta\ell]$ with a fixed number of steps $n_b$ (`hydro/eos_bisections`, default 20)
+([code][tab-espfromp]):
+
+```math
+\ell_m=\tfrac12(\ell_{\rm lo}+\ell_{\rm hi});\quad
+\text{if } \phi(\rho)\widehat{A_P}(\log\rho,\ell_m)<P:\ \ell_{\rm lo}=\ell_m\ \text{else}\ \ell_{\rm hi}=\ell_m;\qquad
+\varepsilon=10^{(\ell_{\rm lo}+\ell_{\rm hi})/2}.
+```
+
+**Requirements.** Bisection needs $P$ increasing in $\varepsilon$ at fixed $\rho$; E5 verified it at every node pair
+(strictly increasing below $3\times10^5$ K, equal on 529 pairs at the cap, A4.3).
+
+**Error bound [derived].** After $n_b$ halvings the bracket has width $W2^{-n_b}$ in $\log_{10}\varepsilon$ with
+$W=(n_e-1)\Delta\ell=7.362$ dex, and the midpoint is within half of it, so
+
+```math
+\Big|\frac{\delta\varepsilon}{\varepsilon}\Big|\le \ln 10\cdot W\cdot 2^{-(n_b+1)} = 8.08\times10^{-6}\quad(n_b=20).
+```
+
+E5 measured exactly this maximum; W1/W2 show $-5.5\times10^{-6}$ and $-6.4\times10^{-6}$ at 20 steps,
+$\le3\times10^{-9}$ at 30, round-off at 60 ([measured]). The resulting **pressure** error is
+$(\partial\ln P/\partial\ln\varepsilon)\,\delta\varepsilon/\varepsilon$, up to $9.2\times10^{-5}$ in the dissociation
+and ionization bands where that logarithmic derivative is large (E5).
+
+**Why a fixed count, not a tolerance.** On a GPU all lanes of a warp execute until the slowest one finishes; a fixed
+count is divergence-free and predictable (code comment). The price is an error that is a *piecewise-constant*
+function of $P$ — non-smooth, unlike the interpolation error — and it enters every HLLD face energy. The double-flux
+reset, which needs pressure equilibrium to round-off, therefore refines the bisection result with three Newton steps
+on the interpolant ([code][dflux-newton]).
+
+**Edges.** With the continuation on, a target below $P(\rho,\varepsilon_{\min})$ is inverted exactly,
+$\varepsilon=\varepsilon_{\min}P/P_{\min}$, and counted as `esp<` ([code][tab-x]). Only the $\rho$ axis is counted once
+per call, because the loop itself runs with counting off (else every one of the $n_b$ probes would count a $\rho$
+clamp). A target **above** $P(\rho,\varepsilon_{\max})$ is not handled: the bisection converges to the top of the
+axis and returns $\varepsilon\approx\varepsilon_{\max}$ silently ([measured], W3(f): target $10\,P_{\max}$ returns
+$0.999992\,\varepsilon_{\max}$, whose pressure is 10× lower than the target, and no counter changes) — observation
+O-1.
+
+### A7.4 The compound interface and the $(\rho,T)$ grid
+
+([code][tab-iface])
+
+| function | definition | note |
+|---|---|---|
+| `PresFromRhoEint(rho, eint)` | `Pof(rho, eint/rho)` | $e_{\rm int}$ is an energy **density** |
+| `EintFromRhoPres(rho, P)` | `EspFromP(rho, P) * rho` | one bisection |
+| `AsqFromRhoPres(rho, P)` | `Cs2of(rho, EspFromP(rho, P))` | one bisection + one lookup |
+| `TemperatureK(rho, eint)` | `10^LogTof(rho, eint/rho)` | kelvin |
+| `TemperatureKFromPres(rho, P)` | `10^LogT(rho, EspFromP(rho,P))`, ρ axis counted only by `EspFromP` | [code][tab-tfromp] |
+| `EintFromRhoTk(rho, Tk, probe)` | $\rho\cdot\widehat{A_\varepsilon}(\log\rho,\log T)$ on the $(\rho,T)$ grid; below $T_{\min}$: $\rho\,\varepsilon(\rho,T_{\min})\,T/T_{\min}$ | `probe = true` tallies in the probe bank ([code][tab-eintT]) |
+
+**Forward–inverse consistency.** $\varepsilon(\rho,T)$ (the $(\rho,T)$ grid) and $T(\rho,\varepsilon)$ (the
+$(\rho,\varepsilon)$ grid) are **two independent bilinear interpolants** of the same physics; their composition is
+not the identity (E-F7): $2\times10^{-5}$ in the production footprint, up to 1.3 % across dissociation and ionization
+(E5); W1: $1.6\times10^{-5}$, W2: $1.0\times10^{-4}$ ([measured]).
+
+**Host twins.** `EintFromRhoTkHost` and `TemperatureKHost` ([code][tab-host]) are line-for-line copies operating on
+the host mirrors, for setup code (`hydro/Tfloor`, problem generators): dereferencing a device View from host code is
+illegal and traps on some architectures (source comment). They do not count clamps.
+
+### A7.5 Loading: `EosTable::Load`
+
+([code][tab-load]) In order: open the file; parse the header (v1 or v2); reject a grid with fewer than two nodes on
+an axis or a non-positive spacing; shift the axis origins and set the payload scale factors (A5.2); compute
+$\rho_{\min},\varepsilon_{\min},T_{\min}=10^{\text{origin}}$; read the four arrays into device Views through host
+mirrors, scaling on the way, and (p_over_rho) divide $P$ by $\rho_i$; throw if the file is truncated; copy the
+$\varepsilon(\rho,T)$ and $\log T$ arrays back from the device into the shared host mirrors (so the host twins read
+exactly what the kernels read); allocate the zero-initialised counter View. `p_over_rho_` is applied inside `Load`
+(the division by $\rho_i$) and `extrapolate_` by every lookup; the source requires both to be set before `Load`, and
+both load sites (hydro, radiation) do so.
+
+## A8. How the EOS enters the solver
+
+### A8.1 `AdiabaticGLMMHDEOS`: one interface for both EOS
+
+[`src/eos/adiabatic_glmmhd.hpp`][eos-class] holds $\gamma$, the floors and ceilings, `use_h2diss_` (true for
+`eos = hydrogen`) and the `EosTable`. Each method branches once on `use_h2diss_`, and with `use_h2diss_ = false` it is
+the ideal gas:
+
+| method | `eos = adiabatic` | `eos = hydrogen` |
+|---|---|---|
+| `InternalEnergyFromPres(rho, P)` | $P/(\gamma-1)$ | `EintFromRhoPres` |
+| `SoundSpeed(prim)` | $\sqrt{\gamma P/\rho}$ | square root of `AsqFromRhoPres` |
+| `FastMagnetosonicSpeed(d, p, bx, by, bz)` | with $\rho a^2=\gamma P$ | with $\rho a^2=\rho\,c_s^2$, $c_s^2$ from `AsqFromRhoPres` |
+| pressure in `ConsToPrim` | $(\gamma-1)e_{\rm int}$ | `PresFromRhoEint` if $e_{\rm int}>0$, else $(\gamma-1)e_{\rm int}$ |
+
+**Fast magnetosonic speed [derived].** The MHD fast speed is
+$c_f^2=\tfrac12\big[a^2+b^2+\sqrt{(a^2+b^2)^2-4a^2b_x^2}\big]$ with $a^2=c_s^2$ and $b^2=B^2/\rho$ (Heaviside–Lorentz,
+no $4\pi$). With $Q\equiv\rho a^2$ and $B^2=B_x^2+B_t^2$, $(Q+B^2)^2-4QB_x^2=(B^2-Q)^2+4QB_t^2$, which is the form the
+code evaluates ([code][eos-cf]): `asq` $=Q$, `qsq` $=B^2+Q$, `tmp` $=B^2-Q$,
+$c_f=\sqrt{\tfrac12\big(B^2+Q+\sqrt{(B^2-Q)^2+4QB_t^2}\big)/\rho}$. The rewritten radicand is a sum of
+non-negative terms, so it cannot go negative through cancellation. The general EOS enters only through $a^2$.
+
+### A8.2 `ConsToPrim`: from conserved to primitive variables, with floors
+
+([code][c2p]; called per cell by `ConservedToPrimitive` over the **entire** block including ghosts, [code][c2p-mesh])
+
+1. **Density floor**: abort if $\rho\le0$ and no floor is set; else $\rho\leftarrow\max(\rho,\rho_{\rm fl})$
+   (momentum and energy untouched) ([code][c2p-d]).
+2. Velocities $\mathbf v=\mathbf m/\rho$; $\mathbf B$, $\psi$ copied.
+3. $e_{\rm int}=E-|\mathbf m|^2/(2\rho)-B^2/2$ ([code][c2p-eint]).
+4. **Dual energy** (only with `hydro/dual_energy`; see the dual-energy report): may replace $e_{\rm int}$ by the
+   separately advected internal energy where the difference above is ill-conditioned.
+5. **Pressure** ([code][c2p-p]): `PresFromRhoEint(rho, eint)` if $e_{\rm int}>0$; otherwise $(\gamma-1)e_{\rm int}$.
+   *Why the branch:* the table is indexed by $\log_{10}(e_{\rm int}/\rho)$; for $e_{\rm int}\le0$ that is NaN, and
+   NaN compares false against every floor test below, so the cell would be silently poisoned. The ideal-gas
+   expression instead gives a negative pressure that the floor logic (or the `PARTHENON_REQUIRE`) catches. Inside
+   `ConsToPrim` this is where `hydro/gamma` enters a table run, and only through the sign of the result.
+6. Velocity ceiling (rescales $\mathbf m$ and $E$; not EOS).
+7. **Pressure floor** ([code][c2p-pfl]): if $P<P_{\rm fl}$, set $e_{\rm fl}=$ `InternalEnergyFromPres`$(\rho,P_{\rm fl})$
+   and $E=e_{\rm fl}+$KE$+$ME. The stored pressure is $P_{\rm fl}$, or — with `hydro/eos_floor_consistent = true` —
+   the table pressure of the energy actually stored, `PresFromRhoEint(rho, e_fl)`. The two differ when the
+   inversion cannot represent $P_{\rm fl}$; without the continuation that was the case for every realistic floor
+   (E-F5: $P(e_{\rm fl})=6.2\times10^5P_{\rm fl}$ at $\rho_{\rm code}=1$, W3(b) legacy). With the default continuation
+   the inversion is exact ($P(e_{\rm fl})=P_{\rm fl}\times1.000000000000$, W3(b)) and the floored gas sits at
+   $T=10^{-7}$ K — which is why a temperature floor is the physical choice.
+8. **Temperature floor** ([code][c2p-tfl]): the floor pressure is
+   $P_{T,\rm fl}=$`PresFromRhoEint`$(\rho,\rho\varepsilon_{\rm fl})$ under the table (one extra lookup per cell when
+   `Tfloor` is set), $(\gamma-1)\rho\varepsilon_{\rm fl}$ otherwise; if $P<P_{T,\rm fl}$ the energy is set to
+   $\rho\varepsilon_{\rm fl}+$KE$+$ME. A cell held by this floor is counted in the history column `cons-nTfloor`
+   ([code][diag-tfloor]).
+9. **Temperature ceiling** ([code][c2p-tceil]): analogous, guarded so that the default $\varepsilon_{\rm ceil}=\infty$
+   never reaches the table ($\log_{10}\infty$ would clamp to the edge and trigger the ceiling spuriously).
+10. Dual-energy re-sync; passive scalars $=\,$cons$/\rho$.
+
+Every floor **injects** energy (non-conservatively, by design) and records it only through the history counters.
+Floors and ceilings that rewrite $E$ keep the dual energy consistent with the new $E$.
+
+### A8.3 HLLD and the other Riemann solvers
+
+HLLD (Miyoshi & Kusano 2005) builds the left/right conserved states from the reconstructed primitives
+([code][hlld-e]):
+
+```math
+E_{L,R}=e_{\rm int}(\rho_{L,R},P_{L,R})+\tfrac12\rho_{L,R}v_{L,R}^2+\tfrac12B_{L,R}^2 ,
+```
+
+with $e_{\rm int}$ from `InternalEnergyFromPres`, and estimates the outer wave speeds
+$S_{L}=\min(v_{x,L}-c_{f,L},v_{x,R}-c_{f,R})$, $S_R=\max(\dots)$ with the general-EOS $c_f$. The intermediate states
+follow from Rankine–Hugoniot conditions and continuity of the total pressure across the contact and Alfvén
+waves, which do not involve the EOS (code comment), so these two places are the solver's entire EOS dependence.
+
+`eos = hydrogen` requires `riemann = hlld`. Two other solvers still contain the ideal-gas energy:
+
+* `glmmhd_hlle` takes $\gamma$ from the EOS and is refused under the table ([code][hydro-hlld]).
+* `glmmhd_dc_llf` forms $E=P/(\gamma-1)+\dots$ with `igm1` ([code][llf-igm1]). It is used by
+  `hydro/first_order_flux_correct` (FOFC, `FirstOrderFluxCorrect`, [code][fofc]), which is **not** refused under
+  `eos = hydrogen` (only together with `hydro/double_flux`). The corrected fluxes would then carry an ideal-gas energy
+  — observation O-2 (inferred from the source; no test exercises FOFC with the table).
+
+### A8.4 Problem generators and source terms that set energy from temperature
+
+* `eos_test` (all EOS validation decks) sets every state through the table on the device:
+  $e_{\rm int}=$`EintFromRhoTk`$(\rho,T)$, or directly from a specific energy (`espL_code/espR_code`) to plant
+  sub-table or negative energies ([code][eostest]). The acoustic mode perturbs $e_{\rm int}$ linearly,
+  $\delta(\rho\varepsilon)=(\varepsilon_0+P_0/\rho_0)\,\delta\rho$ (the specific enthalpy times $\delta\rho$), to avoid the
+  bisection error ($\sim10^{-5}$) at a $10^{-6}$ amplitude.
+* `collapse_be` with `eos = hydrogen`: the IC uses $\varepsilon(\rho,T_u)$ (A5.4), and the barotropic step
+  prescribes $T=T_u\sqrt{1+(\rho/\rho_{\rm crit})^{2(\gamma-1)}}$ and sets $E=$`EintFromRhoTk`$(\rho,T)+$KE$+$ME
+  ([code][be-baro]); there `hydro/gamma` is only the barotropic index. Skipped when the radiation package owns the
+  energy.
+* Radiation: temperature from `TemperatureK`; the Fleck factor needs $dT/d\varepsilon$, obtained as
+  $2\Delta T/[\varepsilon(T+\Delta T)-\varepsilon(T-\Delta T)]$ with $\Delta T=10^{-3}T$ and set to 0 (explicit
+  scheme) if the difference is not positive ([code][rad-dtde]).
+* Non-ideal MHD: the ionization model's temperature is `TemperatureKFromPres`$/T_u$, never $P/\rho$
+  ([code][diff-T]); dust: `TemperatureK` with a floor ([code][dust-T]).
+* Double flux (E-F10, Sec. 6.4): freezes a stiffened-gas fit through the cell state,
+  $g_*=\rho c_s^2/P$ (clamped to $[1.0001,\,5]$) and $\varepsilon_{0*}=(e_{\rm int}-P/(g_*-1))/\rho$
+  ([code][dflux-freeze]), and resets $E$ from the table at the frozen-EOS pressure with `EspFromPRefined`
+  (bisection + 3 Newton steps, [code][dflux-newton]).
+
+## A9. Numerical accuracy and stability
+
+### A9.1 The error budget of one lookup
+
+| source | size | where measured / derived |
+|---|---|---|
+| Saha physics vs the real gas | model-limited (A3.7) | not tested |
+| generator: Saha solve | round-off (bisection 200×) | E2: neutrality $5\times10^{-15}$, element conservation $2\times10^{-16}$ |
+| table vs direct Saha at off-node points ($P$, $c_s^2$) | median $1.6\times10^{-3}$, max $5.5\times10^{-3}$ ($P$); max $3.3\times10^{-2}$ ($c_s^2$, at a kink) | E2 |
+| bilinear $\varepsilon(\rho,T)$ at an off-node point | W1 $1.6\times10^{-5}$, W2 $8.8\times10^{-4}$ (table 914.15 vs Saha 913.35 code) | W, `W_worked_saha.txt` vs `W_worked_examples.txt` |
+| $c_s^2$ finite-difference bias | +0.133 % in $\Gamma_1$ for molecular gas (derived below) | W1 |
+| `p` interpolation (legacy) | +0.167 % in $P$ at mid-cell, slope sawtooth ±6 % | A7.2, E6, E-F1 |
+| P → ε bisection | $\le8.08\times10^{-6}$ in $\varepsilon$, $\le9.2\times10^{-5}$ in $P$ | A7.3, E5 |
+| T → ε → T round trip | $2\times10^{-5}$ (footprint) … 1.3 % | E-F7, E5 |
+
+### A9.2 The bias of the tabulated sound speed [derived, verified]
+
+For molecular gas at 10 K, $P=\tfrac23\rho\varepsilon$ exactly (frozen rotation; W1: $e_{\rm int}/P=1.499971$ in the
+table, 1.5 from the generator), so $c_s^2=P/\rho+(P/\rho^2)(\tfrac23\rho)=\tfrac53P/\rho$, of which the
+$(\partial P/\partial\rho)_\varepsilon$ term is the fraction $3/5$. The generator evaluates that derivative with a
+central difference on the $\log_{10}\rho$ grid: for $P=A\rho$,
+
+```math
+\frac{P_{i+1}-P_{i-1}}{2\Delta}=A\rho_i\,\frac{10^{\Delta}-10^{-\Delta}}{2\Delta}
+=\ln10\,A\rho_i\,\frac{\sinh x}{x},\qquad x=\Delta\ln10=0.115417,
+```
+
+i.e. the exact derivative times $\sinh x/x=1+x^2/6+\dots=1.0022217$. The same factor along $\log\varepsilon$
+($y=0.005266\ln10$) is $1+2.45\times10^{-5}$. Weighted by $3/5$ and $2/5$: predicted
+$\Gamma_1^{\rm table}/\Gamma_1=1.0013428$. Measured on the real code: $1.668887/1.666667=1.0013322$ (W1,
+[measured]); the 1e-5 remainder comes from the interpolations in the generator and at run time, which this estimate
+ignores. So the table's sound speed in cold molecular gas is 0.067 % fast, purely from the grid spacing in density;
+E3 reported $\Gamma_1=1.668$ at 10 K for the same reason. The effect depends only on $\Delta\log\rho$; halving it
+would reduce it 4×.
+
+### A9.3 Precision and cancellation
+
+* $e_{\rm int}=E-\mathrm{KE}-\mathrm{ME}$ loses relative precision as $(\mathrm{KE}+\mathrm{ME})/e_{\rm int}$ grows (low
+  plasma beta, hypersonic flow). That is the dual-energy module's subject, not the table's; the EOS's part is to
+  receive a possibly non-positive $e_{\rm int}$ safely (A8.2 step 5).
+* All table arithmetic is double precision. GCC may contract $a\cdot b+c$ into fused multiply-adds differently
+  depending on inlining, so any change to the inline lookup bodies changes the last bit of results in callers
+  (E-F9); bitwise reproduction of an old run therefore needs the legacy build.
+* The lookups call `log10` and `pow`; the GPU's versions may differ from the CPU's in the last ulp (E9: lookups
+  agree to $\le3.3\times10^{-15}$).
+
+### A9.4 Robustness: what happens to bad inputs
+
+| input | path | result ([code] / [measured]) |
+|---|---|---|
+| $e_{\rm int}\le0$ in ConsToPrim | ideal-gas branch | negative $P$ → pressure/temperature floor or abort |
+| $0<\varepsilon<\varepsilon_{\min}$ | continuation | $P\propto\varepsilon$, counted `esp<` (W3(a): ratio 0.500000, 5 counts) |
+| $\rho<\rho_{\min}$ | `p_over_rho`: exact $P\propto\rho$; `p`: continuation (legacy: frozen, ×2 at $0.5\rho_{\min}$) | counted `rho<` (W3(d)) |
+| $\varepsilon>\varepsilon_{\max}$, $T>T_{\max}$, $\rho>\rho_{\max}$ | edge clamp | counted `esp>`/`T>`/`rho>` (W3(f)) |
+| $P>P(\rho,\varepsilon_{\max})$ in `EspFromP` | bisection pinned at the top | $\varepsilon\approx\varepsilon_{\max}$, **not counted** (W3(f), O-1) |
+| $P<P(\rho,\varepsilon_{\min})$ in `EspFromP` | exact continuation inverse | counted `esp<` |
+| $c_s^2$ at a flat top segment | `Cs2of` returns the tabulated (floored $10^{-12}$) value | — |
+| radiation $d\varepsilon\le0$ | Fleck factor disabled | explicit exchange |
+
+A clamp counter that fires on **cell states** means the table does not cover the run; the per-cycle report says so
+and names the edge ([code][clamp-report]). E10 found the production runs inside the table, with only transient
+`esp<` lookups.
+
+## A10. Configuration parameters
+
+Defaults are the values passed to `GetOrAdd*` in the source; "required" means the key is read with `Get*` and the
+run aborts without it.
+
+| parameter | meaning | default | units | accepted | effect | source |
+|---|---|---|---|---|---|---|
+| `hydro/eos` | EOS choice | required | — | `adiabatic`, `hydrogen` | selects the ideal gas or the table | [hydro.cpp][hydro-eos] |
+| `hydro/gamma` | ratio of specific heats | required | — | > 1 | ideal gas: the EOS. Table: sign of $P$ for $e_{\rm int}\le0$, `Tceil` conversion, LLF/FOFC energy (O-2), `collapse_be` barotropic index | [hydro.cpp][hydro-eos] |
+| `hydro/eos_table_file` | table path | none (`eos_table_hires_v5_cold.bin` in the run directory only if `eos_table_allow_default`) | — | v1 or v2 file | the table | [hydro.cpp][hydro-eos] |
+| `hydro/eos_table_allow_default` | permit the default file name | false | — | bool | — | [hydro.cpp][hydro-eos] |
+| `hydro/eos_interp` | what is interpolated along ρ | `p_over_rho` | — | `p`, `p_over_rho` | A7.2, E-F1 | [hydro.cpp][hydro-eos] |
+| `hydro/eos_extrapolate` | ideal-gas continuation outside the table | true (false and refused in the legacy build) | — | bool | A7.2–A7.4, E-F5/E-F6 | [hydro.cpp][hydro-eos] |
+| `hydro/eos_bisections` | P → ε bisection steps | 20 | — | integer in [10, 60] | A7.3 | [hydro.cpp][hydro-eos] |
+| `hydro/riemann` | Riemann solver | required | — | `hlld` with the table | A8.3 | [hydro.cpp][hydro-hlld] |
+| `hydro/eos_floor_consistent` | floored cell stores the pressure of its energy | false | — | bool | A8.2 step 7 | [hydro.cpp][hydro-ctor] |
+| `hydro/eos_clamp_report` | per-cycle out-of-table report | true | — | bool | printing only | [hydro.cpp][hydro-ctor] |
+| `hydro/dfloor` | density floor | −1 (off) | code density | > 0 to enable | A8.2 step 1 | [hydro.cpp][hydro-tfloor] |
+| `hydro/pfloor` | pressure floor | −1 (off) | code pressure | > 0 to enable | A8.2 step 7 | [hydro.cpp][hydro-tfloor] |
+| `hydro/Tfloor` | temperature floor | −1 (off) | **code T** (`hydrogen`) / K (`adiabatic`) | > 0 to enable | $\varepsilon_{\rm fl}=\varepsilon(\rho_{\rm code}=1,T)$ (table); A8.2 step 8 | [hydro.cpp][hydro-tfloor] |
+| `hydro/Tceil` | temperature ceiling | $\infty$ | K, ideal-gas conversion for both EOS | finite to enable; needs `<units>` + `He_mass_fraction` | A8.2 step 9 (O-3) | [hydro.cpp][hydro-tceil] |
+| `hydro/He_mass_fraction` | composition of the **ideal-gas** $\bar m$ | none | — | — | `mbar_over_kb` for the ideal `Tfloor`/`Tceil` only; the table's $X=0.716$ is fixed in the generator | [hydro.cpp][hydro-he] |
+| `units/rho_unit_cgs`, `v_unit_cgs`, `length_unit_cgs` | base scales | 5.467e-19, 1.9e4, 2.81e16 | cgs | refused for `collapse_be` | table conversion at load | [physical_units.hpp][units-build] |
+| `units/mu_thermal` | temperature calibration | 2.29 | — | — | $T_u$ (A5.4) | [physical_units.hpp][units-build] |
+| `problem/collapse_be/eint_over_p_override` | constant $e_{\rm int}/p$ for the IC | −1 (use the table) | — | > 0 to enable | A5.4 | [collapse_be.cpp][be-ic] |
+| `hydro/double_flux`, `double_flux_kappa`, `double_flux_ghost_fill`, `double_flux_fill_sensor` | contact fix (opt-in) | false, 0.2, true, true | — | requires `eos = hydrogen`, HLLD, VL2 | Sec. 6.4–6.6 | [hydro.cpp][hydro-dflux] |
+| CMake `ATHENAPK_EOS_LEGACY_LOOKUPS` | verbatim pre-fix lookups | OFF | — | ON/OFF | E-F9; refuses `eos_extrapolate = true` | [CMakeLists.txt][cmake] |
+
+The radiation package reads the same `hydro/eos_*` keys for its own table copy ([code][rad-load]); Parthenon
+requires one default per key, so the two load sites use identical defaults.
+
+## A11. Worked examples, computed by the real code
+
+All three examples were **executed**: the table side by
+[`host/worked_examples.cpp`](host/worked_examples.cpp), which compiles the real `src/eos/eos_table.hpp` on the host
+exactly as the E5 harness does (run: `host/run_worked.sh`, output
+[`results/tables/W_worked_examples.txt`](results/tables/W_worked_examples.txt)); the physics side by
+[`scripts/worked_saha.py`](scripts/worked_saha.py), which calls the generator's own `solve_saha` and `P_e_of_rho_T`
+(output [`results/tables/W_worked_saha.txt`](results/tables/W_worked_saha.txt)). Configuration: the shipped
+`eos_table_hires_v5_cold_rho26.bin` (md5 `cb68bd0f`), default keys (`p_over_rho`, `eos_extrapolate = true`, 20
+bisections), default units. Hand calculations below are labelled; every other number is copied from those files.
+
+### W1. An ordinary state: the reference gas of the code units
+
+**Input.** $\rho_{\rm code}=1$ ($5.467\times10^{-19}$ g cm$^{-3}$), $T=T_u=10.015144$ K.
+
+**Physics (generator).** $n_{\rm H,tot}=X\rho/m_H=0.716\times5.467\times10^{-19}/1.6726\times10^{-24}=2.340\times10^5$ cm$^{-3}$
+[hand]; at 10 K $K_d$ underflows, so all H is in H$_2$: $n_{\rm H_2}=1.1701\times10^5$, $n_{\rm He}=2.3206\times10^4$,
+$n_{\rm tot}=1.402196\times10^5$ cm$^{-3}$, $\mu=\rho/(m_Hn_{\rm tot})=2.331002$. Rotation and vibration are frozen
+($n_{\rm H_2}\epsilon_{\rm rot}=6\times10^{-31}$ erg cm$^{-3}$ against a total $2.9\times10^{-10}$), so
+$e_{\rm int}=\tfrac32n_{\rm tot}k_BT=2.908307\times10^{-10}$ erg cm$^{-3}$ and $P=n_{\rm tot}k_BT=1.938872\times10^{-10}$
+erg cm$^{-3}$: $e_{\rm int}/P=1.5$, $\Gamma_1=5/3$. In code units $\varepsilon=e_{\rm int}/(\rho v_u^2)=1.473615$ and
+$P=0.982410$.
+
+**The lookup `EintFromRhoTk(1, 10.015144)`.** $\log_{10}\rho_{\rm code}=0$, so
+$f_i=(0-(-7.752787))/0.050125=154.668$ → $i=154$, $t_i=0.668$; $f_j=(\log_{10}10.015144+1.336642)/0.004977=469.603$
+→ $j=469$, $t_j=0.603$. The four nodes are $1.4634683$ (both $\rho$ nodes at $j$) and $1.4803367$ (both at $j+1$): at
+10 K the specific energy does not depend on density. Bilinear:
+$\varepsilon=1.4634683+0.602894\times(1.4803367-1.4634683)=1.4736382$ [hand; the code prints 1.4736381505], i.e. $e_{\rm int}=1.4736382$ (code) and $5.3198\times10^8$ erg g$^{-1}$.
+Table vs generator: $+1.6\times10^{-5}$.
+
+**`Pof(1, 1.4736382)`** (p_over_rho): stencil $j=417$, $t_j=0.611$; nodes $P/\rho_i=0.97517798$ and $0.98707328$; the
+product with $\rho=1$ gives $P=0.98244421$ code $=1.938939\times10^{-10}$ erg cm$^{-3}$, $P/\rho=0.98244$ — the
+$\mu_{\rm th}/\mu$ of A5.4. **`Cs2of`**: $c_s^2=1.6395886$ (code), $c_s=2.4329\times10^4$ cm s$^{-1}$,
+$\Gamma_1=1.668887$ (A9.2: +0.133 % from the $\rho$ spacing). `LogTof` returns 10.015301 K ($+1.6\times10^{-5}$,
+E-F7). **`EspFromP(1, P)`**: $1.473630061$ with 20 bisections ($-5.5\times10^{-6}$, inside the $8.08\times10^{-6}$
+bound), $-3.0\times10^{-9}$ with 30, $-1.1\times10^{-16}$ with 60. No counter fired.
+
+**Reproduce.** `cd validation/eos_tabulated/host && REPO=<clone> ./run_worked.sh`.
+
+### W2. A state in H$_2$ dissociation: the softest point of the EOS
+
+**Input.** $\rho=10^{-9}$ g cm$^{-3}$ ($\rho_{\rm code}=1.829157\times10^9$), $T=2000$ K.
+
+**Physics.** 10.2 % of H nuclei are atomic, $2n_{\rm H_2}/n_{\rm H,tot}=0.8977$, ionization is negligible
+($n_{\rm H^+}/n_{\rm H,tot}=1.7\times10^{-15}$), $\mu=2.1476$. The internal energy is now dominated by chemistry:
+
+| term | erg cm$^{-3}$ | share |
+|---|---|---|
+| translational $\tfrac32n_{\rm tot}k_BT$ | 115.31 | 35.0 % |
+| H$_2$ rotation | 48.90 | 14.8 % |
+| H$_2$ vibration | 8.38 | 2.5 % |
+| dissociation $\tfrac12\chi_d(n_{\rm H}+n_{\rm H^+})$ | 157.14 | 47.7 % |
+
+$e_{\rm int}=329.72$, $P=76.870$ erg cm$^{-3}$; $e_{\rm int}/P=4.29$ and $1+P/e_{\rm int}=1.233$, while the adiabatic index
+from the exact Saha EOS is $\Gamma_1=1.100951$: compressing the gas mostly dissociates more H$_2$ instead of heating
+it.
+
+**Table.** $\varepsilon=914.15$ code (Saha 913.35: $+8.8\times10^{-4}$, the bilinear error where $\varepsilon(T)$ is
+strongly curved); $P=3.89623\times10^{11}$ code (Saha $3.89496\times10^{11}$); $\Gamma_1=1.102987$ (+0.18 %); T round
+trip $+1.0\times10^{-4}$; `EspFromP` $-6.4\times10^{-6}$ (20 steps). W2b ($10^{-8}$ g cm$^{-3}$, 3000 K, 89 % atomic):
+dissociation holds 82.6 % of $e_{\rm int}$, $\mu=1.335$, $\Gamma_1=1.1672$ (Saha) / 1.1699 (table).
+
+### W3. Edges, floors and safeguards (real branches)
+
+At $\rho_{\rm code}=1$: $\varepsilon_{\min}=9.3147\times10^{-3}$ code ($T=0.0633$ K), $P(\rho,\varepsilon_{\min})=6.2098\times10^{-3}$.
+
+* **(a) Sub-edge energy**, $\varepsilon=\tfrac12\varepsilon_{\min}$: the continuation gives
+  $P=3.1049\times10^{-3}$ (ratio 0.500000), the legacy clamp $6.2098\times10^{-3}$ — twice the pressure the energy
+  holds (E-F5). $T=0.0317$ K. Counters: `esp<` 5.
+* **(b) Pressure floor** $P_{\rm fl}=10^{-8}$ through `EintFromRhoPres` (the call `InternalEnergyFromPres` makes):
+  hand [continuation inverse] $\varepsilon=\varepsilon_{\min}P_{\rm fl}/P_{\min}=9.3147\times10^{-3}\times10^{-8}/6.2098\times10^{-3}=1.4999811\times10^{-8}$;
+  code $1.4999812\times10^{-8}$, and $P(\varepsilon)=P_{\rm fl}$ to 12 digits, at $T=1.0\times10^{-7}$ K. Legacy:
+  $\varepsilon=\varepsilon_{\min}(1+8.1\times10^{-6})$ (the bisection, pinned at the bottom of the axis, returns the
+  midpoint of its last bracket) with $P=6.2\times10^5P_{\rm fl}$.
+* **(c) Temperature floor** `hydro/Tfloor = 0.2726` (code) $=2.730128$ K: `EintFromRhoTkHost(1, T)` $=0.40171153$ code;
+  the floor pressure $P(\rho,\rho\varepsilon_{\rm fl})/\rho=0.26781559$ and $T=2.730156$ K at $\rho_{\rm code}=10^{-6}$,
+  1 and $10^6$ alike (at 2.7 K $\varepsilon$ does not depend on $\rho$, so evaluating the floor at $\rho_{\rm code}=1$
+  is exact here; it would not be at temperatures where the composition depends on density). The E-F5 probe measured
+  $P/\rho=0.26782$ for the same floor in a run.
+* **(d) Density below the table**, $\rho=\tfrac12\rho_{\min}$, $\varepsilon$ of 10 K: $P/\rho=0.98096$ with
+  `p_over_rho` and with `p` + continuation; `p` legacy clamp 1.96192 (×2, E-F6). Counted `rho<`.
+* **(e) The E-F1 bias**: A7.2.
+* **(f) Upper edges**: $\varepsilon_{\max}=2.1445\times10^5$ code ($T=3\times10^5$ K); `Pof` at $2\varepsilon_{\max}$
+  returns $P(\varepsilon_{\max})$ (counted `esp>`); `EintFromRhoTk` at $10^6$ K returns $\varepsilon(T_{\max})$ (counted
+  `T>`); `EspFromP` at $10P(\varepsilon_{\max})$ returns $0.999992\varepsilon_{\max}$ with **no** count (O-1).
+
+## A12. The EOS in one paragraph
+
+A cell's conserved state gives $\rho$ and, by subtraction, $e_{\rm int}$. `ConsToPrim` turns $(\rho,e_{\rm int}/\rho)$
+into $P$ with one bilinear lookup of $P/\rho_i$ on a logarithmic grid that was precomputed from a Saha equilibrium of
+H$_2$/H/H$^+$/He/He$^+$/He$^{2+}$/e$^-$ with H$_2$ rotation, vibration and dissociation energies; floors repair
+non-physical cells. The reconstruction carries $P$ to the faces; HLLD converts it back to energy with a 20-step
+bisection of the same lookup and uses the tabulated $c_s^2$ (a finite-difference derivative of the tabulated $P$) in
+the fast magnetosonic speed for its wave speeds and for the time step. Temperatures, when another package needs
+them, come from a second lookup on the same grid ($T$ in kelvin), and energies from a temperature from a third
+table on a $(\rho,T)$ grid. Everything outside the table is either continued as the ideal gas it is there (cold, dilute
+side) or clamped and counted (hot, dense side).
+
+---
+
+# Part B — Validation
 
 ## 1. Scope
 
@@ -289,9 +1184,9 @@ Results of v4 (E7p; standard PLM in brackets; dE/E = (E_dflux - E_std)/E_std of 
 | R1 dE/E | -2.7e-6 | -1.9e-6 | -1.1e-6 | -5.8e-7 | — |
 | R3 plateau dP* | -5.3e-5 [-5.3e-5] | -8.8e-6 [-8.9e-6] | +2.1e-6 [+2.2e-6] | +5.9e-7 [+6.5e-7] | — |
 | R3 dE/E | +2.6e-6 | +1.3e-6 | +6.5e-7 | +3.3e-7 | — |
-| pure contact R4, max |P/P*-1| | 3.2e-14 [4.2e-2] | 3.8e-14 [3.7e-2] | 4.8e-14 [3.2e-2] | 8.9e-14 [2.8e-2] | 1.4e-13 [2.3e-2] |
+| pure contact R4, max \|P/P*-1\| | 3.2e-14 [4.2e-2] | 3.8e-14 [3.7e-2] | 4.8e-14 [3.2e-2] | 8.9e-14 [2.8e-2] | 1.4e-13 [2.3e-2] |
 | pure contact R4 dE/E | +2.4e-3 | +1.5e-3 | +8.9e-4 | +5.5e-4 | +3.4e-4 |
-| pure contact R2, max |P/P*-1| | 1.8e-14 [1.1e-2] | 4.9e-14 [9.6e-3] | 5.3e-14 [8.3e-3] | 9.4e-14 [7.2e-3] | 2.0e-13 [6.1e-3] |
+| pure contact R2, max \|P/P*-1\| | 1.8e-14 [1.1e-2] | 4.9e-14 [9.6e-3] | 5.3e-14 [8.3e-3] | 9.4e-14 [7.2e-3] | 2.0e-13 [6.1e-3] |
 
 So with PLM: moving contacts are pressure-exact to round-off; the R2/R4 plateaus reach the 1e-6 level (the level of
 R1/R3 and of the reference solver) from N = 1600 on, 65-280x below standard PLM at N = 3200-6400; L1(rho), which
@@ -334,7 +1229,7 @@ within a few 1e-6 of v4; energies to 3 digits; R3 identical).
 pure contacts, wave vector (mx, my, mz) in box units, velocity along k (R4 star states). Exact solution: translation
 at uniform P*.
 
-| case | double flux max / L1 |P/P*-1| | standard | dE/E over the run (double flux) |
+| case | double flux max / L1 \|P/P*-1\| | standard | dE/E over the run (double flux) |
 |---|---|---|---|
 | 2D k = (1,1), N = 64 / 128 / 256 / 512 | 1.1e-14 / 2.0e-14 / 2.4e-14 / 1.1e-12 | 9.3e-2 / 6.9e-2 / 5.3e-2 / 4.4e-2 | +1.8e-2 / +1.1e-2 / +6.6e-3 / +4.1e-3 |
 | 3D k = (1,1,1), N = 32 / 64 / 128 | 7e-15 / 2.0e-14 / 1.4e-14 | 8.4e-2 / 6.3e-2 / 5.2e-2 | +3.1e-2 / +1.9e-2 / +1.2e-2 |
@@ -701,9 +1596,210 @@ wave (N 128) 13.6 s -> 1.02 s (research code 1.09 s). Check: results bit-identic
 | E7 double flux 2D/3D/AMR/GPU | E7q_*, E7r_*, E7k/E7e (E7t) | E7q_slab.sh, E7r_amr.sh, E7t_v6.sh, E7u_bitid37.sh, E7v_prolong.sh, E9g_dflux_gpu.sh + E9g_cpu.sh | e7q_eval.py, e7r_eval.py, e7m_eval.py (`E7t E7t_dflux_v6.txt`) | E7q_slab.txt, E7r_amr.txt, E7v_pc.txt, E7t_dflux_v6.txt, E9g_dflux_gpu.txt | — |
 | E7 contact + double flux | E7k_*_{mov,rest}_n*, E7e_*_p_over_rho_n*, E6_wave_* | E7k_contact.sh, E7m_dflux.sh, E7n_dflux.sh, E7o_dflux.sh, E7p_dflux.sh, E6_dflux.sh | e7j_entropy.py, e7j_invariant.py, e7k_eval.py, e7m_eval.py (`E7p E7p_dflux_cell.txt`) | E7j_*.txt, E7k_contact.txt, E7m/E7n/E7o/E7p_*.txt | — |
 | E7 diagnosis | E7c_* (archived), E7d_*, E7g_*, E7e (E7h/E7i overrides) | E7d.sh, E7g.sh, E7g_table_*.sh, E7h_scheme.sh, E7i_limo3.sh | e7g_kinks2.py, e7g_profiles.py, e7g_eval.py, e7f_eval.py, analyze_E7.py (E7_PREFIX) | E7g_kinks2.txt, E7g_tables.txt, E7d_riemann.txt, E7h_scheme.txt, E7i_limo3.txt | E7g_error_profiles.png |
+| W (worked examples, Part A Sec. A11) | — | host/run_worked.sh | host/worked_examples.cpp (real eos_table.hpp), worked_saha.py | W_worked_examples.txt, W_worked_saha.txt | — |
 
 ## 14. References
 Abgrall 1996, JCP 125, 150 (pressure oscillations of conservative schemes at material interfaces); Abgrall & Karni
 2001, JCP 169, 594 (double flux); Billet & Abgrall 2003, Computers & Fluids 32, 1473; Cada & Torrilhon 2009, JCP 228,
 4118 (LimO3); Colella & Glaz 1985, JCP 59, 264; Liu 1975, JDE 18, 218 (shock admissibility); Masunaga & Inutsuka
 2000, ApJ 531, 350; Toro 2009, Riemann Solvers and Numerical Methods for Fluid Dynamics (3rd ed.).
+
+---
+
+# Part C — Reading the validation, limits, open points, source index
+
+## C1. What each test establishes, and which code it exercises
+
+The results are in Part B (Sec. 4–9); this table says what each one proves and what it does not. "Runtime code"
+means the C++ that a simulation executes; tests that re-implement the lookup in Python are marked as such.
+
+| test | property tested | code exercised | reference / metric | establishes | does **not** establish |
+|---|---|---|---|---|---|
+| E1 provenance | the shipped bytes come from the shipped generator | `gen_eos_table.py build` | byte identity | reproducibility of `v5_cold` (and, in Sec. 9.4, `rho26`: md5 `cb68bd0f`) | that the physics is right |
+| E2 thermodynamic gates | Saha solution converged; P and e mutually consistent; table ≈ direct Saha | `solve_saha`, `P_e_of_rho_T`; the table through a **Python** bilinear reader | neutrality / conservation to round-off; Maxwell identity to 3e-3; table vs Saha at off-node points | the generator's equilibrium solve and the table's interpolation accuracy (1e-3 level) | the C++ lookups; agreement with a real-gas EOS; it does not separate the A3.5 rotational-model term from finite-difference error |
+| E3 limits | $\Gamma_1$ in the known regimes | generator + table | known limits (5/3 cold, dips at dissociation/ionization) | the regimes are where physics puts them | quantitative agreement with an external EOS table |
+| E5 inversions | monotonicity, bisection error, round trips, edge and floor behaviour | **real** `eos_table.hpp` compiled on the host | analytic bisection bound; identity of round trips | the exact numerical behaviour of the runtime lookups on CPU (E-F5, E-F6, E-F7) | behaviour inside the solver; GPU (see E9) |
+| E6 acoustic waves | the scheme propagates sound at the table's speed | ConsToPrim (`Pof`), HLLD (`EspFromP`, $c_f$ via `Cs2of`), eos_test IC (`EintFromRhoTk`) | linear eigenmode after one period; phase speed vs the interpolant's $c_s$ | the solver sees the interpolant's sound speed (found E-F1, fixed by `p_over_rho`) | nonlinear flow; magnetised waves (`B = 0` in the E6 decks; magnetised table waves are I1c of the ideal-MHD report) |
+| E7 Riemann problems | shocks and rarefactions across EOS regimes converge to the right weak solution | as E6, plus floors; double flux (Sec. 6.4–6.6) | exact general-EOS Riemann solution of the same interpolant (`riemann_exact.py`) | convergence for R1–R4; the slow R2/R4 convergence is the conservative-contact effect (E-F10), not the table; double flux makes contacts pressure-exact | MHD Riemann problems with the table (`B = 0` in E7) — magnetised table flows are covered by the dual-energy D2/D4 tests |
+| E8 compression | the scheme's $P\,dV$ work follows the table adiabat over 10 K → 12 500 K | ConsToPrim, HLLD, `eos_homologous` BC | exact adiabat $d\varepsilon/d\ln\rho=P/\rho$ of the interpolant | ≤ 4e-7 after removing the known geometric term, through dissociation and into ionization | radiative (non-adiabatic) paths; the physical adiabat vs a real-gas EOS |
+| E9 GPU | device lookups and solver = CPU | the same kernels on CUDA | CPU run of the same deck | lookups ≤ 3.3e-15; flows to round-off or 3–4 orders below discretisation error | Tfloor on the GPU (not run, Sec. 8) |
+| E10 footprint + probe | the production state is inside the table; floored cells are visible | clamp counters, floors, `cons_diag` | counter values, energy budget | coverage of the measured footprint; E-F5/E-F6 found and fixed | coverage of later collapse stages ($T>133$ K was not reached by the runs analysed) |
+| W1–W3 (this guide) | worked examples | real `eos_table.hpp` (host) + generator | hand calculation / generator | the step-by-step arithmetic of A7; the cs² bias of A9.2; O-1 | anything about the solver |
+
+## C2. Limitations, assumptions and untested regimes
+
+1. **Physics model** (A3.1, A3.7): ideal, non-degenerate Saha gas; no pressure ionization, Coulomb corrections, H$^-$,
+   H$_2^+$, metals or radiation pressure; harmonic vibration, rigid rotor, ground-state atoms. Quantitatively
+   questionable above ~$10^{-2}$ g cm$^{-3}$ in the ionization band (A3.7). Not tested against an external EOS.
+2. **Thermodynamic consistency** (A3.5): energy and chemical equilibrium use different ortho/para models, so the table
+   is not derived from one free energy where H$_2$ dissociates. Size of the effect not isolated (C4, T-4).
+3. **Table top** (A4.3): flat $P(\varepsilon)$ above $3\times10^5$ K at high density; `EspFromP` cannot represent
+   pressures above $P(\rho,\varepsilon_{\max})$ and does not count them (O-1).
+4. **Sound speed**: the tabulated $c_s^2$ is a finite-difference derivative of the tabulated $P$ with a known bias
+   (+0.13 % in $\Gamma_1$ for molecular gas, A9.2) and up to 3.3 % deviation at kinks (E2).
+5. **Two independent interpolants** for $T(\rho,\varepsilon)$ and $\varepsilon(\rho,T)$: round trip up to 1.3 % (E-F7).
+6. **Bisection**: piecewise-constant error up to $8.1\times10^{-6}$ in $\varepsilon$, $9.2\times10^{-5}$ in $P$ (A7.3).
+7. **Untested combinations**: FOFC with the table (O-2); `Tceil` with the table (O-3); `Tfloor` and double flux on the
+   GPU (Sec. 8); MHD shock tubes with the table against an exact solution; the table above 133 K in a full collapse
+   run (E10 covered the earlier epochs).
+
+## C3. Implementation observations from this documentation pass (not changed)
+
+Found while tracing the code for Part A. None of them changes a result in the configurations validated in Part B;
+each is reported with its evidence, and none was fixed here (documentation-only change).
+
+* **O-1 — `EspFromP` silently clamps pressures above the table.** For $P>P(\rho,\varepsilon_{\max})$ the bisection
+  returns $\approx\varepsilon_{\max}$ and no counter is incremented (only the $\rho$ axis is counted in `EspFromP`;
+  the low-pressure side is handled and counted since E-F5). Measured: target $10\,P_{\max}$ at $\rho_{\rm code}=1$
+  → $\varepsilon=0.999992\,\varepsilon_{\max}$, whose pressure is $1.13\times10^5$ instead of $1.13\times10^6$, counters
+  unchanged (`W_worked_examples.txt`, W3(f)). Affects HLLD face energies and the pressure-floor inversion only
+  above $3\times10^5$ K (or where the table top is flat); invisible to the clamp report.
+* **O-2 — first-order flux correction uses the ideal-gas energy under the table.** `hydro/first_order_flux_correct`
+  recomputes fluxes with the LLF solver, which forms $E=P/(\gamma-1)+\dots$ ([code][llf-igm1]); it is refused with
+  double flux but not with `eos = hydrogen` alone ([code][hydro-dflux]). [inferred] A corrected face would then
+  carry an energy flux inconsistent with the table. No test or deck in this repository uses FOFC with the table.
+* **O-3 — `Tceil` (and, for `eos = adiabatic`, `Tfloor`) are in kelvin with an ideal-gas conversion; under
+  `eos = hydrogen` `Tfloor` is in code temperature units and inverted through the table.** So under the table the
+  two keys use different units, and `Tceil` still requires a `<units>` block and `hydro/He_mass_fraction` and maps
+  through $\gamma$ and $\bar m$ rather than the table ([code][hydro-tceil]). [inferred] A table run that sets `Tceil`
+  gets a ceiling at a different temperature than requested (the same class of issue that AUDIT F-22 fixed for
+  `Tfloor`).
+* **O-4 — the temperature unit and the table's molecular weight differ by 1.8 %** (A5.4): $T_u$ uses
+  $\mu_{\rm th}=2.29$, the table has $\mu=2.331$. Under `eos = hydrogen`, `collapse_be` starts at $T_u$ and therefore at
+  $P=0.98244\,\rho$, 1.76 % below the isothermal Bonnor–Ebert equilibrium $p=\rho$ that the IC density profile
+  assumes (W1 measured $P/\rho$; IC code: [energy][be-ic], [pressure][be-p]). The comment above the IC (`e_int/p = esp/T_code = esp
+  (since p = rho*T ...)`) holds only for $\mu=\mu_{\rm th}$. Whether this matters for a given study (a ~1.8 %
+  stronger initial gravitational imbalance) is a modelling decision; it is not an EOS error.
+* **O-5 — the temperature floor is converted at $\rho_{\rm code}=1$ only.** `efloor = EintFromRhoTkHost(1.0, T)`
+  gives one specific energy for all densities ([code][hydro-tfloor]). Exact while $\varepsilon(T)$ does not depend on
+  density — verified for 2.73 K over 12 decades (W3(c)) — but a floor set in the dissociation or ionization range would
+  correspond to different temperatures at different densities.
+* **O-6 — stale or misleading comments** (documentation only): `gen_eos_table.py` says the table is "HDF5 ...
+  consumed at runtime by ... eos_hydrogen.hpp" (the runtime reads the `.bin` through `eos_table.hpp`) and that $c_s^2$ is
+  "via finite differences on the adiabat" (it is the identity of A3.6 with grid derivatives); its default `build`
+  target `eos_table.bin` and the default table of `src/eos/tests/test_eos_consistency.py` are not shipped, and that
+  copy of the test still reads only v1 files (E-F2; the suite's copy in `scripts/` is fixed). The per-cycle clamp
+  report says lookups "were EDGE-CLAMPED" also for lookups that were continued, which the same message then
+  qualifies.
+* **O-7 — top-node lookups are counted as clamps** (A7.1): harmless, but a run sitting exactly on the top node would
+  report clamps.
+
+## C4. Suggested additional tests (not implemented, not run)
+
+| id | test | what it would establish |
+|---|---|---|
+| T-1 | host-harness case: `EspFromP` above $P(\rho,\varepsilon_{\max})$ with a counter assertion | makes O-1 observable and regression-tested |
+| T-2 | E7 R2/R4 with `first_order_flux_correct = true` forced to trigger (e.g. very low `dfloor`/`pfloor` margins), table vs `eos_floor_consistent` energy audit | whether O-2 changes energies in practice |
+| T-3 | E10-style probe with `hydro/Tceil` under `eos = hydrogen` | the temperature the ceiling actually enforces (O-3) |
+| T-4 | rebuild the table with the rotational energy taken from the same (equilibrium) partition function as $K_d$ and repeat the E2 Maxwell gate in the dissociation band | isolates the A3.5 contribution to the 2.46e-3 Maxwell residual |
+| T-5 | rebuild with half the $\log\rho$ spacing; measure $\Gamma_1$ at 10 K | confirms the A9.2 prediction (bias ∝ $\Delta^2$: 0.133 % → 0.033 %) |
+| T-6 | `collapse_be` at $t=0$ with `eos = hydrogen` vs `adiabatic`: early velocity growth and central density drift before collapse | quantifies O-4 |
+| T-7 | compare $P$, $\varepsilon$, $\Gamma_1$ with an independent EOS that includes non-ideal effects (e.g. Saumon, Chabrier & van Horn 1995) above $10^{-6}$ g cm$^{-3}$ | where the ideal-Saha model departs from a dense-plasma EOS (A3.7) |
+| T-8 | GPU runs of the Tfloor probe and of double flux on refined meshes with Tfloor | closes the GPU gaps listed in Sec. 8 |
+| T-9 | radiation Fleck derivative $d\varepsilon/dT$ from the table vs analytic $c_v$ of the generator | accuracy of the numerical $c_v$ (A3.6) |
+| T-10 | magnetised general-EOS Riemann problem (e.g. Brio–Wu states mapped to the R2 densities/temperatures) against a converged reference | HLLD + table with $B\neq0$ in shocks (C2 item 7) |
+
+## C5. Source reference index
+
+All links point to commit `a40eff5`. Line ranges are those of that commit.
+
+| file | functions / blocks | role |
+|---|---|---|
+| [`src/eos/gen_eos_table.py`][gen] | constants [L26–37][gen-const], `Zrot_ns` [L60–68][gen-zrot], `erot_per_H2` [L69–79][gen-erot], `Zvib`/`evib_per_H2` [L80–91][gen-evib], `solve_saha` [L93–136][gen-saha], `P_e_of_rho_T` [L138–147][gen-pe], `build_table` [L149–381][gen-build] | offline physics and table construction (A3, A4) |
+| [`src/eos/eos_table_format.hpp`][fmt] | `ReadEosHeader` | file format v1/v2 (A4.4) |
+| [`src/eos/eos_table.hpp`][tab] | `bilin` [L124–163][tab-bilin], legacy lookups [L165–215][tab-legacy], continuation helpers [L259–307][tab-x], `Pof`/`Cs2of`/`LogTof` [L309–326][tab-pof], `EspFromP` [L327–360][tab-espfromp], interface [L363–377][tab-iface], `TemperatureKFromPres` [L405–412][tab-tfromp], `EintFromRhoTk` [L413–425][tab-eintT], host twins [L450–518][tab-host], `Load` [L526–611][tab-load], counters [L617–633][tab-ctr2] | runtime lookups (A7) |
+| [`src/eos/adiabatic_glmmhd.hpp`][eos-class] | constructor, `InternalEnergyFromPres` [L59–63][eos-iefp], `SoundSpeed`/`FastMagnetosonicSpeed` [L73–91][eos-cf], `ConsToPrim` [L100–321][c2p] | the EOS interface of the solver (A8) |
+| [`src/eos/adiabatic_glmmhd.cpp`][c2p-mesh] | `ConservedToPrimitive` | the per-cell kernel launch |
+| [`src/hydro/hydro.cpp`][hydro] | clamp report [L131–195][clamp-report], EOS keys and load [L1101–1185][hydro-eos], floors [L1202–1240][hydro-tfloor], `Tceil` [L1242–1255][hydro-tceil], EOS object [L1690–1694][hydro-ctor], `EstimateHyperbolicTimestep` [L2127–2190][dt-hyp], `FirstOrderFluxCorrect` [L2578ff][fofc] | configuration, initialization, time step (A6, A10) |
+| [`src/hydro/rsolvers/glmmhd_hlld.hpp`][hlld] | face energies and fast speeds [L104–126][hlld-e] | Riemann solver (A8.3) |
+| [`src/hydro/rsolvers/glmmhd_dc_llf.hpp`][llf] | `igm1` energy [L56][llf-igm1] | O-2 |
+| [`src/units/physical_units.hpp`][units] | `PhysicalUnits`, `BuildPhysicalUnits` [L84–129][units-build] | units (A5) |
+| [`src/pgen/eos_test.cpp`][eostest] | IC kernel | validation problem generator |
+| [`src/pgen/collapse_be.cpp`][be] | IC energy [L276–297][be-ic], [L396–402][be-p]; `ApplyBarotropicCooling` [L842–895][be-baro] | A5.4, A8.4 |
+| [`src/hydro/double_flux.cpp`][dflux] | `EspFromPRefined` [L71–86][dflux-newton], freeze [L186–208][dflux-freeze] | Sec. 6.4–6.6 |
+| [`src/radiation/radiation.cpp`][rad] / [`radiation_sn.cpp`][rad-dtde] | own table load [L288–319][rad-load]; $T$ and $dT/d\varepsilon$ [L923–963][rad-dtde] | A8.4 |
+| [`src/hydro/diffusion/diffusion.cpp`][diff-T], [`src/dust/dust.cpp`][dust-T], [`src/refinement/jeans.cpp`][jeans], [`src/diagnostics/cons_diag.cpp`][diag-tfloor] | temperature and sound-speed consumers | A6.2 |
+| [`src/eos/TABLE_PROVENANCE.md`][prov] | shipped tables, md5, rebuild commands | A4 |
+
+[gen]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py
+[gen-head]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L1-L23
+[gen-const]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L26-L37
+[gen-zrot]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L60-L68
+[gen-erot]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L69-L79
+[gen-zvib]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L80-L81
+[gen-evib]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L82-L91
+[gen-saha]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L93-L108
+[gen-neut]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L109-L126
+[gen-bisect]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L127-L134
+[gen-nh2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L135-L136
+[gen-pe]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L138-L147
+[gen-build]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L149-L381
+[gen-rhoT]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L216-L223
+[gen-pad]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L257-L264
+[gen-eaxis]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L225-L256
+[gen-sat]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L265-L310
+[gen-invert]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L311-L318
+[gen-cs2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L319-L333
+[gen-write]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L345-L373
+[prov]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/TABLE_PROVENANCE.md
+[fmt]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table_format.hpp
+[tab]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp
+[tab-ctr]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L86-L120
+[tab-bilin]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L122-L163
+[tab-legacy]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L165-L215
+[tab-x]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L259-L307
+[tab-pof]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L309-L326
+[tab-espfromp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L327-L360
+[tab-iface]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L363-L377
+[tab-tfromp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L401-L412
+[tab-eintT]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L413-L425
+[tab-host]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L432-L518
+[tab-load]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L521-L611
+[tab-prho]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L570-L580
+[tab-ctr2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L613-L633
+[eos-class]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L25-L67
+[eos-iefp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L56-L63
+[eos-cf]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L69-L91
+[c2p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L94-L321
+[c2p-d]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L132-L139
+[c2p-eint]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L151-L153
+[c2p-p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L205-L213
+[c2p-pfl]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L239-L256
+[c2p-tfl]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L258-L270
+[c2p-tceil]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L272-L284
+[c2p-mesh]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.cpp#L33-L69
+[hydro]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp
+[clamp-report]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L131-L195
+[hydro-eos]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1101-L1185
+[hydro-n14]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1153-L1171
+[hydro-hlld]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1173-L1176
+[hydro-he]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1187-L1200
+[hydro-tfloor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1202-L1240
+[hydro-tceil]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1242-L1255
+[hydro-ctor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1644-L1709
+[hydro-dflux]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1025-L1060
+[dt-hyp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L2127-L2190
+[fofc]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L2578-L2612
+[hlld]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_hlld.hpp
+[hlld-e]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_hlld.hpp#L104-L126
+[llf]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_dc_llf.hpp
+[llf-igm1]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_dc_llf.hpp#L56-L56
+[units]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/units/physical_units.hpp
+[units-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/units/physical_units.hpp#L120-L127
+[units-build]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/units/physical_units.hpp#L84-L129
+[eostest]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/eos_test.cpp#L155-L230
+[be]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp
+[be-ic]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp#L276-L297
+[be-p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp#L390-L402
+[be-baro]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp#L822-L895
+[dflux]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/double_flux.cpp
+[dflux-newton]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/double_flux.cpp#L71-L86
+[dflux-freeze]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/double_flux.cpp#L186-L208
+[rad]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/radiation/radiation.cpp
+[rad-load]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/radiation/radiation.cpp#L288-L319
+[rad-dtde]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/radiation/radiation_sn.cpp#L923-L963
+[diff-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/diffusion/diffusion.cpp#L104-L127
+[dust-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/dust/dust.cpp#L259-L270
+[jeans]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/refinement/jeans.cpp#L36-L60
+[diag-tfloor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/diagnostics/cons_diag.cpp#L97-L103
+[cmake]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/CMakeLists.txt#L69-L72

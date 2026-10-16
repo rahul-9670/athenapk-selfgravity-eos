@@ -4,8 +4,10 @@ Configuration under test: `eos = hydrogen` with `src/eos/eos_table_hires_v5_cold
 H/He, H2 dissociation, H2 rotation/vibration), HLLD + PLM + VL2, `eos_floor_consistent = true`, 20 P -> e bisections
 (default). Problem generator: `eos_test` (`src/pgen/eos_test.cpp`).
 
-**Report: [`EOS_VALIDATION.md`](EOS_VALIDATION.md)** (authoritative: every test with numbers, findings E-F1..E-F10,
-reproduction map). Tables: `results/tables/`, figures: `results/figures/`.
+**Report: [`EOS_VALIDATION.md`](EOS_VALIDATION.md)** (authoritative). Part A is the implementation guide (physics,
+derivations, execution path, every lookup, numerics, units, configuration keys, worked examples); Part B the
+validation (every test with numbers, findings E-F1..E-F11, reproduction map); Part C what each test establishes,
+limitations, open observations O-1..O-7 and proposed tests. Tables: `results/tables/`, figures: `results/figures/`.
 
 | ID | test | reference | result |
 |---|---|---|---|
@@ -24,7 +26,9 @@ reproduction map). Tables: `results/tables/`, figures: `results/figures/`.
 * `inputs/` — decks (`make_decks_eos.py`, `make_decks_eos2.py` regenerate them).
 * `runs/*.sh` — the SLURM scripts that ran each test, as run (one node, Kokkos OpenMP; GPU scripts on one H100).
 * `scripts/` — analysis, exact solvers, the table reader `eostab.py`, `run_one_nobind.sh`.
-* `host/` — host-only harness that compiles the real `src/eos/eos_table.hpp` with plain g++ (`run_e5.sh`).
+* `host/` — host-only harnesses that compile the real `src/eos/eos_table.hpp` with plain g++ (`run_e5.sh` for E5,
+  `run_worked.sh` for the worked examples of Part A, output `results/tables/W_worked_examples.txt`; the physics side is
+  `scripts/worked_saha.py` -> `results/tables/W_worked_saha.txt`).
 * `results/` — tables and figures quoted in the report.
 
 Paths: decks and scripts refer to the repository root as `$REPO` (`export REPO=/path/to/clone`; in decks substitute
