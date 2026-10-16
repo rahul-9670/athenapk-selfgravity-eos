@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """EOS consistency gate for the tabulated multi-Saha protostellar EOS.
 
-Read-only characterization of the EXISTING EOS (src/eos/gen_eos_table.py + the shipped
-src/eos/eos_table.bin). No numerics are changed; this quantifies whether the EOS meets the
+Read-only characterization of the EXISTING EOS (src/eos/gen_eos_table.py + a shipped table, by default
+src/eos/eos_table_hires_v5_cold_rho26.bin). No numerics are changed; this quantifies whether the EOS meets the
 Phase-3 acceptance criteria before any Helmholtz-free-energy rework is considered.
 
 Gates:
@@ -12,7 +12,7 @@ Gates:
      (u = specific internal energy, v = 1/rho). ANY EOS derived from one free energy must
      satisfy it; here P and e are produced by the same Saha solver, so this checks that they
      are mutually thermodynamically consistent (a Maxwell-relation test, entropy-free).
-  4. Shipped-binary fidelity: the eos_table.bin P(rho,esp) reproduces the Saha P(rho,T) to
+  4. Shipped-binary fidelity: the table P(rho,esp) reproduces the Saha P(rho,T) to
      the table's interpolation accuracy (catches a stale/corrupt table or a unit-scale bug).
 
 Run: python3 src/eos/tests/test_eos_consistency.py
@@ -29,7 +29,7 @@ GEN = os.path.normpath(os.path.join(HERE, "..", "gen_eos_table.py"))
 # hi-res table can be validated against the same gates before any production swap.
 TABLE = (sys.argv[1] if len(sys.argv) > 1 else
          os.environ.get("EOS_TABLE_BIN",
-                        os.path.normpath(os.path.join(HERE, "..", "eos_table.bin"))))
+                        os.path.normpath(os.path.join(HERE, "..", "eos_table_hires_v5_cold_rho26.bin"))))
 
 # import gen_eos_table as a module (its build action is guarded by __main__)
 spec = importlib.util.spec_from_file_location("gen_eos_table", GEN)
@@ -38,8 +38,25 @@ spec.loader.exec_module(G)
 
 
 def load_table(path):
-    """Read the flat binary written by EosTable::Load (see eos_table.hpp)."""
+    """Read the table (eos_table_format.hpp). v2 (magic "EOSTABL1", cgs) is converted to the
+    generator's code units (rho0, v0) so the gates below see the same convention as a v1 file.
+    (EOS_VALIDATION.md E-F2: this loader used to read only v1 files, so gates 4-5 could not run on any
+    shipped table; fixed in this copy 2026-10-16, as in validation/eos_tabulated/scripts.)"""
     with open(path, "rb") as f:
+        first = np.fromfile(f, dtype=np.int64, count=1)[0]
+        if first == 0x454F535441424C31:
+            ver, flags, nr, ne, nT = (int(x) for x in np.fromfile(f, dtype=np.int64, count=5))
+            lr0, dlr, le0, dle, lT0, dlT, _, _ = np.fromfile(f, dtype=np.float64, count=8)
+            assert flags & 1, "v2 table without the cgs flag"
+            rho0, v0 = G.rho0, G.v0
+            P = np.fromfile(f, dtype=np.float64, count=nr * ne).reshape(nr, ne) / (rho0 * v0 * v0)
+            cs2 = np.fromfile(f, dtype=np.float64, count=nr * ne).reshape(nr, ne) / (v0 * v0)
+            logT = np.fromfile(f, dtype=np.float64, count=nr * ne).reshape(nr, ne)
+            espT = np.fromfile(f, dtype=np.float64, count=nr * nT).reshape(nr, nT) / (v0 * v0)
+            return dict(nr=nr, ne=ne, nT=nT, lr0=lr0 - np.log10(rho0), dlr=dlr,
+                        le0=le0 - np.log10(v0 * v0), dle=dle, lT0=lT0, dlT=dlT,
+                        P=P, cs2=cs2, logT=logT, espT=espT)
+        f.seek(0)
         hdr = np.fromfile(f, dtype=np.int64, count=3)
         nr, ne, nT = (int(x) for x in hdr)
         g = np.fromfile(f, dtype=np.float64, count=6)
@@ -128,7 +145,7 @@ def main():
     # H2-dissociation (~2200 K) and H-ionization (~7000-10000 K) gamma-softening kinks. That
     # degradation is the actionable Phase-3 EOS item (finer/adaptive grid at the transitions),
     # NOT a bug: the underlying Saha EOS is thermodynamically consistent (gates 1-3).
-    print("--- GATE 4: eos_table.bin P(rho,esp) reproduces Saha P(rho,T) ---")
+    print("--- GATE 4: table P(rho,esp) reproduces Saha P(rho,T) ---")
     if not os.path.exists(TABLE):
         print(f"  SKIP: {TABLE} not found")
     else:

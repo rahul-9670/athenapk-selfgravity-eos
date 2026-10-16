@@ -1,4 +1,4 @@
-# eos_table.hpp md5 59d20077  table md5 cb68bd0f
+# eos_table.hpp md5 8c3eec39  table md5 cb68bd0f
 # Worked examples, table $REPO/src/eos/eos_table_hires_v5_cold_rho26.bin
 # units: rho_unit 5.4670e-19 g/cm^3, v_unit 1.9000e+04 cm/s, esp_unit = v^2 = 3.610000e+08 erg/g, P_unit = rho v^2 = 1.973587e-10 erg/cm^3, temperature_unit = mu_th m_H v^2/k_B = 10.015144 K
 # grid (code units after Load): nr 520 ne 1399 nT 1370
@@ -87,12 +87,20 @@
     clamp counters after (d) p: rho< 2 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
   (e) E-F1: midway between rho nodes 300 and 301 (rho 1.1159e-11 g/cm^3), esp of 10 K: P(p) / P(p_over_rho) = 1.00166562;  predicted (1 + 10^dlr)/(2 10^(dlr/2)) = 1.00166562
     clamp counters after (e): rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
-    clamp counters after (f) setup: rho< 0 rho> 0 esp< 0 esp> 1 T< 0 T> 0 | probe 0 0 0 0 0 0
+    clamp counters after (f) setup: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
   (f) esp_max = 2.144471e+05 code; P(rho, esp_max) = 1.128406e+05; T(rho, esp_max) = 3.000000e+05 K
-    clamp counters after (f) edge-node lookups: rho< 0 rho> 0 esp< 0 esp> 1 T< 0 T> 0 | probe 0 0 0 0 0 0
+    clamp counters after (f) edge-node lookups: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
       Pof(rho, 2 esp_max) = 1.128406e+05 (ratio to P(esp_max) 1.000000)
     clamp counters after Pof above the esp axis: rho< 0 rho> 0 esp< 0 esp> 2 T< 0 T> 0 | probe 0 0 0 0 0 0
       EintFromRhoTk(rho, 1e6 K) / rho = 2.142328e+05 (esp(T_max) = 2.142328e+05)
-    clamp counters after EintFromRhoTk above the T axis: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 2 | probe 0 0 0 0 0 0
+    clamp counters after EintFromRhoTk above the T axis: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 1 | probe 0 0 0 0 0 0
       EspFromP(rho, 10 P(esp_max)) = 2.144453e+05 = esp_max x 0.999992;  P of that esp = 1.128396e+05 (target 1.128406e+06)
-    clamp counters after EspFromP above the P range (the Pof check above it is the esp> count): rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+    clamp counters after EspFromP above the P range (the Pof check above it is the esp> count): rho< 0 rho> 0 esp< 0 esp> 1 T< 0 T> 0 | probe 0 0 0 0 0 0
+      EspFromP(rho, 0.999 P(esp_max)) = 2.142617e+05 (inside the table)
+    clamp counters after EspFromP inside the P range: rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0
+  (g) Tfloor = 2000 K: esp(rho_code = 1) = 4.793708e+03 code
+      rho = 1e-16 g/cm^3: T of rho*esp(1) =  1997.81 K;  T of e(rho, Tfloor) =  1997.67 K
+      rho = 1e-12 g/cm^3: T of rho*esp(1) =  2175.73 K;  T of e(rho, Tfloor) =  1999.89 K
+      rho = 1e-09 g/cm^3: T of rho*esp(1) =  2779.46 K;  T of e(rho, Tfloor) =  2000.21 K
+      rho = 1e-06 g/cm^3: T of rho*esp(1) =  4005.71 K;  T of e(rho, Tfloor) =  2000.04 K
+    clamp counters after (g): rho< 0 rho> 0 esp< 0 esp> 0 T< 0 T> 0 | probe 0 0 0 0 0 0

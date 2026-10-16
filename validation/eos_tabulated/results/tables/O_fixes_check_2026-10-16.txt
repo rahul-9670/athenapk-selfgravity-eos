@@ -1,0 +1,45 @@
+# Checks of the fixes of EOS_VALIDATION.md observations O-1 .. O-7 (2026-10-16)
+# NEW = this commit, CPU build md5 1455f3fc;  OLD = a40eff5, CPU build md5 446d9034 (same flags, GCC 13.3, Kokkos OpenMP).
+# Decks: inputs/E10_probe_*.in (eos_test, thin 3D box 32x4x4) with the overrides listed; table eos_table_hires_v5_cold_rho26.bin.
+# Temperatures: from the dumped prim (rho, P) through the table as the runtime does it (p_over_rho, 60-step bisection).
+
+## Regression (unchanged behaviour)
+key-off: the 47 self-gravity / EOS / dual-energy / collapse_be regression runs, NEW vs OLD as built (same decks, ranks):
+  47/47 bitwise in every field of every dump, history files identical (strict audit)
+dual-energy legs D1b_M1_N256, D1b_M100_N1024, D2a_par_b1_N256, D4_b1, D1b_M10_N1024 (decks set Tfloor = 0.2726): bitwise
+E10 probes + hydro/Tfloor=0.2726 (2.73 K), 3 cycles: control legs bitwise; sub-edge and negative legs (floor binds):
+  max |d| / max 1.8e-16 in prim (last bit: e(rho, 2.73 K) per density vs rho * e(rho_code = 1, 2.73 K))
+collapse_be L6 deck + eos=hydrogen, problem/collapse_be/table_isothermal=temperature, 20 cycles, 32 ranks: NEW = OLD bitwise
+
+## O-1, O-7 (host harness, results/tables/W_worked_examples.txt, W3(f))
+EspFromP(rho, 10 P(esp_max)): returns 0.999992 esp_max as before; counters esp> 0 (OLD) -> 1 (NEW)
+EspFromP(rho, 0.999 P(esp_max)): no count (inside the table)
+P(rho, esp_max) at the top node: counted esp> 1 (OLD) -> 0 (NEW); EintFromRhoTk(rho, 1e6 K): T> 1 (NEW, 2 before incl. the top-node lookup)
+
+## O-5 temperature floor at each density
+overrides: rhoL=1829156.7587342237 rhoR=1829156758.7342236 (1e-12 | 1e-9 g/cm^3) TL=TR=100 hydro/Tfloor=199.69763 (2000 K) nlim=1
+  NEW: T = 1999.89 K (1e-12) and 2000.21 K (1e-9), at t = 0 and after 1 cycle
+  OLD: T = 2175.73 K and 2779.46 K   (floor energy rho * e(rho_code = 1, 2000 K))
+  host harness W3(g), 2000 K floor at 1e-16 / 1e-12 / 1e-9 / 1e-6 g/cm^3: OLD 1997.81 / 2175.73 / 2779.46 / 4005.71 K,
+  NEW 1997.67 / 1999.89 / 2000.21 / 2000.04 K (residual = the E-F7 T -> e -> T round trip)
+
+## O-3 temperature ceiling under eos = hydrogen
+same densities, TL=TR=5000, hydro/Tceil=199.69763 (code T = 2000 K)
+  NEW: T = 1999.89 K and 2000.21 K
+  OLD: aborts (rc 134): "Temperature ceiling requires units and gas composition ..."
+  OLD with its own meaning (Tceil = 2000 in kelvin + <units> code_length_cgs 2.81e16, code_mass_cgs 1.2130226e31,
+    code_time_cgs 1.4789474e12, He_mass_fraction 0.284): T = 1726.18 K and 2209.85 K
+
+## O-2 first-order flux correction with the table
+overrides: TL=TR=1 uL=-300 uR=300 B0y=10000 hydro/dfloor=1e-12 hydro/pfloor=1e-14 hydro/first_order_flux_correct=true
+  hydro/fofc_verbose=true nlim=200 (low-beta vacuum-forming flow; four other probes, incl. a 1e9 pressure-ratio blast,
+  did not trigger FOFC)
+  FOFC fires in both: "attempt 0 corrected 32" twice
+  NEW vs OLD after 200 cycles: P max|d|/max 7.7e-3, up to 13 % in single cells; rho 7.5e-6; tot-E 7.8e-6
+  (OLD gave the corrected faces the ideal-gas energy P/(gamma-1) with gamma = 1.4; NEW the table energy)
+
+## O-4 collapse_be with the table
+L6 deck (inputs of validation/self_gravity) + hydro/eos=hydrogen, 32 ranks, P/rho over all cells:
+  NEW default (table_isothermal = pressure): t = 0: min/median/max 1.00000000 / 1.00000000 / 1.00000000;
+    after 20 cycles 0.99981201 / 1.00000000 / 1.00034046
+  table_isothermal = temperature (= OLD, bitwise): t = 0: 0.98244411 / 0.98244417 / 0.98244429

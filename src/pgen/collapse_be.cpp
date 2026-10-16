@@ -172,10 +172,45 @@ void RegisterCollapseBeParams(parthenon::ParameterInput *pin,
   hydro_pkg->AddParam("collapse_be_rc", g_rc);
   hydro_pkg->AddParam("collapse_be_gamma", gam);
   // Tabulated EOS: the barotropic law sets the TEMPERATURE, T = T0 sqrt(1 + (rho/rhocrit)^(2(gamma-1))), and
-  // the internal energy comes from the table at that T. T0 = the temperature of T_code = 1 (the IC state).
-  hydro_pkg->AddParam("collapse_be_table",
-                      pin->GetOrAddString("hydro", "eos", "adiabatic") == "hydrogen");
-  hydro_pkg->AddParam("collapse_be_T0K", PhysUnits::BuildPhysicalUnits(pin).temperature_unit);
+  // the internal energy comes from the table at that T. T0 is the isothermal temperature of the IC.
+  const bool use_table = pin->GetOrAddString("hydro", "eos", "adiabatic") == "hydrogen";
+  hydro_pkg->AddParam("collapse_be_table", use_table);
+  // problem/collapse_be/table_isothermal (EOS_VALIDATION.md O-4; default "pressure"):
+  //   "pressure"    T0 is the temperature at which the TABLE gas has p = rho (code), i.e. the isothermal sound speed
+  //                 the Bonnor-Ebert profile was built for (c_s = 1). The code temperature unit assumes
+  //                 mu_thermal = 2.29 (units/mu_thermal), the table's molecular gas has mu = 2.331, so at
+  //                 T_code = 1 the table pressure is 0.9824 rho and the sphere would start 1.8 % below its
+  //                 equilibrium; this T0 is 10.19 K for the default units.
+  //   "temperature" T0 = temperature_unit (10.015 K): the gas has the nominal temperature and p = 0.9824 rho (the
+  //                 behaviour before 2026-10-16).
+  const std::string iso = pin->GetOrAddString("problem/collapse_be", "table_isothermal", "pressure");
+  PARTHENON_REQUIRE_THROWS(iso == "pressure" || iso == "temperature",
+                           "problem/collapse_be/table_isothermal must be pressure or temperature");
+  Real T0K = PhysUnits::BuildPhysicalUnits(pin).temperature_unit;
+  if (use_table && iso == "pressure") {
+    // Fixed-point iteration T <- T rho / P(rho, e(rho, T)) at the central density (code rho = f); P is
+    // proportional to T at fixed composition, so it converges in one step in cold molecular gas; 8 steps for safety.
+    // One device evaluation (the lookups read device Views).
+    const auto tab = hydro_pkg->Param<AdiabaticGLMMHDEOS>("eos").GetEosTable();
+    const Real rho_ref = f;
+    const Real T_start = T0K;
+    Real T_iso = 0.0;
+    Kokkos::parallel_reduce(
+        "collapse_be_T0", Kokkos::RangePolicy<parthenon::DevExecSpace>(0, 1),
+        KOKKOS_LAMBDA(const int, Real &t) {
+          Real Tk = T_start;
+          for (int it = 0; it < 8; ++it) {
+            const Real p = tab.PresFromRhoEint(rho_ref, tab.EintFromRhoTk(rho_ref, Tk));
+            Tk *= rho_ref / p;
+          }
+          t += Tk;
+        },
+        T_iso);
+    PARTHENON_REQUIRE_THROWS(T_iso > 0.0 && std::isfinite(T_iso),
+                             "collapse_be: the table-isothermal temperature T0 is not finite");
+    T0K = T_iso;
+  }
+  hydro_pkg->AddParam("collapse_be_T0K", T0K);
 
   // Consistency guard: the authoritative unit system (PhysUnits) must reproduce this BE normalization
   // exactly. Both now route through DeriveBENormalization, so this is a regression sentinel
@@ -284,16 +319,19 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
   if (use_h2diss) {
     e_int_over_p = pin->GetOrAddReal("problem/collapse_be", "eint_over_p_override", -1.0);
     if (!(e_int_over_p > 0.0)) {
-      // esp at T_code = 1 from the RT grid, then e_int/p = esp/T_code = esp (since p = rho*T
-      // and T_code = 1 => p = rho => e_int/p = (esp*rho)/rho = esp).
+      // esp at the isothermal temperature T0 from the RT grid; the IC sets e_int = esp * p with p = rho. With
+      // table_isothermal = pressure the table gives back exactly p = rho for that energy (T0 = 10.19 K); with
+      // table_isothermal = temperature, T0 = temperature_unit and the table pressure is 0.9824 rho, because the
+      // temperature unit assumes mu_thermal = 2.29 and the table's molecular gas has mu = 2.331.
       const auto &eos_ic = hydro_pkg->Param<AdiabaticGLMMHDEOS>("eos");
       const auto &tab_ic = eos_ic.GetEosTable();
-      const auto U_ic = PhysUnits::BuildPhysicalUnits(pin);
       // Evaluate at the BE central density (rho_code = f); esp is essentially rho-independent
       // at 10 K (verified: 1.473638 across three decades in rho), so any interior state does.
       // HOST call: EintFromRhoTk reads a device View and is illegal here. GH200 traps it
       // at startup; x86 tolerated it silently. Host twin, same arithmetic.
-      e_int_over_p = tab_ic.EintFromRhoTkHost(f, U_ic.temperature_unit) / f;
+      // T0 = collapse_be_T0K (RegisterCollapseBeParams, problem/collapse_be/table_isothermal; EOS_VALIDATION.md O-4):
+      // with the default "pressure" the table pressure of this energy is p = rho, the BE equilibrium.
+      e_int_over_p = tab_ic.EintFromRhoTkHost(f, hydro_pkg->Param<Real>("collapse_be_T0K")) / f;
     }
   }
   // NOTE(WP-13, 2026-08-02): the registration below now lives in RegisterCollapseBeParams(),
@@ -794,8 +832,8 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
           // AUDIT F-45: was a hardcoded 1.0 under the tabulated EOS ("the BE-sphere IC is
           // isothermal at 10 K everywhere => T_code=1"). True in intent, false in fact: the
           // IC's own energy put it at T_code = 1.0179 (10.194 K), so Er was seeded 7.3 % low.
-          // Now that e_int_over_p is inverted from the table at T_code = 1 the two agree by
-          // construction, and reading the table here keeps them agreeing if either changes.
+          // e_int_over_p is now inverted from the table at T0 (collapse_be_T0K; 10.19 K with the default
+          // table_isothermal = pressure), and reading the table here keeps the seed at the gas temperature.
           const Real T   = use_h2diss
                                ? eos_ic_seed.TemperatureKHost(rho, u(IEN, k, j, i) - ke - me) /
                                      T_unit
@@ -829,7 +867,7 @@ void ProblemGenerator(MeshBlock *pmb, parthenon::ParameterInput *pin) {
 // enforcement, not a differential cooling equation.
 //
 // With the tabulated EOS (eos = hydrogen) the same law prescribes the temperature,
-//   T = T0 * sqrt(1 + (rho/rhocrit)^(2(gamma-1)))     (T0 = temperature of T_code = 1),
+//   T = T0 * sqrt(1 + (rho/rhocrit)^(2(gamma-1)))     (T0 = collapse_be_T0K, the IC's isothermal temperature),
 // which is the ideal-gas law's T_code = p/rho, and e_th = e_table(rho, T): isothermal at T0 below
 // rhocrit, T ~ rho^(gamma-1) above it, with the table's own energy (H2 rotation/vibration,
 // dissociation, ionization) at that temperature. gamma (= hydro/gamma) is then only the barotropic index.

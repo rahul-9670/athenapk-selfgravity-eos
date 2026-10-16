@@ -66,6 +66,29 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
   KOKKOS_INLINE_FUNCTION
   const EOSTable::EosTable &GetEosTable() const { return eos_tab_; }
 
+#ifndef ATHENAPK_EOS_LEGACY_LOOKUPS
+  //! Tabulated EOS: the temperature floor / ceiling in KELVIN (hydro/Tfloor, hydro/Tceil in code temperature units
+  //! times temperature_unit), set by hydro.cpp after construction; <= 0 = off. With them the floor and ceiling
+  //! energies are taken from the table AT EACH CELL'S DENSITY (EOS_VALIDATION.md O-3, O-5), not from one specific
+  //! energy evaluated at rho_code = 1, which is exact only where e(T) does not depend on density (cold gas).
+  void SetTableTemperatureLimits(const Real Tfloor_K, const Real Tceil_K) {
+    Tfloor_K_ = Tfloor_K;
+    Tceil_K_ = Tceil_K;
+  }
+  //! Internal-energy DENSITY of the temperature floor at density rho (ideal gas: rho * e_floor, as before).
+  KOKKOS_INLINE_FUNCTION
+  Real EintFloor(const Real rho) const {
+    return (use_h2diss_ && Tfloor_K_ > 0.0) ? eos_tab_.EintFromRhoTk(rho, Tfloor_K_)
+                                            : rho * GetInternalEFloor();
+  }
+  //! Internal-energy DENSITY of the temperature ceiling at density rho (ideal gas: rho * e_ceiling, as before).
+  KOKKOS_INLINE_FUNCTION
+  Real EintCeil(const Real rho) const {
+    return (use_h2diss_ && Tceil_K_ > 0.0) ? eos_tab_.EintFromRhoTk(rho, Tceil_K_)
+                                           : rho * GetInternalECeiling();
+  }
+#endif
+
   //----------------------------------------------------------------------------------------
   // \!fn Real EquationOfState::SoundSpeed(Real prim[NHYDRO])
   // \brief returns adiabatic sound speed given vector of primitive variables
@@ -184,7 +207,11 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
       if ((e_int > dual_eta1_ * u_e || shock_keep) && !distrust_high) {
         u_ie = e_int; // total energy is trustworthy here: it stays authoritative
       } else {
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
         e_int = (u_ie > 0.0) ? u_ie : e_floor_ * u_d;
+#else
+        e_int = (u_ie > 0.0) ? u_ie : EintFloor(u_d);
+#endif
         dual_keep = e_int;
         u_e = e_int + e_k + e_B; // local, bounded non-conservation, counted by cons_diag
         dual_switched = true;
@@ -259,6 +286,7 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
     // pressure corresponding to the specific-internal-energy floor comes from the table
     // (the gm1 conversion would set w_p inconsistent with the u_e written below); the
     // ideal-gas branch is unchanged.
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
     const Real eff_pressure_floor = (use_h2diss_ && e_floor_ > 0.0)
                                         ? eos_tab_.PresFromRhoEint(u_d, u_d * e_floor_)
                                         : gm1 * u_d * e_floor_;
@@ -268,10 +296,24 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
       energy_rewritten = true;
       w_p = eff_pressure_floor;
     }
+#else
+    // Tabulated EOS: the floor energy is e(rho, Tfloor) at THIS cell's density (O-5); ideal gas: rho * e_floor.
+    const Real eint_floor = EintFloor(u_d);
+    const Real eff_pressure_floor = (use_h2diss_ && e_floor_ > 0.0)
+                                        ? eos_tab_.PresFromRhoEint(u_d, eint_floor)
+                                        : gm1 * u_d * e_floor_;
+    if (w_p < eff_pressure_floor) {
+      // apply temperature floor, correct total energy
+      u_e = eint_floor + e_k + e_B;
+      energy_rewritten = true;
+      w_p = eff_pressure_floor;
+    }
+#endif
 
     // temperature (internal energy) based pressure ceiling (guard the table against the
     // default e_ceiling = infinity: log10(inf) would clamp to the table edge and
     // spuriously trigger the ceiling).
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
     const Real eff_pressure_ceiling =
         (use_h2diss_ && e_ceiling_ < std::numeric_limits<Real>::infinity())
             ? eos_tab_.PresFromRhoEint(u_d, u_d * e_ceiling_)
@@ -282,6 +324,19 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
       energy_rewritten = true;
       w_p = eff_pressure_ceiling;
     }
+#else
+    // Tabulated EOS: the ceiling energy is e(rho, Tceil) at THIS cell's density (O-3/O-5); ideal gas as before.
+    const bool ceil_on = e_ceiling_ < std::numeric_limits<Real>::infinity();
+    const Real eint_ceil = (use_h2diss_ && ceil_on) ? EintCeil(u_d) : u_d * e_ceiling_;
+    const Real eff_pressure_ceiling = (use_h2diss_ && ceil_on) ? eos_tab_.PresFromRhoEint(u_d, eint_ceil)
+                                                               : gm1 * u_d * e_ceiling_;
+    if (w_p > eff_pressure_ceiling) {
+      // apply temperature ceiling, correct total energy
+      u_e = eint_ceil + e_k + e_B;
+      energy_rewritten = true;
+      w_p = eff_pressure_ceiling;
+    }
+#endif
 
     // Dual energy: the floors/ceilings above may have rewritten u_e; keep the advected internal
     // energy consistent with what the cell ended up with.
@@ -338,7 +393,11 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
     const bool shock_keep =
         dual_shock_eta1_ && (comp >= dual_shock_) && (e_E > dual_eta1_ * (e_E + e_B));
     if ((e_E > dual_eta1_ * E || shock_keep) && !distrust_high) return e_E;
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
     return (u_ie > 0.0) ? u_ie : GetInternalEFloor() * rho;
+#else
+    return (u_ie > 0.0) ? u_ie : EintFloor(rho);
+#endif
   }
 
  private:
@@ -353,6 +412,10 @@ class AdiabaticGLMMHDEOS : public EquationOfState {
   Real dual_kappa_ = 3.0;         // hydro/dual_energy_kappa
   Real dual_shock_ = 0.02;        // hydro/dual_energy_shock_comp: -div v dt above this = shock
   bool dual_shock_eta1_ = false;  // hydro/dual_energy_shock_eta1: the shock exemption also from eta1 (F2)
+#ifndef ATHENAPK_EOS_LEGACY_LOOKUPS
+  Real Tfloor_K_ = -1.0; // tabulated EOS: temperature floor [K], <= 0 = off (SetTableTemperatureLimits)
+  Real Tceil_K_ = -1.0;  // tabulated EOS: temperature ceiling [K], <= 0 = off
+#endif
 public:
   Real DualEta2() const { return dual_eta2_; }
 private:

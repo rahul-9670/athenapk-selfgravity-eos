@@ -44,7 +44,7 @@ Real ConsDiagReduce(MeshData<Real> *md, ConsDiag which) {
           ? md->PackVariables(std::vector<std::string>{"dual_switched"})
           : prim;
   const bool mhd = hydro_pkg->Param<bool>("cons_diag_mhd");
-  // nTfloor: the floor pressure ConsToPrim applies for hydro/Tfloor, P_fl(rho) = P(rho, rho e_floor) (table) or
+  // nTfloor: the floor pressure ConsToPrim applies for hydro/Tfloor, P_fl(rho) = P(rho, e(rho, Tfloor)) (table) or
   // (gamma-1) rho e_floor (ideal gas). The EOS is copied only for that column (a dummy otherwise, never evaluated).
   const bool want_tf = (which == ConsDiag::nTfloor);
   const AdiabaticGLMMHDEOS eosd = want_tf ? hydro_pkg->Param<AdiabaticGLMMHDEOS>("eos")
@@ -97,8 +97,14 @@ Real ConsDiagReduce(MeshData<Real> *md, ConsDiag which) {
         }
         if (which == ConsDiag::nTfloor) {
           const Real efl = eosd.GetInternalEFloor();
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
           const Real pfl = eosd.UseH2Diss() ? eosd.GetEosTable().PresFromRhoEint(rho, rho * efl)
                                             : (eosd.GetGamma() - 1.0) * rho * efl;
+#else
+          // the same floor pressure ConsToPrim applies: table energy at THIS density (EOS_VALIDATION.md O-5)
+          const Real pfl = eosd.UseH2Diss() ? eosd.GetEosTable().PresFromRhoEint(rho, eosd.EintFloor(rho))
+                                            : (eosd.GetGamma() - 1.0) * rho * efl;
+#endif
           if (efl > 0.0 && w(IPR, k, j, i) <= pfl * (1.0 + 1.0e-9)) lsum += 1.0;
           return;
         }

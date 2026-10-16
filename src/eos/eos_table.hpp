@@ -142,7 +142,13 @@ struct EosTable {
     if (i < 0) i = 0;
     if (i > n1 - 2) {
       i = n1 - 2;
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
       if (count) Kokkos::atomic_fetch_add(&ctr(ctr_off + 1), 1ull);
+#else
+      // A query ON the top node (fi = n1 - 1, weight 1) is an exact table value, not a clamp
+      // (EOS_VALIDATION.md O-7): count only queries beyond it.
+      if (count && fi > n1 - 1) Kokkos::atomic_fetch_add(&ctr(ctr_off + 1), 1ull);
+#endif
     }
     Real ti = fi - i;
     if (ti < 0.0) ti = 0.0;
@@ -153,7 +159,11 @@ struct EosTable {
     if (j < 0) j = 0;
     if (j > n2 - 2) {
       j = n2 - 2;
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
       if (count) Kokkos::atomic_fetch_add(&ctr(ctr_off + jbase + 1), 1ull);
+#else
+      if (count && fj > n2 - 1) Kokkos::atomic_fetch_add(&ctr(ctr_off + jbase + 1), 1ull);
+#endif
     }
     Real tj = fj - j;
     if (tj < 0.0) tj = 0.0;
@@ -237,7 +247,7 @@ struct EosTable {
     if (i < 0) i = 0;
     if (i > n1 - 2) {
       i = n1 - 2;
-      if (count) Kokkos::atomic_fetch_add(&ctr(ctr_off + 1), 1ull);
+      if (count && fi > n1 - 1) Kokkos::atomic_fetch_add(&ctr(ctr_off + 1), 1ull); // O-7, as in bilin
     }
     Real ti = fi - i;
     if (ti < 0.0) ti = 0.0;
@@ -248,7 +258,7 @@ struct EosTable {
     if (j < 0) j = 0;
     if (j > n2 - 2) {
       j = n2 - 2;
-      if (count) Kokkos::atomic_fetch_add(&ctr(ctr_off + jbase + 1), 1ull);
+      if (count && fj > n2 - 1) Kokkos::atomic_fetch_add(&ctr(ctr_off + jbase + 1), 1ull); // O-7
     }
     Real tj = fj - j;
     if (tj < 0.0) tj = 0.0;
@@ -296,6 +306,16 @@ struct EosTable {
     CountEspLow();
     esp = esp_min_ * (P / Pmin);
     return true;
+  }
+  // EspFromP above the highest tabulated pressure (EOS_VALIDATION.md O-1): the bisection pins at the top of the esp
+  // axis and returns ~esp_max, whose pressure is below the target. That cannot be continued (there is no physics
+  // above T_max in the table), but it must not be silent: count it as `esp>`, like a forward lookup above the axis.
+  // Called only when the bisection never lowered its upper bound, i.e. P exceeded every probe.
+  KOKKOS_INLINE_FUNCTION EOS_NOINLINE void XCountEspHighP(const Real lr, const Real fac, const Real P) const {
+    if (clamp_ctr_.data() == nullptr) return;
+    const Real Pmax =
+        fac * bilin_x(P_, nr_, ne_, lr0_, dlr_, le0_, dle_, lr, le0_ + (ne_ - 1) * dle_, clamp_ctr_, 2, false);
+    if (P > Pmax) Kokkos::atomic_fetch_add(&clamp_ctr_(3), 1ull);
   }
   KOKKOS_INLINE_FUNCTION EOS_NOINLINE void XEintOperands(const Real rho, const Real Tk, const int off,
                                                           Real &lT, Real &r) const {
@@ -349,6 +369,7 @@ struct EosTable {
       if (XEspLowP(rho, P, e_low)) return e_low; // E-F5
       if (!p_over_rho_ && rho < rho_min_) fac = rho / rho_min_; // E-F6
     }
+    const Real le_top = lehi;
     for (int it = 0; it < n_bisect_; ++it) {
       const Real lem = 0.5 * (lelo + lehi);
       const Real Pm =
@@ -356,6 +377,7 @@ struct EosTable {
           bilin(P_, nr_, ne_, lr0_, dlr_, le0_, dle_, lr, lem, clamp_ctr_, 2, false);
       if (Pm < P) lelo = lem; else lehi = lem;
     }
+    if (lehi == le_top) XCountEspHighP(lr, fac, P); // O-1
     return std::pow(10.0, 0.5 * (lelo + lehi));
   }
 

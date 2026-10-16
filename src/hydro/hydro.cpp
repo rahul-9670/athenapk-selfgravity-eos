@@ -175,9 +175,9 @@ void PreStepMeshUserWorkInLoop(Mesh *pmesh, ParameterInput *pin, SimTime &tm) {
         etab.AxisRanges(lrl, lrh, lel, leh, lTl, lTh);
         std::cout << (tot > 0 ? "### WARNING EOS table: " : "### NOTE EOS table: ") << tot
                   << " CELL-STATE (+ " << tot_probe << " solver-probe)"
-                  << " out-of-range lookups were EDGE-CLAMPED in the previous cycle"
-                     " (nearest-neighbour extrapolation; the returned value is NOT"
-                     " interpolated). Breakdown  rho<" << lrl << ": " << c[0]
+                  << " lookups fell OUTSIDE the table in the previous cycle"
+                     " (the note after the breakdown says which are continued and which edge-clamped)."
+                     " Breakdown  rho<" << lrl << ": " << c[0]
                   << "  rho>" << lrh << ": " << c[1] << "  esp<" << lel << ": " << c[2]
                   << "  esp>" << leh << ": " << c[3] << "  T<" << lTl << ": " << c[4]
                   << "  T>" << lTh << ": " << c[5]
@@ -186,7 +186,8 @@ void PreStepMeshUserWorkInLoop(Mesh *pmesh, ParameterInput *pin, SimTime &tm) {
                   << "  T<: " << c[10] << "  T>: " << c[11]
                   << "   (axes are log10; rho,esp in CODE units, T in K). With hydro/eos_extrapolate"
                      " (default) rho< (eos_interp=p), esp< and T< lookups are CONTINUED as an ideal gas,"
-                     " not clamped; rho>/esp>/T> are clamped. CELL-STATE clamps"
+                     " not clamped; rho>/esp>/T> are clamped (esp> also counts P->e inversions above the highest"
+                     " tabulated pressure). CELL-STATE clamps"
                      " mean the table does not cover the run -- regenerate it"
                      " (src/eos/gen_eos_table.py). PROBE clamps are root-finder trial values"
                      " pulled back by bisection and are benign unless they explode."
@@ -1210,6 +1211,9 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     Real pfloor = pin->GetOrAddReal("hydro", "pfloor", -1.0);
     Real Tfloor = pin->GetOrAddReal("hydro", "Tfloor", -1.0);
     Real efloor = Tfloor;
+    // Tabulated EOS: floor and ceiling temperatures in K, handed to the EOS so that ConsToPrim takes the floor /
+    // ceiling energy from the table at each cell's density (EOS_VALIDATION.md O-3, O-5). -1 = off.
+    Real Tfloor_K = -1.0, Tceil_K = -1.0;
     if (efloor > 0.0) {
       // validation/eos_tabulated E-F5 (2026-10-05): the tabulated EOS takes the floor energy from the table
       // (below) and needs neither a units block nor hydro/He_mass_fraction -- the requirement applies to the
@@ -1232,6 +1236,7 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
         const auto U_fl = PhysUnits::BuildPhysicalUnits(pin);
         // HOST call -- see the note on EosTable::EintFromRhoTkHost.
         efloor = eos_tab.EintFromRhoTkHost(1.0, Tfloor * U_fl.temperature_unit) / 1.0;
+        Tfloor_K = Tfloor * U_fl.temperature_unit;
       } else {
         efloor = Tfloor / pkg->Param<Real>("mbar_over_kb") / (gamma - 1.0);
       }
@@ -1243,6 +1248,18 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
     Real Tceil =
         pin->GetOrAddReal("hydro", "Tceil", std::numeric_limits<Real>::infinity());
     Real eceil = Tceil;
+#ifndef ATHENAPK_EOS_LEGACY_LOOKUPS
+    if (use_h2diss && eceil < std::numeric_limits<Real>::infinity()) {
+      // EOS_VALIDATION.md O-3: under eos = hydrogen hydro/Tceil is a CODE temperature (x temperature_unit = K), like
+      // hydro/Tfloor, and is inverted through the table -- not converted with gamma and the ideal-gas mbar (which
+      // also needed a <units> block and He_mass_fraction). eceil (the value at rho_code = 1) only marks the ceiling
+      // as on; ConsToPrim takes e(rho, Tceil) at each cell's density.
+      PARTHENON_REQUIRE_THROWS(Tceil > 0.0, "hydro/Tceil must be > 0");
+      const auto U_ce = PhysUnits::BuildPhysicalUnits(pin);
+      Tceil_K = Tceil * U_ce.temperature_unit;
+      eceil = eos_tab.EintFromRhoTkHost(1.0, Tceil_K) / 1.0; // HOST call, see EosTable::EintFromRhoTkHost
+    } else
+#endif
     if (eceil < std::numeric_limits<Real>::infinity()) {
       if (!pkg->AllParams().hasKey("mbar_over_kb")) {
         PARTHENON_FAIL("Temperature ceiling requires units and gas composition. "
@@ -1691,6 +1708,9 @@ std::shared_ptr<StateDescriptor> Initialize(ParameterInput *pin) {
                              eos_tab, dual_idx, dual_eta1,
                              floor_consistent, dual_unsigned, dual_exact, dual_eta2, dual_kappa,
                              dual_shock, dual_shock_eta1);
+#ifndef ATHENAPK_EOS_LEGACY_LOOKUPS
+      if (use_h2diss) eos.SetTableTemperatureLimits(Tfloor_K, Tceil_K);
+#endif
       pkg->AddParam<>("eos", eos);
       // IM-F1 (read by DualEnergyPdV)
       pkg->AddParam<>("dual_energy_shock_detector", shock_det_i);

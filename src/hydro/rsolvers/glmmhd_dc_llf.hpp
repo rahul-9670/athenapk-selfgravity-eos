@@ -120,10 +120,27 @@ struct Riemann<Fluid::glmmhd, RiemannSolver::llf> {
     fsum.bz = wli[IB3] * wli[IV1] + wri[IB3] * wri[IV1] - bxi * (wli[IV3] + wri[IV3]);
 
     Real el, er;
+#ifdef ATHENAPK_EOS_LEGACY_LOOKUPS
     el = wli[IPR] * igm1 +
          0.5 * wli[IDN] * (SQR(wli[IV1]) + SQR(wli[IV2]) + SQR(wli[IV3])) + qc + SQR(bxi);
     er = wri[IPR] * igm1 +
          0.5 * wri[IDN] * (SQR(wri[IV1]) + SQR(wri[IV2]) + SQR(wri[IV3])) + qd + SQR(bxi);
+#else
+    // Internal energy from the ACTIVE EOS (EOS_VALIDATION.md O-2): this solver also supplies the fluxes of
+    // hydro/first_order_flux_correct, which is allowed with the tabulated EOS; P/(gamma-1) there would give the
+    // corrected faces an ideal-gas energy. The ideal-gas branch is the expression used before.
+    if (eos.UseH2Diss()) {
+      el = eos.InternalEnergyFromPres(wli[IDN], wli[IPR]) +
+           0.5 * wli[IDN] * (SQR(wli[IV1]) + SQR(wli[IV2]) + SQR(wli[IV3])) + qc + SQR(bxi);
+      er = eos.InternalEnergyFromPres(wri[IDN], wri[IPR]) +
+           0.5 * wri[IDN] * (SQR(wri[IV1]) + SQR(wri[IV2]) + SQR(wri[IV3])) + qd + SQR(bxi);
+    } else {
+      el = wli[IPR] * igm1 +
+           0.5 * wli[IDN] * (SQR(wli[IV1]) + SQR(wli[IV2]) + SQR(wli[IV3])) + qc + SQR(bxi);
+      er = wri[IPR] * igm1 +
+           0.5 * wri[IDN] * (SQR(wri[IV1]) + SQR(wri[IV2]) + SQR(wri[IV3])) + qd + SQR(bxi);
+    }
+#endif
     fsum.mx += (wli[IPR] + wri[IPR]);
     fsum.e = (el + wli[IPR] + qc) * wli[IV1] + (er + wri[IPR] + qd) * wri[IV1];
     fsum.e -= bxi * (wli[IB2] * wli[IV2] + wli[IB3] * wli[IV3]);

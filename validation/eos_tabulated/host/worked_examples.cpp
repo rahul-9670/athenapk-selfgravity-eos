@@ -193,6 +193,24 @@ int main(int argc, char **argv) {
     std::printf("      EspFromP(rho, 10 P(esp_max)) = %.6e = esp_max x %.6f;  P of that esp = %.6e (target %.6e)\n",
                 e10, e10 / esp_max, t.Pof(rho, e10), 10.0 * Pmax);
     counters(t, "EspFromP above the P range (the Pof check above it is the esp> count)");
+    // a target just inside the top (no count expected) and exactly the top-node pressure
+    const double e_in = t.EspFromP(rho, 0.999 * Pmax);
+    std::printf("      EspFromP(rho, 0.999 P(esp_max)) = %.6e (inside the table)\n", e_in);
+    counters(t, "EspFromP inside the P range");
+  }
+  {
+    // (g) a temperature floor where e(T) depends on density (EOS_VALIDATION.md O-5): the floor energy taken at
+    // rho_code = 1 and scaled with rho (the behaviour before 2026-10-16) vs e(rho, Tfloor) at each density (now).
+    const double TK = 2000.0;
+    const double esp1 = t.EintFromRhoTk(1.0, TK) / 1.0;
+    std::printf("  (g) Tfloor = %.0f K: esp(rho_code = 1) = %.6e code\n", TK, esp1);
+    for (double rcgs : {1.0e-16, 1.0e-12, 1.0e-9, 1.0e-6}) {
+      const double r = rcgs / RHO_U;
+      const double e_old = r * esp1, e_new = t.EintFromRhoTk(r, TK);
+      std::printf("      rho = %.0e g/cm^3: T of rho*esp(1) = %8.2f K;  T of e(rho, Tfloor) = %8.2f K\n", rcgs,
+                  t.TemperatureK(r, e_old), t.TemperatureK(r, e_new));
+    }
+    counters(t, "(g)");
   }
   return 0;
 }

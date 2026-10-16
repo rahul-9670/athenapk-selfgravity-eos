@@ -3,8 +3,9 @@
 Full protostellar-EOS table generator for AthenaPK (H2 dissociation + H ionization +
 He/He+ ionization + H2 rotational/vibrational + inert-thermal He), in the shared FHC
 code units.  Computes P, e_internal, c_s^2, T on a (log rho, log e_specific) grid for the
-hydro path and e_specific(log rho, log T) for the RT path, and writes them to an HDF5
-table consumed at runtime by the device bilinear interpolator (eos_hydrogen.hpp).
+hydro path and e_specific(log rho, log T) for the RT path, and writes them to an HDF5 file
+(for analysis) and to the flat binary <out>.bin that the runtime reads (src/eos/eos_table.hpp,
+format src/eos/eos_table_format.hpp; v2, cgs).
 
 Physics (per unit mass; gas = H mass-fraction X + He mass-fraction Y):
   species H2, HI, HII, e, HeI, HeII, HeIII solved from coupled Saha at (rho,T):
@@ -16,7 +17,8 @@ Physics (per unit mass; gas = H mass-fraction X + He mass-fraction Y):
   internal energy (ref: cold ground-state H2 + neutral He):
     e = 3/2 kT n_tot  + nH2 * e_rotvib(T)  + chi_d*(nHI+nHII)/2
         + chi_H*nHII  + chi_He1*(nHeII+nHeIII) + chi_He2*nHeIII
-  pressure P = n_tot k T.  c_s^2 = (dP/drho)_s via finite differences on the adiabat.
+  pressure P = n_tot k T.  c_s^2 = (dP/drho)_s = (dP/drho)_esp + (P/rho^2)(dP/desp)_rho, with the two
+  derivatives taken by np.gradient of the tabulated P on the (log rho, log esp) grid (see build_table).
 
 Validation prints gamma_eff(T) at a fixed density: ~7/5 warm-molecular, dip <4/3 at H2
 dissociation (~2000 K) and again at H ionization (~1e4 K), ->5/3 atomic/ionized.
@@ -383,9 +385,9 @@ def build_table(path, nr=180, ne=220, nT=200,
 if __name__ == "__main__":
     import os, sys
     if len(sys.argv) > 1 and sys.argv[1] == "build":
-        # `build`                       -> shipped table (180x220x200) at the default path.
-        #   Reproduces src/eos/eos_table.bin bit-for-bit; do NOT change these defaults, so a
-        #   plain rebuild never silently alters the production EOS the runs load at runtime.
+        # `build`                       -> the original low-resolution table (180x220x200) as
+        #   src/eos/eos_table.h5/.bin. That table is NOT shipped any more; the shipped tables and their exact build
+        #   commands are in TABLE_PROVENANCE.md. Do not change these defaults (they define that legacy table).
         # `build <nr> <ne> <nT> [out.h5]` -> a higher-resolution table at an explicit path.
         #   Use this for the Phase-3 kink-fidelity table (e.g. 400 1000 920 -> ~0.9% worst at
         #   the H2-dissociation/H-ionization cusps vs ~6.9% at shipped res). Swapping it into
