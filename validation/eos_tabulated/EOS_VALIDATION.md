@@ -271,14 +271,39 @@ e_{\rm int}=\tfrac32 n_{\rm tot}k_BT+n_{\rm H_2}\big[\epsilon_{\rm rot}(T)+\epsi
   Boltzmann average over its own levels (even / odd $J$) and **measured from its own ground state** (para $J=0$,
   ortho $J=1$), so $\epsilon_{\rm rot}\to0$ as $T\to0$ ([code][gen-erot]).
 
-**A modelling inconsistency to be aware of [inferred].** The rotational energy uses a *frozen* 3:1 mixture with
+**A modelling inconsistency (measured by T-4).** The rotational energy uses a *frozen* 3:1 mixture with
 ortho measured from $J=1$, while the dissociation constant $K_d$ uses the *equilibrium* spin-weighted sum measured
 from para $J=0$. The energy is therefore not $-\partial\ln Z/\partial\beta$ of the partition function that sets the
 chemical equilibrium, i.e. the table is not derived from one Helmholtz free energy where H$_2$ dissociates. Where the
 composition does not change with density (no dissociation), $P=n_{\rm tot}k_BT$ does not depend on the internal
-levels and the Maxwell identity of E2 holds regardless. Where H$_2$ dissociates, this choice is one possible
-contributor to the E2 Maxwell residual (2.46e-3, which E2 attributes to its finite differencing); the two have not
-been separated. The choice itself is physical (slow ortho–para conversion) and deliberate (code comment).
+levels and the Maxwell identity of E2 holds regardless. Where H$_2$ dissociates, the energy charged per dissociated
+molecule differs between the two models by the mean ortho zero point $\tfrac34\cdot2k_B\theta_{\rm rot}=128$ K$\cdot k_B$
+= 0.011 eV (0.25 % of $\chi_d$) [derived]: at $T\gtrsim1000$ K the equilibrium ortho:para ratio is already 3:1, so this
+offset is the only difference left. The choice of a frozen mixture itself is physical (slow ortho–para conversion)
+and deliberate (code comment).
+
+**T-4 (2026-10-16, `scripts/t4_orthopara.py`, `results/tables/T4_orthopara.txt`).** The Maxwell identity of E2 on its
+154 states, with the generator's own Saha solver, for four rotational-energy models and three finite-difference
+steps $h$ (worst relative residual):
+
+| model | $h=2\times10^{-3}$ | $10^{-3}$ | $5\times10^{-4}$ | where |
+|---|---|---|---|---|
+| shipped (frozen 3:1, ortho from $J=1$) | 2.56e-3 | **2.46e-3** | 2.43e-3 | $10^{-12}$ g cm$^{-3}$, 1848 K |
+| equilibrium, $u_{\rm rot}=k_BT^2\,d\ln Z_{\rm rot}^{\rm ns}/dT$ (consistent with $K_d$) | 1.96e-4 | 4.9e-5 | 1.2e-5 | $10^{-13}$, 1848 K |
+| frozen 3:1 with ortho measured from para $J=0$ | 1.96e-4 | 4.9e-5 | 1.2e-5 | $10^{-13}$, 1848 K |
+| shipped energy, dissociation charged $\chi_d-\tfrac34\cdot2k_B\theta_{\rm rot}$ | 1.96e-4 | 4.9e-5 | 1.2e-5 | $10^{-13}$, 1848 K |
+
+The shipped residual does not change with $h$, so it is **not** finite-difference error (as E2 assumed) but the
+model inconsistency; every consistent variant falls as $h^2$ (factor 4 per halving), i.e. its residual is pure
+truncation. All of it is the ortho zero-point offset: the last two rows, which change nothing but that offset, are as
+consistent as the full equilibrium model. Below 1000 K all four agree to $<10^{-9}$ (no composition change).
+
+What a fix would change: the minimal one (last row) leaves the EOS below 1000 K bit for bit unchanged and lowers $u$ in
+the dissociation band by 0.12 % (2000 K, $10^{-9}$ g cm$^{-3}$), 0.20 % (3000 K, $10^{-8}$), 0.19 % (5000 K, $10^{-6}$);
+$\Gamma_1$ there moves by $\le2.4\times10^{-4}$ (e.g. 1.16718 → 1.16742). The equilibrium model instead changes the
+molecular regime itself — $\Gamma_1$ at 50 K from 1.665 to 1.310 — which is a different physical assumption (equilibrium
+instead of normal H$_2$), not a consistency fix. Neither is applied: either requires regenerating the tables, which
+changes the table EOS above ~1000 K at the 0.1–0.2 % level and every validated result there.
 
 ### A3.6 Derived thermodynamic quantities
 
@@ -1021,7 +1046,8 @@ byte-identically (6.6 min, `runs/E1_rebuild`).
 
 **E2 thermodynamic gates** (`scripts/test_eos_consistency.py`, `results/tables/E2_consistency_v5cold.txt`):
 charge neutrality 5.05e-15, element conservation 2.2e-16, Maxwell identity -rho^2 (du/drho)_T = T (dP/dT)_rho - P
-to 2.46e-3 (tol 3e-3, finite-difference limited), table P vs direct Saha median 1.56e-3 / max 5.5e-3 (7454 K,
+to 2.46e-3 (tol 3e-3, finite-difference limited — corrected by T-4, Part A Sec. A3.5: the residual does not depend on
+the step and is the ortho/para modelling inconsistency of the generator), table P vs direct Saha median 1.56e-3 / max 5.5e-3 (7454 K,
 1e-14 g/cc), cs2 vs Saha median 1.55e-3 / max 3.3e-2 (9047 K, 1e-13: a kink).
 
 **E3 limits.** Gamma1 = 1.668 (10 K), 1.597 (100 K), 1.428 (500 K), 1.101 (2000 K, 1e-9 g/cc), 1.145 (1e4 K,
@@ -1638,7 +1664,7 @@ means the C++ that a simulation executes; tests that re-implement the lookup in 
 | test | property tested | code exercised | reference / metric | establishes | does **not** establish |
 |---|---|---|---|---|---|
 | E1 provenance | the shipped bytes come from the shipped generator | `gen_eos_table.py build` | byte identity | reproducibility of `v5_cold` (and, in Sec. 9.4, `rho26`: md5 `cb68bd0f`) | that the physics is right |
-| E2 thermodynamic gates | Saha solution converged; P and e mutually consistent; table ≈ direct Saha | `solve_saha`, `P_e_of_rho_T`; the table through a **Python** bilinear reader | neutrality / conservation to round-off; Maxwell identity to 3e-3; table vs Saha at off-node points | the generator's equilibrium solve and the table's interpolation accuracy (1e-3 level) | the C++ lookups; agreement with a real-gas EOS; it does not separate the A3.5 rotational-model term from finite-difference error |
+| E2 thermodynamic gates | Saha solution converged; P and e mutually consistent; table ≈ direct Saha | `solve_saha`, `P_e_of_rho_T`; the table through a **Python** bilinear reader | neutrality / conservation to round-off; Maxwell identity to 3e-3; table vs Saha at off-node points | the generator's equilibrium solve and the table's interpolation accuracy (1e-3 level) | the C++ lookups; agreement with a real-gas EOS. Its Maxwell residual (2.46e-3) is the A3.5 ortho/para inconsistency, not finite-difference error (T-4) |
 | E3 limits | $\Gamma_1$ in the known regimes | generator + table | known limits (5/3 cold, dips at dissociation/ionization) | the regimes are where physics puts them | quantitative agreement with an external EOS table |
 | E5 inversions | monotonicity, bisection error, round trips, edge and floor behaviour | **real** `eos_table.hpp` compiled on the host | analytic bisection bound; identity of round trips | the exact numerical behaviour of the runtime lookups on CPU (E-F5, E-F6, E-F7) | behaviour inside the solver; GPU (see E9) |
 | E6 acoustic waves | the scheme propagates sound at the table's speed | ConsToPrim (`Pof`), HLLD (`EspFromP`, $c_f$ via `Cs2of`), eos_test IC (`EintFromRhoTk`) | linear eigenmode after one period; phase speed vs the interpolant's $c_s$ | the solver sees the interpolant's sound speed (found E-F1, fixed by `p_over_rho`) | nonlinear flow; magnetised waves (`B = 0` in the E6 decks; magnetised table waves are I1c of the ideal-MHD report) |
@@ -1654,7 +1680,8 @@ means the C++ that a simulation executes; tests that re-implement the lookup in 
    H$_2^+$, metals or radiation pressure; harmonic vibration, rigid rotor, ground-state atoms. Quantitatively
    questionable above ~$10^{-2}$ g cm$^{-3}$ in the ionization band (A3.7). Not tested against an external EOS.
 2. **Thermodynamic consistency** (A3.5): energy and chemical equilibrium use different ortho/para models, so the table
-   is not derived from one free energy where H$_2$ dissociates. Size of the effect not isolated (C4, T-4).
+   is not derived from one free energy where H$_2$ dissociates. T-4 (A3.5): Maxwell residual 2.46e-3, entirely the
+   ortho zero-point offset; a consistent table would differ by 0.1–0.2 % in $u$ above ~1000 K. Not changed.
 3. **Table top** (A4.3): flat $P(\varepsilon)$ above $3\times10^5$ K at high density; `EspFromP` cannot represent
    pressures above $P(\rho,\varepsilon_{\max})$ (counted as `esp>` since `5649acd`, O-1).
 4. **Sound speed**: the tabulated $c_s^2$ is a finite-difference derivative of the tabulated $P$ with a known bias
@@ -1715,19 +1742,21 @@ pre-fix restart).
 * **O-7 — top-node lookups were counted as clamps.** *Fix:* the upper count fires only beyond the top node
   ([code][tab-bilin]). *Check:* W3(f): 0 counts for a lookup at $\varepsilon_{\max}$.
 
-Not changed: the ortho/para modelling choice of A3.5 (a physics decision of the generator; isolating its effect is
-T-4) and the other limitations of C2.
+Not changed: the ortho/para modelling choice of A3.5 (a physics decision of the generator, quantified by T-4: its
+inconsistency is the whole E2 Maxwell residual; the minimal consistent variant would change the table by 0.1–0.2 %
+above ~1000 K) and the other limitations of C2.
 
 ## C4. Suggested additional tests
 
-T-1, T-2, T-3 and T-6 were run for the fixes of C3 (status column); the others are proposals that have not been run.
+T-1, T-2, T-3 and T-6 were run for the fixes of C3, T-4 for A3.5 (status column); the others are proposals that have not
+been run.
 
 | id | test | what it would establish | status |
 |---|---|---|---|
 | T-1 | host-harness case: `EspFromP` above $P(\rho,\varepsilon_{\max})$ with a counter assertion | makes O-1 observable and regression-tested | done (W3(f)) |
 | T-2 | E7 R2/R4 with `first_order_flux_correct = true` forced to trigger (e.g. very low `dfloor`/`pfloor` margins), table vs `eos_floor_consistent` energy audit | whether O-2 changes energies in practice | done with a low-β probe instead of R2/R4 (FOFC never fired in the Riemann/blast probes; C3) |
 | T-3 | E10-style probe with `hydro/Tceil` under `eos = hydrogen` | the temperature the ceiling actually enforces (O-3) | done (C3) |
-| T-4 | rebuild the table with the rotational energy taken from the same (equilibrium) partition function as $K_d$ and repeat the E2 Maxwell gate in the dissociation band | isolates the A3.5 contribution to the 2.46e-3 Maxwell residual | not run |
+| T-4 | rebuild the table with the rotational energy taken from the same (equilibrium) partition function as $K_d$ and repeat the E2 Maxwell gate in the dissociation band | isolates the A3.5 contribution to the 2.46e-3 Maxwell residual | done without a table rebuild (gate 3 evaluates the generator directly): the whole residual, A3.5 |
 | T-5 | rebuild with half the $\log\rho$ spacing; measure $\Gamma_1$ at 10 K | confirms the A9.2 prediction (bias ∝ $\Delta^2$: 0.133 % → 0.033 %) | not run |
 | T-6 | `collapse_be` at $t=0$ with `eos = hydrogen` vs `adiabatic`: early velocity growth and central density drift before collapse | quantifies O-4 | done for $t=0$ and 20 cycles (C3); collapse dynamics not compared |
 | T-7 | compare $P$, $\varepsilon$, $\Gamma_1$ with an independent EOS that includes non-ideal effects (e.g. Saumon, Chabrier & van Horn 1995) above $10^{-6}$ g cm$^{-3}$ | where the ideal-Saha model departs from a dense-plasma EOS (A3.7) | not run |

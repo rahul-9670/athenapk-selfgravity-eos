@@ -1,0 +1,28 @@
+# T-4: Maxwell identity -rho^2 (du/drho)_T = T (dP/dT)_rho - P on the 13 x 16 states of gate 3 (interior 11 x 14 =
+# 154), relative residual |lhs - rhs| / max(|lhs|, |rhs|, P); generator src/eos/gen_eos_table.py unchanged except
+# erot_per_H2 swapped in memory. Bands by T [K].
+frozen   h=2e-03  worst 2.563e-03 at rho 1e-12 g/cc, T 1848 K | max by band  T < 300: 1.64e-13  300-1e3: 2.81e-10  1e3-5e3 (H2 dissociation): 2.56e-03  5e3-2e4 (H ionization): 6.46e-05
+frozen   h=1e-03  worst 2.460e-03 at rho 1e-12 g/cc, T 1848 K | max by band  T < 300: 4.03e-13  300-1e3: 3.88e-10  1e3-5e3 (H2 dissociation): 2.46e-03  5e3-2e4 (H ionization): 2.49e-05
+frozen   h=5e-04  worst 2.435e-03 at rho 1e-12 g/cc, T 1848 K | max by band  T < 300: 6.41e-13  300-1e3: 4.14e-10  1e3-5e3 (H2 dissociation): 2.43e-03  5e3-2e4 (H ionization): 2.50e-05
+equil    h=2e-03  worst 1.955e-04 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 2.24e-13  300-1e3: 1.42e-10  1e3-5e3 (H2 dissociation): 1.95e-04  5e3-2e4 (H ionization): 6.46e-05
+equil    h=1e-03  worst 4.887e-05 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 4.03e-13  300-1e3: 3.52e-11  1e3-5e3 (H2 dissociation): 4.89e-05  5e3-2e4 (H ionization): 1.61e-05
+equil    h=5e-04  worst 1.222e-05 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 6.64e-13  300-1e3: 8.43e-12  1e3-5e3 (H2 dissociation): 1.22e-05  5e3-2e4 (H ionization): 4.04e-06
+frozen0  h=2e-03  worst 1.955e-04 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 3.39e-13  300-1e3: 1.42e-10  1e3-5e3 (H2 dissociation): 1.95e-04  5e3-2e4 (H ionization): 6.46e-05
+frozen0  h=1e-03  worst 4.887e-05 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 9.60e-13  300-1e3: 3.51e-11  1e3-5e3 (H2 dissociation): 4.89e-05  5e3-2e4 (H ionization): 1.61e-05
+frozen0  h=5e-04  worst 1.222e-05 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 1.56e-12  300-1e3: 8.43e-12  1e3-5e3 (H2 dissociation): 1.22e-05  5e3-2e4 (H ionization): 4.04e-06
+chieff   h=2e-03  worst 1.955e-04 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 1.64e-13  300-1e3: 1.42e-10  1e3-5e3 (H2 dissociation): 1.95e-04  5e3-2e4 (H ionization): 6.46e-05
+chieff   h=1e-03  worst 4.887e-05 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 4.03e-13  300-1e3: 3.52e-11  1e3-5e3 (H2 dissociation): 4.89e-05  5e3-2e4 (H ionization): 1.61e-05
+chieff   h=5e-04  worst 1.222e-05 at rho 1e-13 g/cc, T 1848 K | max by band  T < 300: 6.41e-13  300-1e3: 8.43e-12  1e3-5e3 (H2 dissociation): 1.22e-05  5e3-2e4 (H ionization): 4.04e-06
+
+# What the energy model changes in the EOS (frozen = shipped; equil = consistent with K_d)
+# rho [g/cc]  T [K]   u_frozen [erg/g]  u_equil/u_frozen-1  P/u frozen  P/u equil  Gamma1 frozen  Gamma1 equil  | chieff: u/u_frozen-1  Gamma1
+    1e-14      10   5.311706e+08   +3.268e-06        0.66667    0.66666    1.66667       1.66663       | +0.000e+00  1.66667
+    1e-14      30   1.593513e+09   +9.320e-02        0.66667    0.60983    1.66666       1.44004       | +0.000e+00  1.66666
+    1e-14      50   2.656525e+09   +4.339e-01        0.66650    0.46480    1.66494       1.31010       | +0.000e+00  1.66494
+    1e-14     100   5.429742e+09   +5.807e-01        0.65217    0.41260    1.59717       1.44662       | +0.000e+00  1.59717
+    1e-14     200   1.229101e+10   +3.068e-01        0.57622    0.44095    1.46684       1.46294       | +0.000e+00  1.46684
+    1e-14     500   3.669883e+10   +1.031e-01        0.48246    0.43735    1.42819       1.42819       | +0.000e+00  1.42819
+    1e-10    1000   7.848263e+10   +4.823e-02        0.45120    0.43044    1.41479       1.41479       | -3.213e-08  1.41479
+    1e-09    2000   3.297200e+11   +1.031e-02        0.23314    0.23076    1.10095       1.10109       | -1.175e-03  1.10109
+    1e-08    3000   1.662929e+12   +2.413e-04        0.11154    0.11152    1.16718       1.16742       | -2.035e-03  1.16742
+    1e-06    5000   2.004299e+12   +2.287e-05        0.16117    0.16116    1.52650       1.52680       | -1.866e-03  1.52680
