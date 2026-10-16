@@ -19,7 +19,7 @@ unchanged. Hashes that remain identify the binaries recorded in each run's `cmd.
 * **Part B — validation** (Sec. 1–14, unchanged in substance; the section numbers and finding IDs E-F1 … E-F11 that
   other documents cite are kept): the tests E1–E10, their results, the findings and the reproduction map.
 * **Part C — reading the validation** (added 2026-10-16): what each test establishes and what it does not (C1),
-  limitations and untested regimes (C2), implementation observations O-1 … O-7 found while writing Part A, not fixed
+  limitations and untested regimes (C2), implementation observations O-1 … O-7 found while writing Part A and fixed
   (C3), proposed tests that have not been run (C4), and the source reference index with permalinks (C5).
 
 Readers who want the results first can read Sec. 0 and then Part B; Part A explains what those results are results
@@ -59,8 +59,8 @@ Test-infrastructure traps in Sec. 12.
 
 Part A is a self-contained guide to the equation of state as it is implemented in this repository: the physics
 that the table encodes, how the table is built, how the running code reads it, and how its answers enter the MHD
-solver. Every implementation statement links to the source at commit `a40eff5` (the code this document describes;
-the documentation commit does not change any source file). Statements are labelled as follows when the label
+solver. Every implementation statement links to the source at commit `5649acd`, which contains the fixes of the
+observations O-1 … O-7 (Part C3); where the earlier behaviour (commit `a40eff5`) differs, the text says so. Statements are labelled as follows when the label
 matters: **[code]** read directly from the source; **[measured]** a number produced by a program, with the file
 that holds it; **[derived]** a hand derivation; **[theory]** standard textbook physics that the code does not
 itself establish; **[inferred]** a conclusion drawn from the code that no test isolates.
@@ -402,9 +402,9 @@ override is refused ([code][units-build]).
 | table file | cgs, $T$ in K | — |
 | `EosTable::Load` | file → code | $\log\rho_{\rm code}=\log\rho_{\rm cgs}-\log\rho_u$ and $\log\varepsilon_{\rm code}=\log\varepsilon_{\rm cgs}-\log v_u^2$ (shift of the axis **origin**; the spacing is invariant), $P/(\rho_uv_u^2)$, $c_s^2/v_u^2$, $\varepsilon/v_u^2$; $\log T$ untouched ([Load][tab-load]) |
 | all lookups | $\rho$, $\varepsilon$, $e_{\rm int}$, $P$, $c_s^2$ in **code** units; $T$ in **kelvin** | — |
-| callers wanting code temperature | $T_{\rm code}=T/T_u$ | radiation, non-ideal MHD (`T_unit`), `collapse_be` (`collapse_be_T0K` = $T_u$) |
-| `hydro/Tfloor` under `eos = hydrogen` | **code** temperature | $T=T_{\rm floor}\,T_u$ ([code][hydro-tfloor]) |
-| `hydro/Tfloor`, `hydro/Tceil` under `eos = adiabatic`; `Tceil` always | **kelvin**, via $\bar m/k_B$ of the `Units` class | $\varepsilon=T/(\bar m/k_B)/(\gamma-1)$ ([code][hydro-tceil]) — see observation O-3 |
+| callers wanting code temperature | $T_{\rm code}=T/T_u$ | radiation, non-ideal MHD (`T_unit`) |
+| `hydro/Tfloor`, `hydro/Tceil` under `eos = hydrogen` | **code** temperature | $T=T_{\rm floor}\,T_u$, $T_{\rm ceil}\,T_u$ in K, handed to the EOS; the energy is $e(\rho,T)$ from the table at each cell's density ([code][hydro-tfloor], [code][hydro-tceil], [code][eos-tlim]). Before `5649acd` `Tceil` was in kelvin with the ideal-gas conversion (O-3) and the floor energy was taken at $\rho_{\rm code}=1$ (O-5) |
+| `hydro/Tfloor`, `hydro/Tceil` under `eos = adiabatic` | **kelvin**, via $\bar m/k_B$ of the `Units` class | $\varepsilon=T/(\bar m/k_B)/(\gamma-1)$ ([code][hydro-tceil]) |
 
 The load conversion is exact because the axes are logarithmic: a change of unit multiplies $\rho$ by a constant,
 which shifts $\log\rho$ by a constant. Check with the rho26 table: the file's lowest density
@@ -426,15 +426,20 @@ the harness ($-7.752787$).
 
 $\mu_{\rm th}=2.29$ is a **calibration** that makes the isothermal sound speed exactly $v_u$ at $T_u$ for an
 ideal gas; the table's composition gives $\mu=2.331$ for molecular gas ([measured]: W1, $\mu=2.330921$ from the
-table, 2.331002 from the generator). Under `eos = hydrogen` the code fixes the **temperature** (the IC and the
-`collapse_be` barotropic step both evaluate $\varepsilon(\rho,T_u)$), so the pressure of that gas is
-$P/\rho=\mu_{\rm th}/\mu=0.98244$ in code units, not 1 ([measured], W1). Concretely, `collapse_be` sets
-$e_{\rm int}=p\cdot\varepsilon(\rho,T_u)$ with $p=\rho$ ([code][be-ic], [code][be-p]); the table then returns
-$P=0.9824\,\rho$, i.e. the Bonnor–Ebert sphere starts 1.76 % below the pressure of the isothermal equilibrium it
-was built for, and the barotropic step keeps the isothermal phase at that pressure. The alternative —
-keeping $P=\rho$ — would put the gas at 10.19 K (the comment in `collapse_be.cpp` quotes this for the old constant).
-This is observation O-4 (Part C); it is not a defect of the EOS but of the calibration interface between the
-problem and the table.
+table, 2.331002 from the generator). At the temperature $T_u$ the table gas therefore has
+$P/\rho=\mu_{\rm th}/\mu=0.98244$ in code units, not 1 ([measured], W1): with the table, "$T_{\rm code}=1$" and
+"isothermal sound speed 1" are two different states, 1.8 % apart in pressure.
+
+This matters for `collapse_be`, whose Bonnor–Ebert density profile assumes $p=\rho$. The IC sets
+$e_{\rm int}=p\cdot\varepsilon(\rho,T_0)$ with $p=\rho$ ([code][be-ic], [code][be-p]) and the barotropic step
+holds the isothermal phase at $T_0$. Up to commit `a40eff5`, $T_0=T_u$, so the table returned $P=0.9824\,\rho$ and
+the sphere started 1.76 % below its equilibrium (observation O-4). Since `5649acd` the default
+(`problem/collapse_be/table_isothermal = pressure`) takes $T_0$ as the table temperature at which $P=\rho$: a
+fixed-point iteration $T\leftarrow T\,\rho/P(\rho,\varepsilon(\rho,T))$ at the central density, evaluated once at
+package initialisation ([code][be-t0]); 10.19 K for the default units. Measured: $P/\rho=1.00000000$ in every cell at
+$t=0$ (`O_fixes_check_2026-10-16.txt`). `table_isothermal = temperature` restores $T_0=T_u$ and reproduces the
+earlier runs bitwise. Which of the two is wanted is a modelling choice: the first keeps the dynamics of the
+Bonnor–Ebert sphere, the second its nominal temperature. It is not a defect of the EOS.
 
 ## A6. Execution path at runtime
 
@@ -450,8 +455,10 @@ problem and the table.
       ("HLLE's Roe average bakes in a constant gamma", [code][hydro-hlld]).
 2. **Floors and ceilings** ([code][hydro-tfloor]): `dfloor`, `pfloor` (code units, default −1 = off); `Tfloor`
    (default −1) is converted to a specific-energy floor $\varepsilon_{\rm fl}$ — under `hydrogen` by the host lookup
-   `EintFromRhoTkHost(1.0, Tfloor·T_u)/1.0`, i.e. **at $\rho_{\rm code}=1$**; `Tceil` (default $\infty$) by the
-   ideal-gas formula ([code][hydro-tceil]).
+   `EintFromRhoTkHost(1.0, Tfloor·T_u)/1.0`, which only switches the floor on; the floor temperature in kelvin is
+   handed to the EOS (`SetTableTemperatureLimits`, [code][eos-tlim]) and `ConsToPrim` takes the floor energy from
+   the table at each cell's density. `Tceil` (default $\infty$) likewise under `hydrogen` (a code temperature);
+   under `adiabatic` both are kelvin with the ideal-gas formula ([code][hydro-tceil]).
 3. **The EOS object** — `AdiabaticGLMMHDEOS eos(pfloor, dfloor, efloor, vceil, eceil, gamma, use_h2diss, eos_tab,
    dual-energy keys…)` is constructed and stored as the Hydro package Param `"eos"` ([code][hydro-ctor]); the
    `EosTable` is held **by value** inside it ([code][eos-class]). `FillDerivedMesh` is set to `ConsToPrim`
@@ -478,7 +485,7 @@ The order below is the order in which the EOS is called within one stage of the 
 5. **Source terms** that set the energy from a temperature: `collapse_be`'s barotropic step calls
    `EintFromRhoTk` per cell ([code][be-baro]); radiation matter coupling calls `TemperatureK` and `EintFromRhoTk`.
 6. **Boundary exchange**, then **`ConservedToPrimitive`** over the entire block including ghosts ([code][c2p-mesh]):
-   one `Pof` per cell, plus a table lookup for the floor pressure when `Tfloor` is set, plus the floor inversion
+   one `Pof` per cell, plus two lookups for the floor energy and pressure when `Tfloor` is set, plus the floor inversion
    when a cell is floored ([code][c2p]).
 7. Consumers of the new primitives: Jeans refinement (`SoundSpeed`), non-ideal coefficients
    (`TemperatureKFromPres`), dust (`TemperatureK`), diagnostics.
@@ -517,9 +524,9 @@ extrapolation.
 below/above for the T grid), slots 6–11 the same for root-finder **probe** evaluations (radiation's Newton
 iterations), so benign probes do not mask a genuine clamp. The low-side test uses $f_i<0$, not the truncated index,
 so excursions of less than one cell are counted (code-review fix noted in the source). The counter is write-only
-from the kernels: it cannot change a result. A query on the top node itself can be counted as an upper clamp although
-its value is exact ([measured], W3(f): $P(\rho,\varepsilon_{\max})$ with $\varepsilon_{\max}$ computed from the axis
-incremented `esp>`), because the upper test is $i>n-2$.
+from the kernels: it cannot change a result. The upper count fires only for $f_i>n-1$, i.e. beyond the top node;
+up to `a40eff5` the test was $i>n-2$, so a query exactly on the top node (an exact table value) was counted as a
+clamp (O-7; [measured], W3(f): now 0 counts at the top node).
 
 ### A7.2 `Pof`, `Cs2of`, `LogTof`: the $(\rho,\varepsilon)$ grid
 
@@ -600,10 +607,12 @@ on the interpolant ([code][dflux-newton]).
 **Edges.** With the continuation on, a target below $P(\rho,\varepsilon_{\min})$ is inverted exactly,
 $\varepsilon=\varepsilon_{\min}P/P_{\min}$, and counted as `esp<` ([code][tab-x]). Only the $\rho$ axis is counted once
 per call, because the loop itself runs with counting off (else every one of the $n_b$ probes would count a $\rho$
-clamp). A target **above** $P(\rho,\varepsilon_{\max})$ is not handled: the bisection converges to the top of the
-axis and returns $\varepsilon\approx\varepsilon_{\max}$ silently ([measured], W3(f): target $10\,P_{\max}$ returns
-$0.999992\,\varepsilon_{\max}$, whose pressure is 10× lower than the target, and no counter changes) — observation
-O-1.
+clamp). A target **above** $P(\rho,\varepsilon_{\max})$ cannot be represented: the bisection converges to the top of
+the axis and returns $\varepsilon\approx\varepsilon_{\max}$ ([measured], W3(f): target $10\,P_{\max}$ returns
+$0.999992\,\varepsilon_{\max}$, whose pressure is 10× lower than the target). Since `5649acd` this is counted as
+`esp>`: when the bisection never lowered its upper bound, `XCountEspHighP` compares the target with
+$P(\rho,\varepsilon_{\max})$ ([code][tab-xhigh]), one extra lookup only in that case. Up to `a40eff5` it was silent
+(O-1).
 
 ### A7.4 The compound interface and the $(\rho,T)$ grid
 
@@ -683,13 +692,17 @@ non-negative terms, so it cannot go negative through cancellation. The general E
    (E-F5: $P(e_{\rm fl})=6.2\times10^5P_{\rm fl}$ at $\rho_{\rm code}=1$, W3(b) legacy). With the default continuation
    the inversion is exact ($P(e_{\rm fl})=P_{\rm fl}\times1.000000000000$, W3(b)) and the floored gas sits at
    $T=10^{-7}$ K — which is why a temperature floor is the physical choice.
-8. **Temperature floor** ([code][c2p-tfl]): the floor pressure is
-   $P_{T,\rm fl}=$`PresFromRhoEint`$(\rho,\rho\varepsilon_{\rm fl})$ under the table (one extra lookup per cell when
-   `Tfloor` is set), $(\gamma-1)\rho\varepsilon_{\rm fl}$ otherwise; if $P<P_{T,\rm fl}$ the energy is set to
-   $\rho\varepsilon_{\rm fl}+$KE$+$ME. A cell held by this floor is counted in the history column `cons-nTfloor`
-   ([code][diag-tfloor]).
-9. **Temperature ceiling** ([code][c2p-tceil]): analogous, guarded so that the default $\varepsilon_{\rm ceil}=\infty$
-   never reaches the table ($\log_{10}\infty$ would clamp to the edge and trigger the ceiling spuriously).
+8. **Temperature floor** ([code][c2p-tfl]): the floor energy is $e_{\rm fl}(\rho)=$`EintFloor`$(\rho)$, which is
+   `EintFromRhoTk`$(\rho,T_{\rm floor})$ under the table and $\rho\varepsilon_{\rm fl}$ for the ideal gas
+   ([code][eos-tlim]); the floor pressure is $P_{T,\rm fl}=$`PresFromRhoEint`$(\rho,e_{\rm fl})$ under the table (two
+   extra lookups per cell when `Tfloor` is set), $(\gamma-1)\rho\varepsilon_{\rm fl}$ otherwise; if $P<P_{T,\rm fl}$ the
+   energy is set to $e_{\rm fl}+$KE$+$ME. A cell held by this floor is counted in the history column `cons-nTfloor`,
+   with the same per-density floor ([code][diag-tfloor]). Up to `a40eff5` the table floor energy was
+   $\rho\,\varepsilon(\rho_{\rm code}=1,T_{\rm floor})$, exact only where $\varepsilon(T)$ does not depend on density
+   (O-5: a 2000 K floor held gas at 2176 K at $10^{-12}$ g cm$^{-3}$ and 2779 K at $10^{-9}$; now 1999.9 and 2000.2 K).
+9. **Temperature ceiling** ([code][c2p-tceil]): analogous with `EintCeil`, guarded so that the default
+   $\varepsilon_{\rm ceil}=\infty$ never reaches the table ($\log_{10}\infty$ would clamp to the edge and trigger the
+   ceiling spuriously).
 10. Dual-energy re-sync; passive scalars $=\,$cons$/\rho$.
 
 Every floor **injects** energy (non-conservatively, by design) and records it only through the history counters.
@@ -712,10 +725,12 @@ waves, which do not involve the EOS (code comment), so these two places are the 
 `eos = hydrogen` requires `riemann = hlld`. Two other solvers still contain the ideal-gas energy:
 
 * `glmmhd_hlle` takes $\gamma$ from the EOS and is refused under the table ([code][hydro-hlld]).
-* `glmmhd_dc_llf` forms $E=P/(\gamma-1)+\dots$ with `igm1` ([code][llf-igm1]). It is used by
-  `hydro/first_order_flux_correct` (FOFC, `FirstOrderFluxCorrect`, [code][fofc]), which is **not** refused under
-  `eos = hydrogen` (only together with `hydro/double_flux`). The corrected fluxes would then carry an ideal-gas energy
-  — observation O-2 (inferred from the source; no test exercises FOFC with the table).
+* `glmmhd_dc_llf` is used by `hydro/first_order_flux_correct` (FOFC, `FirstOrderFluxCorrect`, [code][fofc]), which
+  is allowed under `eos = hydrogen` (refused only together with `hydro/double_flux`). Since `5649acd` it takes the
+  face internal energies from the active EOS (`InternalEnergyFromPres`, [code][llf-e]); up to `a40eff5` it used
+  $P/(\gamma-1)$ with `igm1` also under the table (O-2). Measured in a low-β vacuum-forming flow where FOFC corrects
+  32 cells: the ideal-gas energy changed the pressure by up to 13 % in single cells after 200 cycles
+  (`O_fixes_check_2026-10-16.txt`).
 
 ### A8.4 Problem generators and source terms that set energy from temperature
 
@@ -724,8 +739,8 @@ waves, which do not involve the EOS (code comment), so these two places are the 
   sub-table or negative energies ([code][eostest]). The acoustic mode perturbs $e_{\rm int}$ linearly,
   $\delta(\rho\varepsilon)=(\varepsilon_0+P_0/\rho_0)\,\delta\rho$ (the specific enthalpy times $\delta\rho$), to avoid the
   bisection error ($\sim10^{-5}$) at a $10^{-6}$ amplitude.
-* `collapse_be` with `eos = hydrogen`: the IC uses $\varepsilon(\rho,T_u)$ (A5.4), and the barotropic step
-  prescribes $T=T_u\sqrt{1+(\rho/\rho_{\rm crit})^{2(\gamma-1)}}$ and sets $E=$`EintFromRhoTk`$(\rho,T)+$KE$+$ME
+* `collapse_be` with `eos = hydrogen`: the IC uses $\varepsilon(\rho,T_0)$ (A5.4; $T_0$ = `collapse_be_T0K`), and the
+  barotropic step prescribes $T=T_0\sqrt{1+(\rho/\rho_{\rm crit})^{2(\gamma-1)}}$ and sets $E=$`EintFromRhoTk`$(\rho,T)+$KE$+$ME
   ([code][be-baro]); there `hydro/gamma` is only the barotropic index. Skipped when the radiation package owns the
   energy.
 * Radiation: temperature from `TemperatureK`; the Fleck factor needs $dT/d\varepsilon$, obtained as
@@ -792,7 +807,7 @@ would reduce it 4×.
 | $0<\varepsilon<\varepsilon_{\min}$ | continuation | $P\propto\varepsilon$, counted `esp<` (W3(a): ratio 0.500000, 5 counts) |
 | $\rho<\rho_{\min}$ | `p_over_rho`: exact $P\propto\rho$; `p`: continuation (legacy: frozen, ×2 at $0.5\rho_{\min}$) | counted `rho<` (W3(d)) |
 | $\varepsilon>\varepsilon_{\max}$, $T>T_{\max}$, $\rho>\rho_{\max}$ | edge clamp | counted `esp>`/`T>`/`rho>` (W3(f)) |
-| $P>P(\rho,\varepsilon_{\max})$ in `EspFromP` | bisection pinned at the top | $\varepsilon\approx\varepsilon_{\max}$, **not counted** (W3(f), O-1) |
+| $P>P(\rho,\varepsilon_{\max})$ in `EspFromP` | bisection pinned at the top | $\varepsilon\approx\varepsilon_{\max}$, counted `esp>` (W3(f); silent up to `a40eff5`, O-1) |
 | $P<P(\rho,\varepsilon_{\min})$ in `EspFromP` | exact continuation inverse | counted `esp<` |
 | $c_s^2$ at a flat top segment | `Cs2of` returns the tabulated (floored $10^{-12}$) value | — |
 | radiation $d\varepsilon\le0$ | Fleck factor disabled | explicit exchange |
@@ -809,7 +824,7 @@ run aborts without it.
 | parameter | meaning | default | units | accepted | effect | source |
 |---|---|---|---|---|---|---|
 | `hydro/eos` | EOS choice | required | — | `adiabatic`, `hydrogen` | selects the ideal gas or the table | [hydro.cpp][hydro-eos] |
-| `hydro/gamma` | ratio of specific heats | required | — | > 1 | ideal gas: the EOS. Table: sign of $P$ for $e_{\rm int}\le0$, `Tceil` conversion, LLF/FOFC energy (O-2), `collapse_be` barotropic index | [hydro.cpp][hydro-eos] |
+| `hydro/gamma` | ratio of specific heats | required | — | > 1 | ideal gas: the EOS. Table: sign of $P$ for $e_{\rm int}\le0$ and the `collapse_be` barotropic index (up to `a40eff5` also the `Tceil` conversion and the FOFC energy, O-2/O-3) | [hydro.cpp][hydro-eos] |
 | `hydro/eos_table_file` | table path | none (`eos_table_hires_v5_cold.bin` in the run directory only if `eos_table_allow_default`) | — | v1 or v2 file | the table | [hydro.cpp][hydro-eos] |
 | `hydro/eos_table_allow_default` | permit the default file name | false | — | bool | — | [hydro.cpp][hydro-eos] |
 | `hydro/eos_interp` | what is interpolated along ρ | `p_over_rho` | — | `p`, `p_over_rho` | A7.2, E-F1 | [hydro.cpp][hydro-eos] |
@@ -820,12 +835,13 @@ run aborts without it.
 | `hydro/eos_clamp_report` | per-cycle out-of-table report | true | — | bool | printing only | [hydro.cpp][hydro-ctor] |
 | `hydro/dfloor` | density floor | −1 (off) | code density | > 0 to enable | A8.2 step 1 | [hydro.cpp][hydro-tfloor] |
 | `hydro/pfloor` | pressure floor | −1 (off) | code pressure | > 0 to enable | A8.2 step 7 | [hydro.cpp][hydro-tfloor] |
-| `hydro/Tfloor` | temperature floor | −1 (off) | **code T** (`hydrogen`) / K (`adiabatic`) | > 0 to enable | $\varepsilon_{\rm fl}=\varepsilon(\rho_{\rm code}=1,T)$ (table); A8.2 step 8 | [hydro.cpp][hydro-tfloor] |
-| `hydro/Tceil` | temperature ceiling | $\infty$ | K, ideal-gas conversion for both EOS | finite to enable; needs `<units>` + `He_mass_fraction` | A8.2 step 9 (O-3) | [hydro.cpp][hydro-tceil] |
+| `hydro/Tfloor` | temperature floor | −1 (off) | **code T** (`hydrogen`) / K (`adiabatic`, needs `<units>` + `He_mass_fraction`) | > 0 to enable | floor energy $e(\rho,T_{\rm floor})$ at each density (table); A8.2 step 8 | [hydro.cpp][hydro-tfloor] |
+| `hydro/Tceil` | temperature ceiling | $\infty$ | **code T** (`hydrogen`) / K (`adiabatic`, needs `<units>` + `He_mass_fraction`) | finite and > 0 to enable | ceiling energy $e(\rho,T_{\rm ceil})$ at each density (table); A8.2 step 9. Up to `a40eff5`: kelvin and ideal-gas conversion also under the table (O-3) | [hydro.cpp][hydro-tceil] |
 | `hydro/He_mass_fraction` | composition of the **ideal-gas** $\bar m$ | none | — | — | `mbar_over_kb` for the ideal `Tfloor`/`Tceil` only; the table's $X=0.716$ is fixed in the generator | [hydro.cpp][hydro-he] |
 | `units/rho_unit_cgs`, `v_unit_cgs`, `length_unit_cgs` | base scales | 5.467e-19, 1.9e4, 2.81e16 | cgs | refused for `collapse_be` | table conversion at load | [physical_units.hpp][units-build] |
 | `units/mu_thermal` | temperature calibration | 2.29 | — | — | $T_u$ (A5.4) | [physical_units.hpp][units-build] |
 | `problem/collapse_be/eint_over_p_override` | constant $e_{\rm int}/p$ for the IC | −1 (use the table) | — | > 0 to enable | A5.4 | [collapse_be.cpp][be-ic] |
+| `problem/collapse_be/table_isothermal` | what the isothermal $T_0$ of a table run keeps | `pressure` | — | `pressure`, `temperature` | `pressure`: $P=\rho$ (BE equilibrium, 10.19 K); `temperature`: $T_0=T_u$ (behaviour up to `a40eff5`); A5.4, O-4 | [collapse_be.cpp][be-t0] |
 | `hydro/double_flux`, `double_flux_kappa`, `double_flux_ghost_fill`, `double_flux_fill_sensor` | contact fix (opt-in) | false, 0.2, true, true | — | requires `eos = hydrogen`, HLLD, VL2 | Sec. 6.4–6.6 | [hydro.cpp][hydro-dflux] |
 | CMake `ATHENAPK_EOS_LEGACY_LOOKUPS` | verbatim pre-fix lookups | OFF | — | ON/OFF | E-F9; refuses `eos_extrapolate = true` | [CMakeLists.txt][cmake] |
 
@@ -908,15 +924,21 @@ At $\rho_{\rm code}=1$: $\varepsilon_{\min}=9.3147\times10^{-3}$ code ($T=0.0633
   midpoint of its last bracket) with $P=6.2\times10^5P_{\rm fl}$.
 * **(c) Temperature floor** `hydro/Tfloor = 0.2726` (code) $=2.730128$ K: `EintFromRhoTkHost(1, T)` $=0.40171153$ code;
   the floor pressure $P(\rho,\rho\varepsilon_{\rm fl})/\rho=0.26781559$ and $T=2.730156$ K at $\rho_{\rm code}=10^{-6}$,
-  1 and $10^6$ alike (at 2.7 K $\varepsilon$ does not depend on $\rho$, so evaluating the floor at $\rho_{\rm code}=1$
-  is exact here; it would not be at temperatures where the composition depends on density). The E-F5 probe measured
-  $P/\rho=0.26782$ for the same floor in a run.
+  1 and $10^6$ alike: at 2.7 K $\varepsilon$ does not depend on $\rho$, so the floor energy taken at
+  $\rho_{\rm code}=1$ (the behaviour up to `a40eff5`) and the per-density floor of `5649acd` agree; in runs they differ
+  in the last bit (1.8e-16). The E-F5 probe measured $P/\rho=0.26782$ for the same floor in a run.
 * **(d) Density below the table**, $\rho=\tfrac12\rho_{\min}$, $\varepsilon$ of 10 K: $P/\rho=0.98096$ with
   `p_over_rho` and with `p` + continuation; `p` legacy clamp 1.96192 (×2, E-F6). Counted `rho<`.
 * **(e) The E-F1 bias**: A7.2.
 * **(f) Upper edges**: $\varepsilon_{\max}=2.1445\times10^5$ code ($T=3\times10^5$ K); `Pof` at $2\varepsilon_{\max}$
   returns $P(\varepsilon_{\max})$ (counted `esp>`); `EintFromRhoTk` at $10^6$ K returns $\varepsilon(T_{\max})$ (counted
-  `T>`); `EspFromP` at $10P(\varepsilon_{\max})$ returns $0.999992\varepsilon_{\max}$ with **no** count (O-1).
+  `T>`); `EspFromP` at $10P(\varepsilon_{\max})$ returns $0.999992\varepsilon_{\max}$ and is counted `esp>` (silent up to
+  `a40eff5`, O-1); a target $0.999\,P(\varepsilon_{\max})$ is inside the table and not counted. The lookup exactly at
+  $\varepsilon_{\max}$ is no longer counted (O-7).
+* **(g) A temperature floor where $\varepsilon(T)$ depends on density** (O-5): for a 2000 K floor, the energy taken at
+  $\rho_{\rm code}=1$ and scaled with $\rho$ corresponds to 1997.8 / 2175.7 / 2779.5 / 4005.7 K at
+  $10^{-16}$ / $10^{-12}$ / $10^{-9}$ / $10^{-6}$ g cm$^{-3}$; $e(\rho,T_{\rm floor})$ at each density to
+  1997.7 / 1999.9 / 2000.2 / 2000.0 K (the residual is the E-F7 round trip).
 
 ## A12. The EOS in one paragraph
 
@@ -1634,172 +1656,189 @@ means the C++ that a simulation executes; tests that re-implement the lookup in 
 2. **Thermodynamic consistency** (A3.5): energy and chemical equilibrium use different ortho/para models, so the table
    is not derived from one free energy where H$_2$ dissociates. Size of the effect not isolated (C4, T-4).
 3. **Table top** (A4.3): flat $P(\varepsilon)$ above $3\times10^5$ K at high density; `EspFromP` cannot represent
-   pressures above $P(\rho,\varepsilon_{\max})$ and does not count them (O-1).
+   pressures above $P(\rho,\varepsilon_{\max})$ (counted as `esp>` since `5649acd`, O-1).
 4. **Sound speed**: the tabulated $c_s^2$ is a finite-difference derivative of the tabulated $P$ with a known bias
    (+0.13 % in $\Gamma_1$ for molecular gas, A9.2) and up to 3.3 % deviation at kinks (E2).
 5. **Two independent interpolants** for $T(\rho,\varepsilon)$ and $\varepsilon(\rho,T)$: round trip up to 1.3 % (E-F7).
 6. **Bisection**: piecewise-constant error up to $8.1\times10^{-6}$ in $\varepsilon$, $9.2\times10^{-5}$ in $P$ (A7.3).
-7. **Untested combinations**: FOFC with the table (O-2); `Tceil` with the table (O-3); `Tfloor` and double flux on the
-   GPU (Sec. 8); MHD shock tubes with the table against an exact solution; the table above 133 K in a full collapse
-   run (E10 covered the earlier epochs).
+7. **Untested combinations**: `Tfloor` and double flux on the GPU (Sec. 8); MHD shock tubes with the table against an
+   exact solution; the table above 133 K in a full collapse run (E10 covered the earlier epochs). FOFC and `Tceil`
+   with the table are now exercised by single runs (C3), not by convergence tests.
+8. **GPU**: the fixes of C3 were built and run on CPU only; the GPU build of this commit was not compiled.
 
-## C3. Implementation observations from this documentation pass (not changed)
+## C3. Implementation observations from this documentation pass, and their fixes
 
-Found while tracing the code for Part A. None of them changes a result in the configurations validated in Part B;
-each is reported with its evidence, and none was fixed here (documentation-only change).
+Found while tracing the code for Part A (commit `a40eff5`), fixed in commit `5649acd`. None of them changed a result in
+the configurations validated in Part B. Evidence for each fix: `results/tables/O_fixes_check_2026-10-16.txt` (runs,
+NEW = `5649acd` CPU build `1455f3fc`, OLD = `a40eff5` build `446d9034`) and `results/tables/W_worked_examples.txt`
+(host harness). **Regression:** the 47 self-gravity / EOS / dual-energy / `collapse_be` regression runs are bitwise
+identical to `a40eff5` as built (every field of every dump, history files identical); five dual-energy legs (decks
+with `Tfloor` = 2.73 K) bitwise; E10 probes with `Tfloor` = 2.73 K bitwise where the floor does not bind and within
+1.8e-16 where it does. The changes to the lookups, `ConsToPrim` and the LLF solver are compiled only without
+`ATHENAPK_EOS_LEGACY_LOOKUPS`; the legacy build keeps the previous code text (it compiles; it was not re-run against a
+pre-fix restart).
 
-* **O-1 — `EspFromP` silently clamps pressures above the table.** For $P>P(\rho,\varepsilon_{\max})$ the bisection
-  returns $\approx\varepsilon_{\max}$ and no counter is incremented (only the $\rho$ axis is counted in `EspFromP`;
-  the low-pressure side is handled and counted since E-F5). Measured: target $10\,P_{\max}$ at $\rho_{\rm code}=1$
-  → $\varepsilon=0.999992\,\varepsilon_{\max}$, whose pressure is $1.13\times10^5$ instead of $1.13\times10^6$, counters
-  unchanged (`W_worked_examples.txt`, W3(f)). Affects HLLD face energies and the pressure-floor inversion only
-  above $3\times10^5$ K (or where the table top is flat); invisible to the clamp report.
-* **O-2 — first-order flux correction uses the ideal-gas energy under the table.** `hydro/first_order_flux_correct`
-  recomputes fluxes with the LLF solver, which forms $E=P/(\gamma-1)+\dots$ ([code][llf-igm1]); it is refused with
-  double flux but not with `eos = hydrogen` alone ([code][hydro-dflux]). [inferred] A corrected face would then
-  carry an energy flux inconsistent with the table. No test or deck in this repository uses FOFC with the table.
-* **O-3 — `Tceil` (and, for `eos = adiabatic`, `Tfloor`) are in kelvin with an ideal-gas conversion; under
-  `eos = hydrogen` `Tfloor` is in code temperature units and inverted through the table.** So under the table the
-  two keys use different units, and `Tceil` still requires a `<units>` block and `hydro/He_mass_fraction` and maps
-  through $\gamma$ and $\bar m$ rather than the table ([code][hydro-tceil]). [inferred] A table run that sets `Tceil`
-  gets a ceiling at a different temperature than requested (the same class of issue that AUDIT F-22 fixed for
-  `Tfloor`).
-* **O-4 — the temperature unit and the table's molecular weight differ by 1.8 %** (A5.4): $T_u$ uses
-  $\mu_{\rm th}=2.29$, the table has $\mu=2.331$. Under `eos = hydrogen`, `collapse_be` starts at $T_u$ and therefore at
-  $P=0.98244\,\rho$, 1.76 % below the isothermal Bonnor–Ebert equilibrium $p=\rho$ that the IC density profile
-  assumes (W1 measured $P/\rho$; IC code: [energy][be-ic], [pressure][be-p]). The comment above the IC (`e_int/p = esp/T_code = esp
-  (since p = rho*T ...)`) holds only for $\mu=\mu_{\rm th}$. Whether this matters for a given study (a ~1.8 %
-  stronger initial gravitational imbalance) is a modelling decision; it is not an EOS error.
-* **O-5 — the temperature floor is converted at $\rho_{\rm code}=1$ only.** `efloor = EintFromRhoTkHost(1.0, T)`
-  gives one specific energy for all densities ([code][hydro-tfloor]). Exact while $\varepsilon(T)$ does not depend on
-  density — verified for 2.73 K over 12 decades (W3(c)) — but a floor set in the dissociation or ionization range would
-  correspond to different temperatures at different densities.
-* **O-6 — stale or misleading comments** (documentation only): `gen_eos_table.py` says the table is "HDF5 ...
-  consumed at runtime by ... eos_hydrogen.hpp" (the runtime reads the `.bin` through `eos_table.hpp`) and that $c_s^2$ is
-  "via finite differences on the adiabat" (it is the identity of A3.6 with grid derivatives); its default `build`
-  target `eos_table.bin` and the default table of `src/eos/tests/test_eos_consistency.py` are not shipped, and that
-  copy of the test still reads only v1 files (E-F2; the suite's copy in `scripts/` is fixed). The per-cycle clamp
-  report says lookups "were EDGE-CLAMPED" also for lookups that were continued, which the same message then
-  qualifies.
-* **O-7 — top-node lookups are counted as clamps** (A7.1): harmless, but a run sitting exactly on the top node would
-  report clamps.
+* **O-1 — `EspFromP` silently clamped pressures above the table.** For $P>P(\rho,\varepsilon_{\max})$ the bisection
+  returns $\approx\varepsilon_{\max}$ (target $10\,P_{\max}$ at $\rho_{\rm code}=1$: $0.999992\,\varepsilon_{\max}$, whose
+  pressure is $1.13\times10^5$ instead of $1.13\times10^6$), and no counter was incremented. *Fix:* counted as `esp>`
+  when the bisection never lowered its upper bound and the target exceeds $P(\rho,\varepsilon_{\max})$
+  ([code][tab-xhigh]). The value is unchanged — there is no physics above $T_{\max}$ in the table — but the clamp
+  report now sees it. *Check:* W3(f): `esp>` 0 → 1; a target $0.999\,P_{\max}$ is not counted.
+* **O-2 — first-order flux correction used the ideal-gas energy under the table.** The LLF solver behind
+  `hydro/first_order_flux_correct` formed $E=P/(\gamma-1)+\dots$ also with `eos = hydrogen`. *Fix:* the internal energy
+  comes from `InternalEnergyFromPres` of the active EOS; the ideal-gas expression is unchanged ([code][llf-e]).
+  *Check:* a low-β vacuum-forming flow (cold gas, $u=\pm300$, $B_y=10^4$; four other probes, including a $10^9$
+  pressure-ratio blast, never triggered FOFC) where FOFC corrects 32 cells: after 200 cycles the old energy differs
+  from the table-consistent one by up to 13 % in the pressure of single cells (0.77 % of the maximum).
+* **O-3 — `Tceil` under the table was in kelvin with the ideal-gas conversion** (and needed `<units>` +
+  `He_mass_fraction`), while `Tfloor` was a code temperature inverted through the table. *Fix:* under
+  `eos = hydrogen` `Tceil` is a code temperature like `Tfloor` and the ceiling energy is $e(\rho,T_{\rm ceil})$ from the
+  table at each density ([code][hydro-tceil], [code][c2p-tceil]). *Check:* 5000 K gas at $10^{-12}$ and $10^{-9}$ g
+  cm$^{-3}$ with a 2000 K ceiling: 1999.89 and 2000.21 K (old: abort without `<units>`; with a units block and
+  `Tceil` = 2000 K, 1726 and 2210 K).
+* **O-4 — the temperature unit and the table's molecular weight differ by 1.8 %** (A5.4), so `collapse_be` with the
+  table started at $P=0.98244\,\rho$, 1.76 % below the Bonnor–Ebert equilibrium $p=\rho$. *Fix:* the isothermal
+  temperature $T_0$ of a table run is, by default, the one at which the table gives $P=\rho$ (10.19 K for the default
+  units; [code][be-t0]); `problem/collapse_be/table_isothermal = temperature` keeps $T_0=T_u$. *Check:* L6 deck with
+  the table: $P/\rho=1.00000000$ in every cell at $t=0$ (old 0.98244); with `temperature` bitwise equal to the old run
+  after 20 cycles. This changes the default behaviour of `collapse_be` with `eos = hydrogen` (a modelling choice, A5.4).
+* **O-5 — the temperature floor was converted at $\rho_{\rm code}=1$ only**, exact only where $\varepsilon(T)$ does not
+  depend on density. *Fix:* the floor energy is $e(\rho,T_{\rm floor})$ at each cell's density, in `ConsToPrim`, the
+  dual-energy fallback, `DualSelectEint` and the `cons-nTfloor` counter ([code][eos-tlim], [code][c2p-tfl]).
+  *Check:* 100 K gas at $10^{-12}$ and $10^{-9}$ g cm$^{-3}$ with a 2000 K floor: 1999.89 and 2000.21 K (old 2175.73 and
+  2779.46 K); W3(g) over four densities. At 2.73 K the two agree to the last bit (see the regression above).
+* **O-6 — stale or misleading comments.** *Fixed:* the generator's docstring (the runtime reads the `.bin`, and how
+  $c_s^2$ is formed) and the description of its default `build` target; `src/eos/tests/test_eos_consistency.py` now
+  reads v2 tables and defaults to the shipped rho26 table (E-F2; all gates pass with the E2 numbers); the per-cycle
+  clamp report no longer calls continued lookups "edge-clamped" and says that `esp>` includes inversions above the
+  table; the `collapse_be` comments. The generator's code is unchanged (comments only), so the tables are unchanged.
+* **O-7 — top-node lookups were counted as clamps.** *Fix:* the upper count fires only beyond the top node
+  ([code][tab-bilin]). *Check:* W3(f): 0 counts for a lookup at $\varepsilon_{\max}$.
 
-## C4. Suggested additional tests (not implemented, not run)
+Not changed: the ortho/para modelling choice of A3.5 (a physics decision of the generator; isolating its effect is
+T-4) and the other limitations of C2.
 
-| id | test | what it would establish |
-|---|---|---|
-| T-1 | host-harness case: `EspFromP` above $P(\rho,\varepsilon_{\max})$ with a counter assertion | makes O-1 observable and regression-tested |
-| T-2 | E7 R2/R4 with `first_order_flux_correct = true` forced to trigger (e.g. very low `dfloor`/`pfloor` margins), table vs `eos_floor_consistent` energy audit | whether O-2 changes energies in practice |
-| T-3 | E10-style probe with `hydro/Tceil` under `eos = hydrogen` | the temperature the ceiling actually enforces (O-3) |
-| T-4 | rebuild the table with the rotational energy taken from the same (equilibrium) partition function as $K_d$ and repeat the E2 Maxwell gate in the dissociation band | isolates the A3.5 contribution to the 2.46e-3 Maxwell residual |
-| T-5 | rebuild with half the $\log\rho$ spacing; measure $\Gamma_1$ at 10 K | confirms the A9.2 prediction (bias ∝ $\Delta^2$: 0.133 % → 0.033 %) |
-| T-6 | `collapse_be` at $t=0$ with `eos = hydrogen` vs `adiabatic`: early velocity growth and central density drift before collapse | quantifies O-4 |
-| T-7 | compare $P$, $\varepsilon$, $\Gamma_1$ with an independent EOS that includes non-ideal effects (e.g. Saumon, Chabrier & van Horn 1995) above $10^{-6}$ g cm$^{-3}$ | where the ideal-Saha model departs from a dense-plasma EOS (A3.7) |
-| T-8 | GPU runs of the Tfloor probe and of double flux on refined meshes with Tfloor | closes the GPU gaps listed in Sec. 8 |
-| T-9 | radiation Fleck derivative $d\varepsilon/dT$ from the table vs analytic $c_v$ of the generator | accuracy of the numerical $c_v$ (A3.6) |
-| T-10 | magnetised general-EOS Riemann problem (e.g. Brio–Wu states mapped to the R2 densities/temperatures) against a converged reference | HLLD + table with $B\neq0$ in shocks (C2 item 7) |
+## C4. Suggested additional tests
+
+T-1, T-2, T-3 and T-6 were run for the fixes of C3 (status column); the others are proposals that have not been run.
+
+| id | test | what it would establish | status |
+|---|---|---|---|
+| T-1 | host-harness case: `EspFromP` above $P(\rho,\varepsilon_{\max})$ with a counter assertion | makes O-1 observable and regression-tested | done (W3(f)) |
+| T-2 | E7 R2/R4 with `first_order_flux_correct = true` forced to trigger (e.g. very low `dfloor`/`pfloor` margins), table vs `eos_floor_consistent` energy audit | whether O-2 changes energies in practice | done with a low-β probe instead of R2/R4 (FOFC never fired in the Riemann/blast probes; C3) |
+| T-3 | E10-style probe with `hydro/Tceil` under `eos = hydrogen` | the temperature the ceiling actually enforces (O-3) | done (C3) |
+| T-4 | rebuild the table with the rotational energy taken from the same (equilibrium) partition function as $K_d$ and repeat the E2 Maxwell gate in the dissociation band | isolates the A3.5 contribution to the 2.46e-3 Maxwell residual | not run |
+| T-5 | rebuild with half the $\log\rho$ spacing; measure $\Gamma_1$ at 10 K | confirms the A9.2 prediction (bias ∝ $\Delta^2$: 0.133 % → 0.033 %) | not run |
+| T-6 | `collapse_be` at $t=0$ with `eos = hydrogen` vs `adiabatic`: early velocity growth and central density drift before collapse | quantifies O-4 | done for $t=0$ and 20 cycles (C3); collapse dynamics not compared |
+| T-7 | compare $P$, $\varepsilon$, $\Gamma_1$ with an independent EOS that includes non-ideal effects (e.g. Saumon, Chabrier & van Horn 1995) above $10^{-6}$ g cm$^{-3}$ | where the ideal-Saha model departs from a dense-plasma EOS (A3.7) | not run |
+| T-8 | GPU runs of the Tfloor probe and of double flux on refined meshes with Tfloor | closes the GPU gaps listed in Sec. 8 (and C2 item 8) | not run |
+| T-9 | radiation Fleck derivative $d\varepsilon/dT$ from the table vs analytic $c_v$ of the generator | accuracy of the numerical $c_v$ (A3.6) | not run |
+| T-10 | magnetised general-EOS Riemann problem (e.g. Brio–Wu states mapped to the R2 densities/temperatures) against a converged reference | HLLD + table with $B\neq0$ in shocks (C2 item 7) | not run |
 
 ## C5. Source reference index
 
-All links point to commit `a40eff5`. Line ranges are those of that commit.
+All links point to commit `5649acd` (the fixes of C3). Line ranges are those of that commit.
 
 | file | functions / blocks | role |
 |---|---|---|
-| [`src/eos/gen_eos_table.py`][gen] | constants [L26–37][gen-const], `Zrot_ns` [L60–68][gen-zrot], `erot_per_H2` [L69–79][gen-erot], `Zvib`/`evib_per_H2` [L80–91][gen-evib], `solve_saha` [L93–136][gen-saha], `P_e_of_rho_T` [L138–147][gen-pe], `build_table` [L149–381][gen-build] | offline physics and table construction (A3, A4) |
+| [`src/eos/gen_eos_table.py`][gen] | constants [L28–39][gen-const], `Zrot_ns` [L62–70][gen-zrot], `erot_per_H2` [L71–81][gen-erot], `Zvib`/`evib_per_H2` [L84–93][gen-evib], `solve_saha` [L95–110][gen-saha], `P_e_of_rho_T` [L140–149][gen-pe], `build_table` [L151–383][gen-build] | offline physics and table construction (A3, A4) |
 | [`src/eos/eos_table_format.hpp`][fmt] | `ReadEosHeader` | file format v1/v2 (A4.4) |
-| [`src/eos/eos_table.hpp`][tab] | `bilin` [L124–163][tab-bilin], legacy lookups [L165–215][tab-legacy], continuation helpers [L259–307][tab-x], `Pof`/`Cs2of`/`LogTof` [L309–326][tab-pof], `EspFromP` [L327–360][tab-espfromp], interface [L363–377][tab-iface], `TemperatureKFromPres` [L405–412][tab-tfromp], `EintFromRhoTk` [L413–425][tab-eintT], host twins [L450–518][tab-host], `Load` [L526–611][tab-load], counters [L617–633][tab-ctr2] | runtime lookups (A7) |
-| [`src/eos/adiabatic_glmmhd.hpp`][eos-class] | constructor, `InternalEnergyFromPres` [L59–63][eos-iefp], `SoundSpeed`/`FastMagnetosonicSpeed` [L73–91][eos-cf], `ConsToPrim` [L100–321][c2p] | the EOS interface of the solver (A8) |
+| [`src/eos/eos_table.hpp`][tab] | `bilin` [L122–173][tab-bilin], legacy lookups [L175–225][tab-legacy], continuation helpers [L269–327][tab-x], `Pof`/`Cs2of`/`LogTof` [L329–346][tab-pof], `EspFromP` [L347–382][tab-espfromp], `XCountEspHighP` [L310–319][tab-xhigh], interface [L385–399][tab-iface], `TemperatureKFromPres` [L423–434][tab-tfromp], `EintFromRhoTk` [L435–447][tab-eintT], host twins [L454–540][tab-host], `Load` [L543–633][tab-load], counters [L635–655][tab-ctr2] | runtime lookups (A7) |
+| [`src/eos/adiabatic_glmmhd.hpp`][eos-class] | constructor, `SetTableTemperatureLimits`/`EintFloor`/`EintCeil` [L69–90][eos-tlim], `InternalEnergyFromPres` [L56–63][eos-iefp], `SoundSpeed`/`FastMagnetosonicSpeed` [L92–114][eos-cf], `ConsToPrim` [L117–376][c2p] | the EOS interface of the solver (A8) |
 | [`src/eos/adiabatic_glmmhd.cpp`][c2p-mesh] | `ConservedToPrimitive` | the per-cell kernel launch |
-| [`src/hydro/hydro.cpp`][hydro] | clamp report [L131–195][clamp-report], EOS keys and load [L1101–1185][hydro-eos], floors [L1202–1240][hydro-tfloor], `Tceil` [L1242–1255][hydro-tceil], EOS object [L1690–1694][hydro-ctor], `EstimateHyperbolicTimestep` [L2127–2190][dt-hyp], `FirstOrderFluxCorrect` [L2578ff][fofc] | configuration, initialization, time step (A6, A10) |
+| [`src/hydro/hydro.cpp`][hydro] | clamp report [L131–196][clamp-report], EOS keys and load [L1102–1186][hydro-eos], floors [L1203–1245][hydro-tfloor], `Tceil` [L1247–1272][hydro-tceil], EOS object [L1661–1729][hydro-ctor], `EstimateHyperbolicTimestep` [L2147–2210][dt-hyp], `FirstOrderFluxCorrect` [L2578ff][fofc] | configuration, initialization, time step (A6, A10) |
 | [`src/hydro/rsolvers/glmmhd_hlld.hpp`][hlld] | face energies and fast speeds [L104–126][hlld-e] | Riemann solver (A8.3) |
-| [`src/hydro/rsolvers/glmmhd_dc_llf.hpp`][llf] | `igm1` energy [L56][llf-igm1] | O-2 |
+| [`src/hydro/rsolvers/glmmhd_dc_llf.hpp`][llf] | face energies [L122–143][llf-e] | FOFC fluxes (O-2) |
 | [`src/units/physical_units.hpp`][units] | `PhysicalUnits`, `BuildPhysicalUnits` [L84–129][units-build] | units (A5) |
 | [`src/pgen/eos_test.cpp`][eostest] | IC kernel | validation problem generator |
-| [`src/pgen/collapse_be.cpp`][be] | IC energy [L276–297][be-ic], [L396–402][be-p]; `ApplyBarotropicCooling` [L842–895][be-baro] | A5.4, A8.4 |
+| [`src/pgen/collapse_be.cpp`][be] | isothermal $T_0$ [L174–213][be-t0], IC energy [L311–335][be-ic], [L428–440][be-p]; `ApplyBarotropicCooling` [L860–933][be-baro] | A5.4, A8.4 |
 | [`src/hydro/double_flux.cpp`][dflux] | `EspFromPRefined` [L71–86][dflux-newton], freeze [L186–208][dflux-freeze] | Sec. 6.4–6.6 |
 | [`src/radiation/radiation.cpp`][rad] / [`radiation_sn.cpp`][rad-dtde] | own table load [L288–319][rad-load]; $T$ and $dT/d\varepsilon$ [L923–963][rad-dtde] | A8.4 |
 | [`src/hydro/diffusion/diffusion.cpp`][diff-T], [`src/dust/dust.cpp`][dust-T], [`src/refinement/jeans.cpp`][jeans], [`src/diagnostics/cons_diag.cpp`][diag-tfloor] | temperature and sound-speed consumers | A6.2 |
 | [`src/eos/TABLE_PROVENANCE.md`][prov] | shipped tables, md5, rebuild commands | A4 |
 
-[gen]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py
-[gen-head]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L1-L23
-[gen-const]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L26-L37
-[gen-zrot]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L60-L68
-[gen-erot]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L69-L79
-[gen-zvib]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L80-L81
-[gen-evib]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L82-L91
-[gen-saha]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L93-L108
-[gen-neut]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L109-L126
-[gen-bisect]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L127-L134
-[gen-nh2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L135-L136
-[gen-pe]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L138-L147
-[gen-build]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L149-L381
-[gen-rhoT]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L216-L223
-[gen-pad]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L257-L264
-[gen-eaxis]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L225-L256
-[gen-sat]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L265-L310
-[gen-invert]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L311-L318
-[gen-cs2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L319-L333
-[gen-write]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/gen_eos_table.py#L345-L373
-[prov]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/TABLE_PROVENANCE.md
-[fmt]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table_format.hpp
-[tab]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp
-[tab-ctr]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L86-L120
-[tab-bilin]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L122-L163
-[tab-legacy]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L165-L215
-[tab-x]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L259-L307
-[tab-pof]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L309-L326
-[tab-espfromp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L327-L360
-[tab-iface]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L363-L377
-[tab-tfromp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L401-L412
-[tab-eintT]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L413-L425
-[tab-host]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L432-L518
-[tab-load]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L521-L611
-[tab-prho]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L570-L580
-[tab-ctr2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/eos_table.hpp#L613-L633
-[eos-class]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L25-L67
-[eos-iefp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L56-L63
-[eos-cf]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L69-L91
-[c2p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L94-L321
-[c2p-d]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L132-L139
-[c2p-eint]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L151-L153
-[c2p-p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L205-L213
-[c2p-pfl]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L239-L256
-[c2p-tfl]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L258-L270
-[c2p-tceil]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.hpp#L272-L284
-[c2p-mesh]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/eos/adiabatic_glmmhd.cpp#L33-L69
-[hydro]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp
-[clamp-report]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L131-L195
-[hydro-eos]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1101-L1185
-[hydro-n14]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1153-L1171
-[hydro-hlld]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1173-L1176
-[hydro-he]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1187-L1200
-[hydro-tfloor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1202-L1240
-[hydro-tceil]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1242-L1255
-[hydro-ctor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1644-L1709
-[hydro-dflux]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L1025-L1060
-[dt-hyp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L2127-L2190
-[fofc]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/hydro.cpp#L2578-L2612
-[hlld]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_hlld.hpp
-[hlld-e]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_hlld.hpp#L104-L126
-[llf]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_dc_llf.hpp
-[llf-igm1]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/rsolvers/glmmhd_dc_llf.hpp#L56-L56
-[units]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/units/physical_units.hpp
-[units-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/units/physical_units.hpp#L120-L127
-[units-build]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/units/physical_units.hpp#L84-L129
-[eostest]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/eos_test.cpp#L155-L230
-[be]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp
-[be-ic]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp#L276-L297
-[be-p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp#L390-L402
-[be-baro]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/pgen/collapse_be.cpp#L822-L895
-[dflux]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/double_flux.cpp
-[dflux-newton]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/double_flux.cpp#L71-L86
-[dflux-freeze]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/double_flux.cpp#L186-L208
-[rad]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/radiation/radiation.cpp
-[rad-load]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/radiation/radiation.cpp#L288-L319
-[rad-dtde]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/radiation/radiation_sn.cpp#L923-L963
-[diff-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/hydro/diffusion/diffusion.cpp#L104-L127
-[dust-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/dust/dust.cpp#L259-L270
-[jeans]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/refinement/jeans.cpp#L36-L60
-[diag-tfloor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/src/diagnostics/cons_diag.cpp#L97-L103
-[cmake]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/a40eff5d24118929bd52ad1e023968e4b80e5231/CMakeLists.txt#L69-L72
+[gen]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py
+[gen-head]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L1-L25
+[gen-const]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L28-L39
+[gen-zrot]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L62-L70
+[gen-erot]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L71-L81
+[gen-zvib]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L82-L83
+[gen-evib]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L84-L93
+[gen-saha]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L95-L110
+[gen-neut]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L111-L128
+[gen-bisect]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L129-L136
+[gen-nh2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L137-L138
+[gen-pe]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L140-L149
+[gen-build]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L151-L383
+[gen-rhoT]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L218-L225
+[gen-pad]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L259-L266
+[gen-eaxis]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L227-L258
+[gen-sat]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L267-L312
+[gen-invert]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L313-L320
+[gen-cs2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L321-L335
+[gen-write]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/gen_eos_table.py#L347-L375
+[prov]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/TABLE_PROVENANCE.md
+[fmt]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table_format.hpp
+[tab]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp
+[tab-ctr]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L86-L120
+[tab-bilin]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L122-L173
+[tab-legacy]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L175-L225
+[tab-x]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L269-L327
+[tab-pof]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L329-L346
+[tab-espfromp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L347-L382
+[tab-iface]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L385-L399
+[tab-tfromp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L423-L434
+[tab-eintT]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L435-L447
+[tab-host]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L454-L540
+[tab-load]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L543-L633
+[tab-prho]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L592-L602
+[tab-ctr2]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L635-L655
+[eos-class]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L25-L67
+[eos-iefp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L56-L63
+[eos-cf]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L92-L114
+[c2p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L117-L376
+[c2p-d]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L155-L162
+[c2p-eint]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L174-L176
+[c2p-p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L232-L240
+[c2p-pfl]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L266-L283
+[c2p-tfl]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L285-L311
+[c2p-tceil]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L313-L339
+[c2p-mesh]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.cpp#L33-L69
+[hydro]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp
+[clamp-report]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L131-L196
+[hydro-eos]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1102-L1186
+[hydro-n14]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1154-L1172
+[hydro-hlld]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1174-L1177
+[hydro-he]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1188-L1201
+[hydro-tfloor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1203-L1245
+[hydro-tceil]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1247-L1272
+[hydro-ctor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1661-L1729
+[hydro-dflux]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L1026-L1061
+[dt-hyp]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L2147-L2210
+[fofc]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/hydro.cpp#L2598-L2632
+[hlld]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/rsolvers/glmmhd_hlld.hpp
+[hlld-e]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/rsolvers/glmmhd_hlld.hpp#L104-L126
+[llf]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/rsolvers/glmmhd_dc_llf.hpp
+[units]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/units/physical_units.hpp
+[units-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/units/physical_units.hpp#L120-L127
+[units-build]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/units/physical_units.hpp#L84-L129
+[eostest]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/pgen/eos_test.cpp#L155-L230
+[be]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/pgen/collapse_be.cpp
+[be-ic]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/pgen/collapse_be.cpp#L311-L335
+[be-p]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/pgen/collapse_be.cpp#L428-L440
+[be-baro]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/pgen/collapse_be.cpp#L860-L933
+[dflux]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/double_flux.cpp
+[dflux-newton]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/double_flux.cpp#L71-L86
+[dflux-freeze]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/double_flux.cpp#L186-L208
+[rad]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/radiation/radiation.cpp
+[rad-load]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/radiation/radiation.cpp#L288-L319
+[rad-dtde]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/radiation/radiation_sn.cpp#L923-L963
+[diff-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/diffusion/diffusion.cpp#L104-L127
+[dust-T]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/dust/dust.cpp#L259-L270
+[jeans]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/refinement/jeans.cpp#L36-L60
+[diag-tfloor]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/diagnostics/cons_diag.cpp#L97-L109
+[cmake]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/CMakeLists.txt#L69-L72
+[eos-tlim]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/adiabatic_glmmhd.hpp#L69-L90
+[tab-xhigh]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L310-L319
+[llf-e]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/rsolvers/glmmhd_dc_llf.hpp#L122-L143
+[be-t0]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/pgen/collapse_be.cpp#L174-L213

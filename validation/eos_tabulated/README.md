@@ -7,7 +7,8 @@ H/He, H2 dissociation, H2 rotation/vibration), HLLD + PLM + VL2, `eos_floor_cons
 **Report: [`EOS_VALIDATION.md`](EOS_VALIDATION.md)** (authoritative). Part A is the implementation guide (physics,
 derivations, execution path, every lookup, numerics, units, configuration keys, worked examples); Part B the
 validation (every test with numbers, findings E-F1..E-F11, reproduction map); Part C what each test establishes,
-limitations, open observations O-1..O-7 and proposed tests. Tables: `results/tables/`, figures: `results/figures/`.
+limitations, observations O-1..O-7 (fixed in 5649acd, checks in `results/tables/O_fixes_check_2026-10-16.txt`) and
+proposed tests. Tables: `results/tables/`, figures: `results/figures/`.
 
 | ID | test | reference | result |
 |---|---|---|---|
