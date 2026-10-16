@@ -165,7 +165,9 @@ The generator models the gas as follows ([code][gen-head]; the limits of validit
 5. **Internal structure.** H$_2$: rigid-rotor rotation ($\theta_{\rm rot}=85.4$ K, levels $J<60$) and harmonic
    vibration ($\theta_{\rm vib}=5987$ K). Atoms: ground state only (statistical weights, no excited levels).
 6. **Ortho/para H$_2$.** For the *energy*, a frozen 3:1 ortho:para mixture (ortho–para conversion is slow in the
-   ISM); for the *dissociation equilibrium*, the nuclear-spin-weighted equilibrium partition function (A3.3, A3.5).
+   ISM); for the *dissociation equilibrium*, the nuclear-spin-weighted equilibrium partition function (A3.3, A3.5). In the
+   tables built before 2026-10-16 (`v5_cold`) the two disagree on the energy of a dissociated molecule; the generator's
+   default `consistent` energy model and the table `eos_table_hires_v6_rho26.bin` remove that (A3.5).
 
 ### A3.2 Pressure
 
@@ -302,8 +304,31 @@ What a fix would change: the minimal one (last row) leaves the EOS below 1000 K 
 the dissociation band by 0.12 % (2000 K, $10^{-9}$ g cm$^{-3}$), 0.20 % (3000 K, $10^{-8}$), 0.19 % (5000 K, $10^{-6}$);
 $\Gamma_1$ there moves by $\le2.4\times10^{-4}$ (e.g. 1.16718 → 1.16742). The equilibrium model instead changes the
 molecular regime itself — $\Gamma_1$ at 50 K from 1.665 to 1.310 — which is a different physical assumption (equilibrium
-instead of normal H$_2$), not a consistency fix. Neither is applied: either requires regenerating the tables, which
-changes the table EOS above ~1000 K at the 0.1–0.2 % level and every validated result there.
+instead of normal H$_2$), not a consistency fix.
+
+**The fix (2026-10-16): the `consistent` energy model and the table `eos_table_hires_v6_rho26.bin`.** The generator
+charges a dissociated molecule $\chi_d-\tfrac34\cdot2k_B\theta_{\rm rot}$ by default (`ENERGY_MODEL`, the 12th argument
+of `build`; [code][gen-emodel], axis pinning [code][gen-axis]); `legacy` rebuilds the `v5_cold` tables byte-identically (verified for both md5s). The
+$\varepsilon$ axis of every build is derived from the legacy energies, so the v6 table has exactly the axes of
+`v5_cold_rho26` and every node below 500 K is the same (99.5 % bit-identical, the rest within $2\times10^{-11}$). Checks
+(`results/tables/T4b_v6_table_check.txt`):
+* consistency gates: Maxwell residual $4.89\times10^{-5}$ (now gated at $2\times10^{-4}$), table vs direct Saha as before
+  (P median $1.56\times10^{-3}$);
+* what changes, at fixed $(\rho,\varepsilon)$ — what the hydro solver sees — above 1000 K and between $10^{-18}$ and
+  $10^{-2}$ g cm$^{-3}$: $P$ median $3.6\times10^{-4}$, 99th percentile $8\times10^{-3}$, max $2.3\times10^{-2}$; $c_s^2$
+  max $5\times10^{-2}$; $\log T$ max $3\times10^{-3}$. The largest changes are where dissociation is nearly complete
+  and the energy is mostly dissociation energy (at $10^{-26}$ g cm$^{-3}$, ~1050 K: up to 3.7 % in $P$). The 0.1–0.2 %
+  quoted above is the energy at fixed $(\rho,T)$;
+* E7 Riemann problems against each table's own exact solution: R1 identical, R2/R3/R4 plateau errors at $N=3200$
+  $-1.80\times10^{-4}$ / $+5.1\times10^{-7}$ / $-5.8\times10^{-4}$ (v5: $-1.73\times10^{-4}$ / $+6.5\times10^{-7}$ /
+  $-5.3\times10^{-4}$), the same convergence. Caveat met on the way: the E7e decks set the initial specific energies
+  computed from the v5 table, so a v6 reference must be solved from the decks' $(\rho,u,\varepsilon)$, not from
+  $(\rho,T)$ (which gives a P* 0.5 % off and an apparent non-convergence of R2);
+* E8 compression legs: the scheme follows the v6 adiabat as before ($\le1.2\times10^{-5}$ before removing the
+  geometric term); the end temperatures move by the physical amount (12 476 → 12 507 K on leg 4).
+
+The validation runs of Part B used `eos_table_hires_v5_cold.bin`; their conclusions hold for v6 by the checks above.
+`v5_cold` and `v5_cold_rho26` stay shipped so that existing runs can be reproduced and continued.
 
 ### A3.6 Derived thermodynamic quantities
 
@@ -377,7 +402,8 @@ inherits a finite-difference bias that is computed exactly in A9.2.
 Padding (prepending nodes at the existing spacing) rather than re-spanning the axes keeps every validated node
 **bit-identical** when an axis is extended; the generator refuses a pad that would leave the lowest $\varepsilon$ nodes
 outside the $(\rho,T)$ coverage ([code][gen-pad]). The $\varepsilon$ axis is derived from the original rows and
-columns only, so the rho26 extension did not move it (AUDIT F-19 comment, [code][gen-eaxis]).
+columns only, so the rho26 extension did not move it (AUDIT F-19 comment, [code][gen-eaxis]), and since 2026-10-16
+from the legacy energies, so the v6 table (A3.5) has exactly these axes.
 
 ### A4.3 Why the top of the table is flat at high density
 
@@ -850,7 +876,7 @@ run aborts without it.
 |---|---|---|---|---|---|---|
 | `hydro/eos` | EOS choice | required | — | `adiabatic`, `hydrogen` | selects the ideal gas or the table | [hydro.cpp][hydro-eos] |
 | `hydro/gamma` | ratio of specific heats | required | — | > 1 | ideal gas: the EOS. Table: sign of $P$ for $e_{\rm int}\le0$ and the `collapse_be` barotropic index (up to `a40eff5` also the `Tceil` conversion and the FOFC energy, O-2/O-3) | [hydro.cpp][hydro-eos] |
-| `hydro/eos_table_file` | table path | none (`eos_table_hires_v5_cold.bin` in the run directory only if `eos_table_allow_default`) | — | v1 or v2 file | the table | [hydro.cpp][hydro-eos] |
+| `hydro/eos_table_file` | table path | none (`eos_table_hires_v5_cold.bin` in the run directory only if `eos_table_allow_default`) | — | v1 or v2 file | the table; recommended `src/eos/eos_table_hires_v6_rho26.bin` (A3.5, [provenance][prov]) | [hydro.cpp][hydro-eos] |
 | `hydro/eos_table_allow_default` | permit the default file name | false | — | bool | — | [hydro.cpp][hydro-eos] |
 | `hydro/eos_interp` | what is interpolated along ρ | `p_over_rho` | — | `p`, `p_over_rho` | A7.2, E-F1 | [hydro.cpp][hydro-eos] |
 | `hydro/eos_extrapolate` | ideal-gas continuation outside the table | true (false and refused in the legacy build) | — | bool | A7.2–A7.4, E-F5/E-F6 | [hydro.cpp][hydro-eos] |
@@ -1681,7 +1707,8 @@ means the C++ that a simulation executes; tests that re-implement the lookup in 
    questionable above ~$10^{-2}$ g cm$^{-3}$ in the ionization band (A3.7). Not tested against an external EOS.
 2. **Thermodynamic consistency** (A3.5): energy and chemical equilibrium use different ortho/para models, so the table
    is not derived from one free energy where H$_2$ dissociates. T-4 (A3.5): Maxwell residual 2.46e-3, entirely the
-   ortho zero-point offset; a consistent table would differ by 0.1–0.2 % in $u$ above ~1000 K. Not changed.
+   ortho zero-point offset. Fixed in the generator's default model and in `eos_table_hires_v6_rho26.bin` (A3.5); the
+   `v5_cold` tables keep it.
 3. **Table top** (A4.3): flat $P(\varepsilon)$ above $3\times10^5$ K at high density; `EspFromP` cannot represent
    pressures above $P(\rho,\varepsilon_{\max})$ (counted as `esp>` since `5649acd`, O-1).
 4. **Sound speed**: the tabulated $c_s^2$ is a finite-difference derivative of the tabulated $P$ with a known bias
@@ -1742,9 +1769,8 @@ pre-fix restart).
 * **O-7 — top-node lookups were counted as clamps.** *Fix:* the upper count fires only beyond the top node
   ([code][tab-bilin]). *Check:* W3(f): 0 counts for a lookup at $\varepsilon_{\max}$.
 
-Not changed: the ortho/para modelling choice of A3.5 (a physics decision of the generator, quantified by T-4: its
-inconsistency is the whole E2 Maxwell residual; the minimal consistent variant would change the table by 0.1–0.2 %
-above ~1000 K) and the other limitations of C2.
+The ortho/para inconsistency of A3.5 (the whole E2 Maxwell residual, T-4) is fixed separately, in the generator and in
+the new table `eos_table_hires_v6_rho26.bin` (A3.5); the other limitations of C2 are unchanged.
 
 ## C4. Suggested additional tests
 
@@ -1756,7 +1782,7 @@ been run.
 | T-1 | host-harness case: `EspFromP` above $P(\rho,\varepsilon_{\max})$ with a counter assertion | makes O-1 observable and regression-tested | done (W3(f)) |
 | T-2 | E7 R2/R4 with `first_order_flux_correct = true` forced to trigger (e.g. very low `dfloor`/`pfloor` margins), table vs `eos_floor_consistent` energy audit | whether O-2 changes energies in practice | done with a low-β probe instead of R2/R4 (FOFC never fired in the Riemann/blast probes; C3) |
 | T-3 | E10-style probe with `hydro/Tceil` under `eos = hydrogen` | the temperature the ceiling actually enforces (O-3) | done (C3) |
-| T-4 | rebuild the table with the rotational energy taken from the same (equilibrium) partition function as $K_d$ and repeat the E2 Maxwell gate in the dissociation band | isolates the A3.5 contribution to the 2.46e-3 Maxwell residual | done without a table rebuild (gate 3 evaluates the generator directly): the whole residual, A3.5 |
+| T-4 | rebuild the table with the rotational energy taken from the same (equilibrium) partition function as $K_d$ and repeat the E2 Maxwell gate in the dissociation band | isolates the A3.5 contribution to the 2.46e-3 Maxwell residual | done (gate 3 evaluates the generator directly): the whole residual is the A3.5 term; fixed in the v6 table (A3.5, `T4b_v6_table_check.txt`) |
 | T-5 | rebuild with half the $\log\rho$ spacing; measure $\Gamma_1$ at 10 K | confirms the A9.2 prediction (bias ∝ $\Delta^2$: 0.133 % → 0.033 %) | not run |
 | T-6 | `collapse_be` at $t=0$ with `eos = hydrogen` vs `adiabatic`: early velocity growth and central density drift before collapse | quantifies O-4 | done for $t=0$ and 20 cycles (C3); collapse dynamics not compared |
 | T-7 | compare $P$, $\varepsilon$, $\Gamma_1$ with an independent EOS that includes non-ideal effects (e.g. Saumon, Chabrier & van Horn 1995) above $10^{-6}$ g cm$^{-3}$ | where the ideal-Saha model departs from a dense-plasma EOS (A3.7) | not run |
@@ -1871,3 +1897,5 @@ All links point to commit `5649acd` (the fixes of C3). Line ranges are those of 
 [tab-xhigh]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/eos/eos_table.hpp#L310-L319
 [llf-e]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/hydro/rsolvers/glmmhd_dc_llf.hpp#L122-L143
 [be-t0]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/5649acdf8cc46a5340f768c1443b9870aad45125/src/pgen/collapse_be.cpp#L174-L213
+[gen-emodel]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/60ead5271cb7f662124a33cffe02ce3dab52f64d/src/eos/gen_eos_table.py#L140-L170
+[gen-axis]: https://github.com/rahul-9670/athenapk-selfgravity-eos/blob/60ead5271cb7f662124a33cffe02ce3dab52f64d/src/eos/gen_eos_table.py#L267-L278

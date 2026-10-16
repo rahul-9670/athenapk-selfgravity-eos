@@ -4,6 +4,9 @@ Configuration under test: `eos = hydrogen` with `src/eos/eos_table_hires_v5_cold
 H/He, H2 dissociation, H2 rotation/vibration), HLLD + PLM + VL2, `eos_floor_consistent = true`, 20 P -> e bisections
 (default). Problem generator: `eos_test` (`src/pgen/eos_test.cpp`).
 
+Recommended table since 2026-10-16: `src/eos/eos_table_hires_v6_rho26.bin` (consistent ortho/para energy, report A3.5;
+checks `results/tables/T4b_v6_table_check.txt`). The tests below ran with `v5_cold`; both `v5_cold` tables stay shipped.
+
 **Report: [`EOS_VALIDATION.md`](EOS_VALIDATION.md)** (authoritative). Part A is the implementation guide (physics,
 derivations, execution path, every lookup, numerics, units, configuration keys, worked examples); Part B the
 validation (every test with numbers, findings E-F1..E-F11, reproduction map); Part C what each test establishes,
