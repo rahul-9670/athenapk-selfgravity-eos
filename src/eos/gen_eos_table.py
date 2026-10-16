@@ -137,13 +137,33 @@ def solve_saha(rho, T):
     nH2 = max((nH_tot - nHI - nHII)/2.0, 0.0)  # H-nucleus conservation (robust as Kd->0)
     return dict(H2=nH2, HI=nHI, HII=nHII, e=ne, HeI=nHeI, HeII=nHeII, HeIII=nHeIII)
 
-def P_e_of_rho_T(rho, T):
+# ENERGY MODEL (EOS_VALIDATION.md A3.5, T-4; 2026-10-16). The rotational energy is that of a FROZEN 3:1 ortho:para
+# mixture with each species measured from its own ground state (erot_per_H2), while K_d measures H2 from para J = 0.
+#   "consistent" (default): a dissociated molecule is charged the dissociation energy FROM THE FROZEN MIXTURE'S ground
+#       state, chi_d - (3/4) 2 k theta_rot (an ortho molecule sits 2 k theta_rot above para J = 0). With it P and e
+#       satisfy the Maxwell identity to the finite-difference truncation of the check (4.9e-5 at h = 1e-3, ~h^2).
+#   "legacy": chi_d, as in every table built before 2026-10-16 (eos_table_hires_v5_cold*.bin); Maxwell residual
+#       2.46e-3 in the dissociation band, independent of the step: the zero-point mismatch.
+# Below ~1000 K (no dissociation) the two are identical.
+ENERGY_MODEL = "consistent"
+
+
+def chi_d_energy(model=None):
+    m = ENERGY_MODEL if model is None else model
+    if m == "legacy":
+        return chi_d
+    if m == "consistent":
+        return chi_d - 0.75 * 2.0 * k_B * theta_rot
+    raise ValueError("energy model must be 'consistent' or 'legacy', not %r" % (m,))
+
+
+def P_e_of_rho_T(rho, T, model=None):
     s = solve_saha(rho, T)
     n_tot = s['H2']+s['HI']+s['HII']+s['e']+s['HeI']+s['HeII']+s['HeIII']
     P = n_tot * k_B * T
     e = 1.5*k_B*T*n_tot
     e += s['H2']*(erot_per_H2(T) + evib_per_H2(T))
-    e += chi_d*(s['HI']+s['HII'])/2.0
+    e += chi_d_energy(model)*(s['HI']+s['HII'])/2.0
     e += chi_H*s['HII']
     e += chi_He1*(s['HeII']+s['HeIII']) + chi_He2*s['HeIII']
     return P, e   # erg/cm^3 (pressure), erg/cm^3 (internal energy density)
@@ -152,12 +172,14 @@ def build_table(path, nr=180, ne=220, nT=200,
                 rho_phys_min=1e-20, rho_phys_max=1e0,
                 T_min=8.0, T_max=3.0e5,
                 esp_pad_pts=0, T_pad_pts=0, allow_esp_sat=False, T_pad_hi_pts=0,
-                rho_pad_pts=0):
+                rho_pad_pts=0, energy_model="consistent"):
     """Generate the code-unit EOS table and write HDF5.
       hydro grid  (log10 rho_code, log10 esp_code) -> P_code, cs2_code, log10T
       RT grid     (log10 rho_code, log10 T)        -> esp_code
     esp = specific internal energy (erg/g -> code v0^2); P,e densities -> e_unit; cs2 -> v0^2.
+    energy_model: "consistent" (default) or "legacy" (the tables built before 2026-10-16), see ENERGY_MODEL.
     """
+    chi_d_energy(energy_model)   # validate the name before the long build
     import h5py
     v0sq = v0*v0
     rho_code = np.logspace(np.log10(rho_phys_min/rho0), np.log10(rho_phys_max/rho0), nr)
@@ -219,7 +241,7 @@ def build_table(path, nr=180, ne=220, nT=200,
     esp_rhoT = np.zeros((nr, nT_tot)); P_rhoT = np.zeros((nr, nT_tot))
     for i, rc in enumerate(rho_cgs):
         for j, T in enumerate(Tgrid):
-            P, ed = P_e_of_rho_T(rc, T)          # cgs: erg/cm^3
+            P, ed = P_e_of_rho_T(rc, T, energy_model)  # cgs: erg/cm^3
             esp_rhoT[i, j] = (ed/rc)/v0sq        # specific -> code
             P_rhoT[i, j]   = P/e_unit
     log10T = np.log10(Tgrid)
@@ -243,6 +265,17 @@ def build_table(path, nr=180, ne=220, nT=200,
     hi0 = esp_rhoT.shape[1] - T_pad_hi_pts if T_pad_hi_pts > 0 else esp_rhoT.shape[1]
     base = esp_rhoT[rho_pad_pts:, T_pad_pts:hi0]   # original rows only (see the rho extension note)
     esp_min = base.min()*0.999; esp_max = base.max()*1.001
+    # ESP AXIS PINNED TO THE LEGACY ENERGY (2026-10-16). esp_max comes from the hottest, lowest-density corner, whose
+    # energy the "consistent" model lowers slightly; deriving the axis from it would move EVERY esp node and change every
+    # interpolated value, also in cold gas where the two models agree. So the axis is always derived from the legacy
+    # energies of the same base block: e increases with T at fixed rho, so its maximum is in the T_max column, which is
+    # recomputed here with the legacy model (one column, cheap). For energy_model = "legacy" this is the same block as
+    # before and the axis is bit-identical; for "consistent" the cold nodes of the two tables coincide exactly.
+    if energy_model != "legacy":
+        lT_top = lT[T_pad_pts + base.shape[1] - 1]
+        col = np.array([P_e_of_rho_T(rc, 10.0**lT_top, "legacy")[1] / rc / v0sq
+                        for rc in rho_cgs[rho_pad_pts:]])
+        esp_max = col.max()*1.001
     le_base = np.linspace(np.log10(esp_min), np.log10(esp_max), ne)
     dle_base = le_base[1] - le_base[0]
     le_all = le_base
@@ -336,7 +369,7 @@ def build_table(path, nr=180, ne=220, nT=200,
 
     with h5py.File(path, "w") as f:
         f.attrs["rho0_cgs"]=rho0; f.attrs["v0_cgs"]=v0; f.attrs["e_unit_cgs"]=e_unit
-        f.attrs["X"]=X; f.attrs["Y"]=Y
+        f.attrs["X"]=X; f.attrs["Y"]=Y; f.attrs["energy_model"]=energy_model
         f.create_dataset("log10_rho_code", data=lr)
         f.create_dataset("log10_esp_code", data=le)
         f.create_dataset("P_code",   data=P_re)
@@ -411,10 +444,13 @@ if __name__ == "__main__":
             allow = (len(sys.argv) >= 10 and sys.argv[9] in ("1", "true", "allow"))
             thipad = int(sys.argv[10]) if len(sys.argv) >= 11 else 0
             rpad = int(sys.argv[11]) if len(sys.argv) >= 12 else 0
+            # argv[12] (2026-10-16): energy model, "consistent" (default) or "legacy" (rebuilds the earlier tables)
+            emodel = sys.argv[12] if len(sys.argv) >= 13 else "consistent"
             build_table(out, nr=nr, ne=ne, nT=nT, esp_pad_pts=epad, T_pad_pts=tpad,
-                        T_max=tmax, allow_esp_sat=allow, T_pad_hi_pts=thipad, rho_pad_pts=rpad)
+                        T_max=tmax, allow_esp_sat=allow, T_pad_hi_pts=thipad, rho_pad_pts=rpad,
+                        energy_model=emodel)
         else:
-            build_table(out)
+            build_table(out, energy_model="legacy")  # the original 180x220x200 table (legacy model)
         sys.exit(0)
     # quick validation: gamma_eff(T) at fixed rho showing the two softening dips
     print("# code units: esp_unit(v0^2)=%.4e erg/g, e_unit=%.4e, rho0=%.3e" %

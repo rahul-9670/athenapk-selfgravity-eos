@@ -66,7 +66,7 @@ if __name__ == "__main__":
     if args and args[0].startswith("--modes="):
         modes = tuple(args[0].split("=", 1)[1].split(",")); args = args[1:]
     res = run(args or None, modes)
-    dst = os.path.join(os.path.dirname(__file__), "..", "results", "tables", "E7_exact.json")
+    dst = os.environ.get("E7_EXACT", os.path.join(os.path.dirname(__file__), "..", "results", "tables", "E7_exact.json"))
     old = json.load(open(dst)) if os.path.exists(dst) else {}
     old.update(res)
     json.dump(old, open(dst, "w"), indent=1, default=float)

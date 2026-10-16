@@ -3,7 +3,7 @@
 import numpy as np
 import os as _os
 _REPO = _os.environ.get("REPO", _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "../../..")))  # repository root
-TABLE = _REPO + "/src/eos/eos_table_hires_v5_cold.bin"
+TABLE = _os.environ.get("EOS_TABLE", _REPO + "/src/eos/eos_table_hires_v5_cold.bin")  # EOS_TABLE: another table
 RHO_U, V_U = 5.467e-19, 1.9e4          # physical_units.hpp defaults for a non-BE pgen
 
 

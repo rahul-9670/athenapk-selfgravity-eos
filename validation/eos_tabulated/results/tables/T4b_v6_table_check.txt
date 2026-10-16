@@ -1,0 +1,45 @@
+# Table revision v6 (2026-10-16): eos_table_hires_v6_rho26.bin = the v5_cold_rho26 grid built with the generator's
+# CONSISTENT energy model (a dissociated H2 molecule is charged chi_d - (3/4) 2 k theta_rot; EOS_VALIDATION.md A3.5, T-4).
+# Binary for the hydro runs: this repository's CPU build 1455f3fc (commit 5649acd source; the table is runtime input).
+
+## Generator change does not disturb the shipped tables
+rebuild with "legacy": eos_table_hires_v5_cold.bin       md5 f712d6a806cb82889214fec95a6c2681 (byte-identical)
+rebuild with "legacy": eos_table_hires_v5_cold_rho26.bin md5 cb68bd0f919a9a929af3601c5befb686 (byte-identical)
+new: eos_table_hires_v6_rho26.bin                        md5 69aca3f9c4fa0a96a85dc65eed45d454 (23 158 832 bytes)
+
+## v6 vs v5_cold_rho26, node by node (same header: esp axis pinned to the legacy energies)
+nodes below 500 K: 99.5 % bit-identical, rest within 2e-11 (P, cs2, log T, esp(T))
+nodes above 1000 K, 1e-18 .. 1e-2 g/cm^3, at fixed (rho, esp): P median 3.6e-4, 99 % 8.2e-3, max 2.3e-2; cs2 median 3.9e-4,
+  99 % 1.0e-2, max 5.0e-2; log T max 3.1e-3. Over all rows max 3.7e-2 (P), 7.3e-2 (cs2) at 1e-26 g/cm^3, ~1050 K (dissociation
+  nearly complete, energy mostly dissociation energy: T at fixed esp 1045 -> 1084 K)
+monotonicity: P(esp) never decreasing (530 equal pairs at the 3e5 K cap; v5: 529); esp(T), log T(esp) strictly increasing
+
+## Consistency gates (src/eos/tests/test_eos_consistency.py)
+v6 (consistent):  neutrality 5.05e-15; Maxwell 4.89e-5 (tol 2e-4); P vs Saha median 1.56e-3 max 6.23e-3; cs2 vs Saha median 1.55e-3 max 3.43e-2. PASS
+v5_cold_rho26 (legacy): Maxwell 2.46e-3 (tol 3e-3); P vs Saha median 1.56e-3 max 5.53e-3; cs2 median 1.55e-3 max 3.31e-2. PASS
+
+## E7 Riemann problems (p_over_rho), exact solution of each table's own interpolant from the decks' initial states
+NOTE: the E7e decks set the specific energies directly (espL_code / espR_code, computed from the v5 table; E-F7), so on
+v6 the initial states are the same (rho, esp) but different T and P (R2 left P +0.97 %). The v6 reference is therefore
+solved from the decks' (rho, u, esp) (E7_exact_v6_deckstates); solving it from (rho, T) instead gives a P* 5.2e-3 off and
+an apparent non-convergence -- a setup mismatch, not a table property.
+exact P* v6 / v5: R1 0 | R2 +5.20e-3 (different initial pressures, see above) | R3 +6.7e-5 | R4 +5.5e-4
+                   N 400      800        1600       3200      (plateau dP*; L1(rho) at 3200)
+R1 v5    plateau  +4.04e-05  +4.05e-06  +2.00e-06  -3.31e-07  L1 2.044e-04
+R1 v6    plateau  +4.04e-05  +4.05e-06  +2.00e-06  -3.31e-07  L1 2.044e-04  (identical: cold gas)
+R2 v5    plateau  -5.20e-04  -3.77e-04  -2.58e-04  -1.73e-04  L1 7.599e-04
+R2 v6    plateau  -5.38e-04  -3.90e-04  -2.66e-04  -1.80e-04  L1 7.862e-04
+R3 v5    plateau  -5.30e-05  -8.87e-06  +2.16e-06  +6.54e-07  L1 2.276e-04
+R3 v6    plateau  -4.99e-05  -8.60e-06  +2.14e-06  +5.11e-07  L1 2.284e-04
+R4 v5    plateau  -1.74e-03  -1.11e-03  -8.70e-04  -5.33e-04  L1 1.070e-03
+R4 v6    plateau  -1.78e-03  -1.11e-03  -8.58e-04  -5.79e-04  L1 1.069e-03
+fundamental derivative along the R2 rarefaction: median 1.124 (v6) / 1.119 (v5); both tables have one sound-speed jump of the
+  interpolant at ~2662 K on this isentrope (an esp node; E7g), larger in v6 (G sampled 0.49 there vs 1.00)
+
+## E8 homologous compression legs 0-4 (exact adiabat of each table's interpolant; e/e_ad - 1 at the end, T_end)
+leg0 v5 +1.261e-06 180.89 K | v6 +1.261e-06 180.89 K
+leg1 v5 +2.581e-06 1309.22 K | v6 +2.569e-06 1309.22 K
+leg2 v5 +5.423e-06 2515.32 K | v6 +6.108e-06 2515.99 K
+leg3 v5 +1.043e-05 3888.03 K | v6 +1.105e-05 3889.57 K
+leg4 v5 +1.071e-05 12475.82 K | v6 +1.171e-05 12507.17 K
+(the residual is the alpha^2 geometric kinetic-energy term of Sec. 7 in both; the end temperature is the physical change)

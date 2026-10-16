@@ -14,9 +14,9 @@ import riemann_exact as RX
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PREFIX = os.environ.get("E7_PREFIX", "E7e")
-RUNS = os.path.join(HERE, "..", "runs", PREFIX)
-TAB = os.path.join(HERE, "..", "results", "tables")
-FIG = os.path.join(HERE, "..", "results", "figures")
+RUNS = os.environ.get("E7_RUNS", os.path.join(HERE, "..", "runs", PREFIX))
+TAB = os.environ.get("E7_TAB", os.path.join(HERE, "..", "results", "tables"))
+FIG = os.environ.get("EOS_FIG", os.path.join(HERE, "..", "results", "figures"))
 NFINE = 25600
 X0 = 0.5
 
@@ -68,7 +68,7 @@ def exact_profile(eos, rec, t):
 
 
 def main():
-    ex = json.load(open(os.path.join(TAB, "E7_exact.json")))
+    ex = json.load(open(os.environ.get("E7_EXACT", os.path.join(TAB, "E7_exact.json"))))
     t = E.load()
     res, lines = {}, []
     profiles = {}

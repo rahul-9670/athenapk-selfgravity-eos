@@ -7,5 +7,5 @@ PY=${PY:-python3}
 cd "$(dirname "$0")"
 OUT=$PWD/eos_table_hires_v5_cold.h5
 echo "generator md5: $(md5sum gen_eos_table.py | cut -c1-32)"
-time $PY gen_eos_table.py build 400 1000 920 "$OUT" 399 450
+time $PY gen_eos_table.py build 400 1000 920 "$OUT" 399 450 3.0e5 0 0 0 legacy
 md5sum eos_table_hires_v5_cold.bin

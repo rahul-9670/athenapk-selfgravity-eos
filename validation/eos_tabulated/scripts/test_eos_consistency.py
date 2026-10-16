@@ -37,6 +37,10 @@ TABLE = (sys.argv[1] if len(sys.argv) > 1 else
 spec = importlib.util.spec_from_file_location("gen_eos_table", GEN)
 G = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(G)
+# Energy model of the generator the table under test was built with (gen_eos_table.ENERGY_MODEL; EOS_VALIDATION.md
+# A3.5, T-4): $EOS_ENERGY_MODEL, else "consistent" for the v6 tables and "legacy" for every earlier table.
+MODEL = os.environ.get("EOS_ENERGY_MODEL") or ("consistent" if "_v6" in os.path.basename(TABLE) else "legacy")
+G.ENERGY_MODEL = MODEL
 
 
 def load_table(path):
@@ -138,9 +142,11 @@ def main():
     # The residual (2.46e-3 at 1848 K, 1e-12 g/cm^3) does NOT depend on hln: it is the generator's ortho/para
     # inconsistency (frozen 3:1 rotational energy vs the equilibrium partition function in K_d), not truncation
     # (EOS_VALIDATION.md A3.5, T-4: consistent variants give 4.9e-5 at this step, falling as hln^2).
-    g3 = worst_thermo < 3e-3
+    # tolerance: legacy 3e-3 (the ortho/para term, 2.46e-3); consistent model 2e-4 (truncation only, 4.9e-5 at hln 1e-3)
+    tol3 = 2e-4 if MODEL == "consistent" else 3e-3
+    g3 = worst_thermo < tol3
     print(f"  worst rel residual over {checked} states = {worst_thermo:.2e}  "
-          f"(tol 3e-3; the ortho/para modelling term, not finite differencing: T-4)  {'PASS' if g3 else 'FAIL'}")
+          f"(energy model {MODEL}, tol {tol3:.0e}; legacy: the ortho/para term, T-4)  {'PASS' if g3 else 'FAIL'}")
     fails += not g3
 
     # ---- Gate 4: shipped-binary fidelity vs the Saha EOS ----

@@ -13,9 +13,9 @@ import eostab as E
 import riemann_exact as RX
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RUNS = os.path.join(HERE, "..", "runs", "E8")
-TAB = os.path.join(HERE, "..", "results", "tables")
-FIG = os.path.join(HERE, "..", "results", "figures")
+RUNS = os.environ.get("E8_RUNS", os.path.join(HERE, "..", "runs", "E8"))
+TAB = os.environ.get("E8_TAB", os.path.join(HERE, "..", "results", "tables"))
+FIG = os.environ.get("EOS_FIG", os.path.join(HERE, "..", "results", "figures"))
 
 
 def adiabat(eos, r0, e0, r1, h=1e-4):
